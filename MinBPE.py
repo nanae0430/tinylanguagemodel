@@ -232,11 +232,7 @@ class RegexTokenizer(Tokenizer):
         ]
         text_ids = [
             [
-                (
-                    continue
-                    if chunk in self.special_tokens
-                    else list(chunk.encode("utf-8"))
-                )
+                ([] if chunk in self.special_tokens else list(chunk.encode("utf-8")))
                 for chunk in text
             ]
             for text in texts
