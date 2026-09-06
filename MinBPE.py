@@ -225,28 +225,24 @@ class RegexTokenizer(Tokenizer):
         new_id = 256
         merges = {}
         vocab = {i: bytes([i]) for i in range(256)}
+
         texts = self._split_special_tokens(corpus, self.special_tokens)
-        texts = [
-            text if text in self.special_tokens else regex.findall(self.pattern, text)
-            for text in texts
-        ]
-        text_ids = [
-            [
-                ([] if chunk in self.special_tokens else list(chunk.encode("utf-8")))
-                for chunk in text
-            ]
-            for text in texts
-        ]
+        text_ids = []
+        for text in texts:
+            if text in self.special_tokens:
+                continue
+            chunks = regex.findall(self.pattern, text)
+            chunk_ids = [list(chunk.encode("utf-8")) for chunk in chunks]
+            text_ids.extend(chunk_ids)
         while new_id < vocab_size:
             all_stats = {}
-            for text_id in text_ids:
-                for ids in text_id:
-                    stats = get_stats(ids)
+            for ids in text_ids:
+                stats = get_stats(ids)
 
-                    for pair, freq in stats.items():
-                        all_stats[pair] = all_stats.get(pair, 0) + freq
-                if len(all_stats) <= 0:
-                    break
+                for pair, freq in stats.items():
+                    all_stats[pair] = all_stats.get(pair, 0) + freq
+            if len(all_stats) <= 0:
+                break
             max_pair = max(all_stats, key=all_stats.get)
             text_ids = [
                 [merge(ids, max_pair, new_id) for ids in text_id]
