@@ -244,10 +244,7 @@ class RegexTokenizer(Tokenizer):
             if len(all_stats) <= 0:
                 break
             max_pair = max(all_stats, key=all_stats.get)
-            text_ids = [
-                [merge(ids, max_pair, new_id) for ids in text_id]
-                for text_id in text_ids
-            ]
+            text_ids = [merge(text_id, max_pair, new_id) for text_id in text_ids]
             merges[max_pair] = new_id
             vocab[new_id] = vocab[max_pair[0]] + vocab[max_pair[1]]
             new_id += 1
