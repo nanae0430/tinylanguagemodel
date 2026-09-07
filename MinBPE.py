@@ -1,4 +1,5 @@
 import regex, unicodedata
+from collections import Counter
 
 
 def get_stats(ids):
@@ -183,7 +184,7 @@ class RegexTokenizer(Tokenizer):
             r"|\s"
         )
 
-    def train(self, text, vocab_size=266):
+    def train_original(self, text, vocab_size=266):
         if vocab_size < 256:
             raise ValueError("vocab_size不能小于256")
 
@@ -219,32 +220,37 @@ class RegexTokenizer(Tokenizer):
         self.merges = merges
         self.vocab = self._build_vocab()
 
-    def train_multitexts(self, corpus, vocab_size=1027):
+    def train_include_special_token(self, corpus, vocab_size=1027):
         if vocab_size < 256:
             raise ValueError("vocab_size不能小于256")
         new_id = 256
         merges = {}
         vocab = {i: bytes([i]) for i in range(256)}
-
+        chunk_freq = Counter()
         texts = self._split_special_tokens(corpus, self.special_tokens)
         text_ids = []
         for text in texts:
             if text in self.special_tokens:
                 continue
             chunks = regex.findall(self.pattern, text)
-            chunk_ids = [list(chunk.encode("utf-8")) for chunk in chunks]
-            text_ids.extend(chunk_ids)
+            chunk_freq.update(chunks)
+        chunk_ids = [
+            (list(chunk.encode("utf-8")), freq) for chunk, freq in chunk_freq.items()
+        ]
         while new_id < vocab_size:
             all_stats = {}
-            for ids in text_ids:
-                stats = get_stats(ids)
+            for chunk, weight in chunk_ids:
+                stats = get_stats(chunk)
 
                 for pair, freq in stats.items():
-                    all_stats[pair] = all_stats.get(pair, 0) + freq
+                    all_stats[pair] = all_stats.get(pair, 0) + freq * weight
             if len(all_stats) <= 0:
                 break
             max_pair = max(all_stats, key=all_stats.get)
-            text_ids = [merge(text_id, max_pair, new_id) for text_id in text_ids]
+            chunk_ids = [
+                (merge(chunk_id, max_pair, new_id), freq)
+                for chunk_id, freq in chunk_ids
+            ]
             merges[max_pair] = new_id
             vocab[new_id] = vocab[max_pair[0]] + vocab[max_pair[1]]
             new_id += 1

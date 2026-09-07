@@ -1,0 +1,2001 @@
+[\u0000]	0
+[\u0001]	1
+[\u0002]	2
+[\u0003]	3
+[\u0004]	4
+[\u0005]	5
+[\u0006]	6
+[\u0007]	7
+[\u0008]	8
+[\u0009]	9
+[\u000a]	10
+[\u000b]	11
+[\u000c]	12
+[\u000d]	13
+[\u000e]	14
+[\u000f]	15
+[\u0010]	16
+[\u0011]	17
+[\u0012]	18
+[\u0013]	19
+[\u0014]	20
+[\u0015]	21
+[\u0016]	22
+[\u0017]	23
+[\u0018]	24
+[\u0019]	25
+[\u001a]	26
+[\u001b]	27
+[\u001c]	28
+[\u001d]	29
+[\u001e]	30
+[\u001f]	31
+[ ]	32
+[!]	33
+["]	34
+[#]	35
+[$]	36
+[%]	37
+[&]	38
+[']	39
+[(]	40
+[)]	41
+[*]	42
+[+]	43
+[,]	44
+[-]	45
+[.]	46
+[/]	47
+[0]	48
+[1]	49
+[2]	50
+[3]	51
+[4]	52
+[5]	53
+[6]	54
+[7]	55
+[8]	56
+[9]	57
+[:]	58
+[;]	59
+[<]	60
+[=]	61
+[>]	62
+[?]	63
+[@]	64
+[A]	65
+[B]	66
+[C]	67
+[D]	68
+[E]	69
+[F]	70
+[G]	71
+[H]	72
+[I]	73
+[J]	74
+[K]	75
+[L]	76
+[M]	77
+[N]	78
+[O]	79
+[P]	80
+[Q]	81
+[R]	82
+[S]	83
+[T]	84
+[U]	85
+[V]	86
+[W]	87
+[X]	88
+[Y]	89
+[Z]	90
+[[]	91
+[\]	92
+[]]	93
+[^]	94
+[_]	95
+[`]	96
+[a]	97
+[b]	98
+[c]	99
+[d]	100
+[e]	101
+[f]	102
+[g]	103
+[h]	104
+[i]	105
+[j]	106
+[k]	107
+[l]	108
+[m]	109
+[n]	110
+[o]	111
+[p]	112
+[q]	113
+[r]	114
+[s]	115
+[t]	116
+[u]	117
+[v]	118
+[w]	119
+[x]	120
+[y]	121
+[z]	122
+[{]	123
+[|]	124
+[}]	125
+[~]	126
+[\u007f]	127
+[�]	128
+[�]	129
+[�]	130
+[�]	131
+[�]	132
+[�]	133
+[�]	134
+[�]	135
+[�]	136
+[�]	137
+[�]	138
+[�]	139
+[�]	140
+[�]	141
+[�]	142
+[�]	143
+[�]	144
+[�]	145
+[�]	146
+[�]	147
+[�]	148
+[�]	149
+[�]	150
+[�]	151
+[�]	152
+[�]	153
+[�]	154
+[�]	155
+[�]	156
+[�]	157
+[�]	158
+[�]	159
+[�]	160
+[�]	161
+[�]	162
+[�]	163
+[�]	164
+[�]	165
+[�]	166
+[�]	167
+[�]	168
+[�]	169
+[�]	170
+[�]	171
+[�]	172
+[�]	173
+[�]	174
+[�]	175
+[�]	176
+[�]	177
+[�]	178
+[�]	179
+[�]	180
+[�]	181
+[�]	182
+[�]	183
+[�]	184
+[�]	185
+[�]	186
+[�]	187
+[�]	188
+[�]	189
+[�]	190
+[�]	191
+[�]	192
+[�]	193
+[�]	194
+[�]	195
+[�]	196
+[�]	197
+[�]	198
+[�]	199
+[�]	200
+[�]	201
+[�]	202
+[�]	203
+[�]	204
+[�]	205
+[�]	206
+[�]	207
+[�]	208
+[�]	209
+[�]	210
+[�]	211
+[�]	212
+[�]	213
+[�]	214
+[�]	215
+[�]	216
+[�]	217
+[�]	218
+[�]	219
+[�]	220
+[�]	221
+[�]	222
+[�]	223
+[�]	224
+[�]	225
+[�]	226
+[�]	227
+[�]	228
+[�]	229
+[�]	230
+[�]	231
+[�]	232
+[�]	233
+[�]	234
+[�]	235
+[�]	236
+[�]	237
+[�]	238
+[�]	239
+[�]	240
+[�]	241
+[�]	242
+[�]	243
+[�]	244
+[�]	245
+[�]	246
+[�]	247
+[�]	248
+[�]	249
+[�]	250
+[�]	251
+[�]	252
+[�]	253
+[�]	254
+[�]	255
+[h]	[e]	->[he]	256
+[ ]	[t]	->[ t]	257
+[ ]	[a]	->[ a]	258
+[ ]	[s]	->[ s]	259
+[ ]	[w]	->[ w]	260
+[n]	[d]	->[nd]	261
+[ t]	[he]	->[ the]	262
+[e]	[d]	->[ed]	263
+[ a]	[nd]	->[ and]	264
+[ t]	[o]	->[ to]	265
+[ ]	[b]	->[ b]	266
+[i]	[n]	->[in]	267
+[ ]	[h]	->[ h]	268
+[ w]	[a]	->[ wa]	269
+[r]	[e]	->[re]	270
+[ ]	[f]	->[ f]	271
+[i]	[t]	->[it]	272
+[o]	[u]	->[ou]	273
+[ ]	[c]	->[ c]	274
+[ ]	[l]	->[ l]	275
+[ ]	[he]	->[ he]	276
+[ ]	[d]	->[ d]	277
+[e]	[r]	->[er]	278
+[ wa]	[s]	->[ was]	279
+[ ]	[m]	->[ m]	280
+[ ]	[p]	->[ p]	281
+[o]	[m]	->[om]	282
+[ ]	[T]	->[ T]	283
+[ ]	[o]	->[ o]	284
+[a]	[y]	->[ay]	285
+[a]	[r]	->[ar]	286
+[in]	[g]	->[ing]	287
+[i]	[s]	->[is]	288
+[ ]	[g]	->[ g]	289
+[i]	[l]	->[il]	290
+[i]	[d]	->[id]	291
+[a]	[t]	->[at]	292
+[.]	[\u000a]	->[.\u000a]	293
+[e]	[n]	->[en]	294
+[ ]	[n]	->[ n]	295
+[ s]	[a]	->[ sa]	296
+[ h]	[a]	->[ ha]	297
+[ ]	[S]	->[ S]	298
+[i]	[m]	->[im]	299
+[a]	[n]	->[an]	300
+[ T]	[he]	->[ The]	301
+[o]	[r]	->[or]	302
+[o]	[n]	->[on]	303
+[ ]	[it]	->[ it]	304
+[ t]	[h]	->[ th]	305
+[l]	[l]	->[ll]	306
+[l]	[e]	->[le]	307
+[ ]	[H]	->[ H]	308
+[ he]	[r]	->[ her]	309
+[e]	[t]	->[et]	310
+[o]	[t]	->[ot]	311
+[i]	[r]	->[ir]	312
+[ S]	[he]	->[ She]	313
+[ H]	[e]	->[ He]	314
+[v]	[er]	->[ver]	315
+[e]	[s]	->[es]	316
+[ ]	[in]	->[ in]	317
+[u]	[t]	->[ut]	318
+[o]	[w]	->[ow]	319
+[c]	[k]	->[ck]	320
+[ ]	[e]	->[ e]	321
+[ ]	[u]	->[ u]	322
+[l]	[d]	->[ld]	323
+[ The]	[y]	->[ They]	324
+[o]	[o]	->[oo]	325
+[i]	[g]	->[ig]	326
+[ sa]	[id]	->[ said]	327
+[a]	[m]	->[am]	328
+[il]	[y]	->[ily]	329
+[ b]	[e]	->[ be]	330
+[ ]	[y]	->[ y]	331
+[ ]	[r]	->[ r]	332
+[ s]	[t]	->[ st]	333
+[c]	[e]	->[ce]	334
+[ s]	[he]	->[ she]	335
+[ ]	["]	->[ "]	336
+[p]	[p]	->[pp]	337
+[k]	[e]	->[ke]	338
+[it]	[h]	->[ith]	339
+[O]	[n]	->[On]	340
+[ ]	[I]	->[ I]	341
+[ w]	[ith]	->[ with]	342
+[v]	[e]	->[ve]	343
+[L]	[ily]	->[Lily]	344
+[ o]	[n]	->[ on]	345
+[ o]	[f]	->[ of]	346
+[ s]	[o]	->[ so]	347
+[ h]	[is]	->[ his]	348
+[k]	[ed]	->[ked]	349
+[r]	[i]	->[ri]	350
+[n]	[t]	->[nt]	351
+[ver]	[y]	->[very]	352
+[ p]	[l]	->[ pl]	353
+[ d]	[ay]	->[ day]	354
+[a]	[d]	->[ad]	355
+[ y]	[ou]	->[ you]	356
+[ th]	[at]	->[ that]	357
+[ u]	[p]	->[ up]	358
+[ ha]	[d]	->[ had]	359
+[s]	[t]	->[st]	360
+[ pl]	[ay]	->[ play]	361
+[ the]	[y]	->[ they]	362
+[ ]	[Lily]	->[ Lily]	363
+[ w]	[e]	->[ we]	364
+[ m]	[om]	->[ mom]	365
+[m]	[y]	->[my]	366
+[ f]	[or]	->[ for]	367
+[e]	[l]	->[el]	368
+[ou]	[ld]	->[ould]	369
+[u]	[n]	->[un]	370
+[ ]	[B]	->[ B]	371
+[']	[s]	->['s]	372
+[it]	[t]	->[itt]	373
+[en]	[t]	->[ent]	374
+[ ha]	[pp]	->[ happ]	375
+[T]	[he]	->[The]	376
+[c]	[h]	->[ch]	377
+[ l]	[i]	->[ li]	378
+[ou]	[t]	->[out]	379
+[ wa]	[nt]	->[ want]	380
+[ s]	[h]	->[ sh]	381
+[he]	[r]	->[her]	382
+[l]	[y]	->[ly]	383
+[ ]	[\u000a]	->[ \u000a]	384
+[im]	[e]	->[ime]	385
+[itt]	[le]	->[ittle]	386
+[ou]	[nd]	->[ound]	387
+[ ]	[very]	->[ very]	388
+[ t]	[ime]	->[ time]	389
+[om]	[e]	->[ome]	390
+[ l]	[ittle]	->[ little]	391
+[ the]	[re]	->[ there]	392
+[s]	[e]	->[se]	393
+[ d]	[o]	->[ do]	394
+[ w]	[h]	->[ wh]	395
+[a]	[ll]	->[all]	396
+[ ]	[k]	->[ k]	397
+[e]	[nd]	->[end]	398
+[a]	[l]	->[al]	399
+[h]	[t]	->[ht]	400
+[ n]	[e]	->[ ne]	401
+[ ]	[re]	->[ re]	402
+[ n]	[ot]	->[ not]	403
+[ happ]	[y]	->[ happy]	404
+[ b]	[ig]	->[ big]	405
+[ ]	[M]	->[ M]	406
+[ b]	[ut]	->[ but]	407
+["]	[\u000a]	->["\u000a]	408
+[ s]	[m]	->[ sm]	409
+[a]	[ck]	->[ack]	410
+[ sa]	[w]	->[ saw]	411
+[ I]	[t]	->[ It]	412
+[ a]	[s]	->[ as]	413
+[ a]	[n]	->[ an]	414
+[r]	[a]	->[ra]	415
+[ri]	[end]	->[riend]	416
+[ f]	[riend]	->[ friend]	417
+[id]	[e]	->[ide]	418
+[On]	[e]	->[One]	419
+[r]	[y]	->[ry]	420
+[']	[t]	->['t]	421
+[v]	[ed]	->[ved]	422
+[ ]	[is]	->[ is]	423
+[On]	[ce]	->[Once]	424
+[a]	[ke]	->[ake]	425
+[ we]	[re]	->[ were]	426
+[t]	[er]	->[ter]	427
+[u]	[g]	->[ug]	428
+[ l]	[oo]	->[ loo]	429
+[ l]	[o]	->[ lo]	430
+[o]	[re]	->[ore]	431
+[e]	[c]	->[ec]	432
+[ T]	[im]	->[ Tim]	433
+[ h]	[im]	->[ him]	434
+[ b]	[o]	->[ bo]	435
+[ to]	[o]	->[ too]	436
+[ up]	[on]	->[ upon]	437
+[ g]	[o]	->[ go]	438
+[ir]	[l]	->[irl]	439
+[ ]	[j]	->[ j]	440
+[ want]	[ed]	->[ wanted]	441
+[ g]	[irl]	->[ girl]	442
+[ s]	[e]	->[ se]	443
+[ ]	[out]	->[ out]	444
+[ar]	[d]	->[ard]	445
+[w]	[ay]	->[way]	446
+[ s]	[p]	->[ sp]	447
+[il]	[l]	->[ill]	448
+[i]	[nd]	->[ind]	449
+[ the]	[m]	->[ them]	450
+[ c]	[ould]	->[ could]	451
+[f]	[u]	->[fu]	452
+[he]	[n]	->[hen]	453
+[ a]	[t]	->[ at]	454
+[u]	[r]	->[ur]	455
+[ d]	[id]	->[ did]	456
+[ sm]	[il]	->[ smil]	457
+[ the]	[ir]	->[ their]	458
+[\u000a]	[\u000a]	->[\u000a\u000a]	459
+[ a]	[re]	->[ are]	460
+[ e]	[x]	->[ ex]	461
+[ ]	[A]	->[ A]	462
+[a]	[in]	->[ain]	463
+[ w]	[ent]	->[ went]	464
+[ar]	[t]	->[art]	465
+[he]	[d]	->[hed]	466
+[r]	[om]	->[rom]	467
+[i]	[c]	->[ic]	468
+[r]	[ound]	->[round]	469
+[ ha]	[ve]	->[ have]	470
+[ n]	[am]	->[ nam]	471
+[l]	[p]	->[lp]	472
+[ a]	[ll]	->[ all]	473
+[ ]	[J]	->[ J]	474
+[fu]	[l]	->[ful]	475
+[ k]	[n]	->[ kn]	476
+[h]	[ing]	->[hing]	477
+[oo]	[d]	->[ood]	478
+[ he]	[lp]	->[ help]	479
+[ig]	[ht]	->[ight]	480
+[ friend]	[s]	->[ friends]	481
+[on]	[e]	->[one]	482
+[ar]	[k]	->[ark]	483
+[ b]	[ack]	->[ back]	484
+[u]	[m]	->[um]	485
+[ c]	[an]	->[ can]	486
+[!]	["]	->[!"]	487
+[ nam]	[ed]	->[ named]	488
+[ c]	[l]	->[ cl]	489
+[ f]	[un]	->[ fun]	490
+[a]	[re]	->[are]	491
+[ B]	[en]	->[ Ben]	492
+[ lo]	[ved]	->[ loved]	493
+[.]	["\u000a]	->[."\u000a]	494
+[el]	[t]	->[elt]	495
+[ a]	[l]	->[ al]	496
+[ Tim]	[my]	->[ Timmy]	497
+[ ]	[One]	->[ One]	498
+[o]	[p]	->[op]	499
+[s]	[ide]	->[side]	500
+[ l]	[e]	->[ le]	501
+[ n]	[o]	->[ no]	502
+[ s]	[c]	->[ sc]	503
+[ T]	[om]	->[ Tom]	504
+[ f]	[elt]	->[ felt]	505
+[ou]	[g]	->[oug]	506
+[ smil]	[ed]	->[ smiled]	507
+[i]	[ck]	->[ick]	508
+[ as]	[ked]	->[ asked]	509
+[Y]	[ou]	->[You]	510
+[ to]	[y]	->[ toy]	511
+[ m]	[an]	->[ man]	512
+[ a]	[round]	->[ around]	513
+[am]	[e]	->[ame]	514
+[ f]	[e]	->[ fe]	515
+[ s]	[ay]	->[ say]	516
+[ bo]	[y]	->[ boy]	517
+[ s]	[ome]	->[ some]	518
+[ loo]	[ked]	->[ looked]	519
+[u]	[re]	->[ure]	520
+[om]	[et]	->[omet]	521
+[ b]	[r]	->[ br]	522
+[ w]	[ould]	->[ would]	523
+[ m]	[e]	->[ me]	524
+[ b]	[ir]	->[ bir]	525
+[ li]	[ke]	->[ like]	526
+[g]	[et]	->[get]	527
+[ st]	[art]	->[ start]	528
+[ r]	[o]	->[ ro]	529
+[a]	[s]	->[as]	530
+[ se]	[e]	->[ see]	531
+[ ]	[W]	->[ W]	532
+[i]	[ce]	->[ice]	533
+[on]	[g]	->[ong]	534
+[ bir]	[d]	->[ bird]	535
+[ s]	[omet]	->[ somet]	536
+[d]	[d]	->[dd]	537
+[ w]	[or]	->[ wor]	538
+[ad]	[e]	->[ade]	539
+[i]	[e]	->[ie]	540
+[k]	[ing]	->[king]	541
+[ a]	[g]	->[ ag]	542
+[ow]	[n]	->[own]	543
+[ t]	[re]	->[ tre]	544
+[ f]	[a]	->[ fa]	545
+[ a]	[way]	->[ away]	546
+[ wh]	[at]	->[ what]	547
+[ing]	[s]	->[ings]	548
+[ start]	[ed]	->[ started]	549
+[get]	[her]	->[gether]	550
+[ r]	[an]	->[ ran]	551
+[�]	[�]	->[�]	552
+[ar]	[ed]	->[ared]	553
+[ m]	[ake]	->[ make]	554
+[ B]	[ut]	->[ But]	555
+[it]	[ed]	->[ited]	556
+[i]	[f]	->[if]	557
+[ou]	[d]	->[oud]	558
+[ m]	[ade]	->[ made]	559
+[ to]	[gether]	->[ together]	560
+[ somet]	[hing]	->[ something]	561
+[ ex]	[c]	->[ exc]	562
+[a]	[g]	->[ag]	563
+[ c]	[o]	->[ co]	564
+[ p]	[ark]	->[ park]	565
+[ ne]	[w]	->[ new]	566
+[ sa]	[d]	->[ sad]	567
+[ p]	[ut]	->[ put]	568
+[,]	["]	->[,"]	569
+[ f]	[rom]	->[ from]	570
+[b]	[le]	->[ble]	571
+[t]	[her]	->[ther]	572
+[ p]	[r]	->[ pr]	573
+[ m]	[u]	->[ mu]	574
+[ c]	[ar]	->[ car]	575
+[ h]	[ome]	->[ home]	576
+[ ]	[You]	->[ You]	577
+[ the]	[n]	->[ then]	578
+[ w]	[hen]	->[ when]	579
+[ f]	[ound]	->[ found]	580
+[e]	[ll]	->[ell]	581
+[ ag]	[ain]	->[ again]	582
+[ o]	[ther]	->[ other]	583
+[ c]	[h]	->[ ch]	584
+[ d]	[ec]	->[ dec]	585
+[ wh]	[o]	->[ who]	586
+[ l]	[a]	->[ la]	587
+[ri]	[ed]	->[ried]	588
+[s]	[s]	->[ss]	589
+[ g]	[ood]	->[ good]	590
+[ h]	[ug]	->[ hug]	591
+[.]	["]	->[."]	592
+[ ]	[L]	->[ L]	593
+[pp]	[ed]	->[pped]	594
+[ wa]	[l]	->[ wal]	595
+[e]	[p]	->[ep]	596
+[all]	[y]	->[ally]	597
+[ say]	[s]	->[ says]	598
+[ f]	[l]	->[ fl]	599
+[es]	[t]	->[est]	600
+[?]	["]	->[?"]	601
+[a]	[ch]	->[ach]	602
+[ ]	[E]	->[ E]	603
+[ exc]	[ited]	->[ excited]	604
+[p]	[l]	->[pl]	605
+[q]	[u]	->[qu]	606
+[oo]	[k]	->[ook]	607
+[ g]	[et]	->[ get]	608
+[oug]	[ht]	->[ought]	609
+[ play]	[ing]	->[ playing]	610
+[ g]	[ot]	->[ got]	611
+[ s]	[w]	->[ sw]	612
+[ou]	[s]	->[ous]	613
+[h]	[at]	->[hat]	614
+[n]	[y]	->[ny]	615
+[id]	[ed]	->[ided]	616
+[u]	[ck]	->[uck]	617
+[ th]	[ings]	->[ things]	618
+[ e]	[very]	->[ every]	619
+[ dec]	[ided]	->[ decided]	620
+[ c]	[ame]	->[ came]	621
+[ be]	[c]	->[ bec]	622
+[a]	[ve]	->[ave]	623
+[r]	[o]	->[ro]	624
+[a]	[x]	->[ax]	625
+[ li]	[ked]	->[ liked]	626
+[ d]	[own]	->[ down]	627
+[ do]	[g]	->[ dog]	628
+[ sc]	[ared]	->[ scared]	629
+[ ]	[v]	->[ v]	630
+[u]	[dd]	->[udd]	631
+[u]	[st]	->[ust]	632
+[ on]	[e]	->[ one]	633
+[ f]	[ind]	->[ find]	634
+[ b]	[l]	->[ bl]	635
+[ th]	[an]	->[ than]	636
+[ ]	[D]	->[ D]	637
+[ou]	[se]	->[ouse]	638
+[way]	[s]	->[ways]	639
+[ kn]	[e]	->[ kne]	640
+[ did]	[n]	->[ didn]	641
+[a]	[p]	->[ap]	642
+[ mom]	[my]	->[ mommy]	643
+[ c]	[are]	->[ care]	644
+[ al]	[ways]	->[ always]	645
+[ a]	[b]	->[ ab]	646
+[is]	[t]	->[ist]	647
+[ d]	[ad]	->[ dad]	648
+[ fe]	[el]	->[ feel]	649
+[ar]	[a]	->[ara]	650
+[b]	[b]	->[bb]	651
+[ar]	[n]	->[arn]	652
+[f]	[e]	->[fe]	653
+[ you]	[r]	->[ your]	654
+[ out]	[side]	->[ outside]	655
+[u]	[e]	->[ue]	656
+[ g]	[ra]	->[ gra]	657
+[an]	[t]	->[ant]	658
+[ ]	[ke]	->[ ke]	659
+[ M]	[om]	->[ Mom]	660
+[ too]	[k]	->[ took]	661
+[ l]	[ot]	->[ lot]	662
+[n]	[n]	->[nn]	663
+[ b]	[u]	->[ bu]	664
+[ ab]	[out]	->[ about]	665
+[es]	[s]	->[ess]	666
+[ ]	[F]	->[ F]	667
+[nd]	[er]	->[nder]	668
+[ tre]	[e]	->[ tree]	669
+[ec]	[i]	->[eci]	670
+[ loo]	[k]	->[ look]	671
+[ p]	[o]	->[ po]	672
+[ m]	[y]	->[ my]	673
+[ou]	[r]	->[our]	674
+[ toy]	[s]	->[ toys]	675
+[!]	[\u000a]	->[!\u000a]	676
+[it]	[e]	->[ite]	677
+[c]	[hed]	->[ched]	678
+[!]	["\u000a]	->[!"\u000a]	679
+[ kne]	[w]	->[ knew]	680
+[ th]	[ought]	->[ thought]	681
+[en]	[ed]	->[ened]	682
+[ le]	[arn]	->[ learn]	683
+[ in]	[t]	->[ int]	684
+[ o]	[ld]	->[ old]	685
+[ m]	[ore]	->[ more]	686
+[nn]	[a]	->[nna]	687
+[is]	[e]	->[ise]	688
+[g]	[ed]	->[ged]	689
+[ t]	[a]	->[ ta]	690
+[udd]	[en]	->[udden]	691
+[eci]	[al]	->[ecial]	692
+[ sp]	[ecial]	->[ special]	693
+[ M]	[ax]	->[ Max]	694
+[a]	[u]	->[au]	695
+[ w]	[ill]	->[ will]	696
+[The]	[y]	->[They]	697
+[er]	[s]	->[ers]	698
+[re]	[t]	->[ret]	699
+[ p]	[e]	->[ pe]	700
+[ h]	[o]	->[ ho]	701
+[ S]	[am]	->[ Sam]	702
+[ t]	[ake]	->[ take]	703
+[ b]	[all]	->[ ball]	704
+[ kn]	[ow]	->[ know]	705
+[ la]	[ug]	->[ laug]	706
+[f]	[ter]	->[fter]	707
+[udden]	[ly]	->[uddenly]	708
+[ c]	[at]	->[ cat]	709
+[ h]	[ow]	->[ how]	710
+[i]	[ve]	->[ive]	711
+[ t]	[r]	->[ tr]	712
+[ mu]	[ch]	->[ much]	713
+[ an]	[y]	->[ any]	714
+[ p]	[u]	->[ pu]	715
+[m]	[a]	->[ma]	716
+[ s]	[l]	->[ sl]	717
+[ s]	[or]	->[ sor]	718
+[ m]	[o]	->[ mo]	719
+[v]	[en]	->[ven]	720
+[is]	[h]	->[ish]	721
+[ sh]	[ow]	->[ show]	722
+[ could]	[n]	->[ couldn]	723
+[au]	[se]	->[ause]	724
+[in]	[k]	->[ink]	725
+[B]	[ut]	->[But]	726
+[ h]	[ouse]	->[ house]	727
+[ int]	[o]	->[ into]	728
+[um]	[p]	->[ump]	729
+[ o]	[ver]	->[ over]	730
+[ t]	[ried]	->[ tried]	731
+[a]	[nd]	->[and]	732
+[ e]	[at]	->[ eat]	733
+[ s]	[k]	->[ sk]	734
+[ s]	[un]	->[ sun]	735
+[ t]	[w]	->[ tw]	736
+[ cl]	[o]	->[ clo]	737
+[ r]	[un]	->[ run]	738
+[i]	[a]	->[ia]	739
+[ ha]	[nd]	->[ hand]	740
+[ E]	[very]	->[ Every]	741
+[ ]	[en]	->[ en]	742
+[ in]	[side]	->[ inside]	743
+[d]	[y]	->[dy]	744
+[ ]	[if]	->[ if]	745
+[ to]	[ld]	->[ told]	746
+[ ne]	[ver]	->[ never]	747
+[ ]	[qu]	->[ qu]	748
+[i]	[on]	->[ion]	749
+[ bec]	[ause]	->[ because]	750
+[b]	[y]	->[by]	751
+[ pr]	[oud]	->[ proud]	752
+[?]	["\u000a]	->[?"\u000a]	753
+[ g]	[ave]	->[ gave]	754
+[ sor]	[ry]	->[ sorry]	755
+[ th]	[is]	->[ this]	756
+[ o]	[p]	->[ op]	757
+[ play]	[ed]	->[ played]	758
+[at]	[e]	->[ate]	759
+[ ex]	[pl]	->[ expl]	760
+[ he]	[ard]	->[ heard]	761
+[t]	[y]	->[ty]	762
+[ o]	[r]	->[ or]	763
+[ wa]	[ter]	->[ water]	764
+[an]	[k]	->[ank]	765
+[g]	[e]	->[ge]	766
+[s]	[ed]	->[sed]	767
+[ p]	[ick]	->[ pick]	768
+[ot]	[her]	->[other]	769
+[ ro]	[om]	->[ room]	770
+[et]	[ter]	->[etter]	771
+[ j]	[ust]	->[ just]	772
+[a]	[ce]	->[ace]	773
+[ hug]	[ged]	->[ hugged]	774
+[ g]	[re]	->[ gre]	775
+[a]	[k]	->[ak]	776
+[he]	[re]	->[here]	777
+[ of]	[f]	->[ off]	778
+[ S]	[ara]	->[ Sara]	779
+[ p]	[ret]	->[ pret]	780
+[il]	[e]	->[ile]	781
+[ e]	[ach]	->[ each]	782
+[ l]	[ong]	->[ long]	783
+[ c]	[om]	->[ com]	784
+[ bo]	[x]	->[ box]	785
+[or]	[t]	->[ort]	786
+[ st]	[r]	->[ str]	787
+[i]	[z]	->[iz]	788
+[ u]	[nt]	->[ unt]	789
+[ wa]	[t]	->[ wat]	790
+[ot]	[h]	->[oth]	791
+[ ne]	[ed]	->[ need]	792
+[ j]	[o]	->[ jo]	793
+[ W]	[e]	->[ We]	794
+[ sm]	[all]	->[ small]	795
+[T]	[om]	->[Tom]	796
+[in]	[e]	->[ine]	797
+[ be]	[ar]	->[ bear]	798
+[M]	[om]	->[Mom]	799
+[ unt]	[il]	->[ until]	800
+[ n]	[ice]	->[ nice]	801
+[ t]	[ry]	->[ try]	802
+[v]	[ing]	->[ving]	803
+[u]	[c]	->[uc]	804
+[s]	[el]	->[sel]	805
+[oug]	[h]	->[ough]	806
+[ learn]	[ed]	->[ learned]	807
+[ k]	[ind]	->[ kind]	808
+[ A]	[nna]	->[ Anna]	809
+[il]	[d]	->[ild]	810
+[ f]	[o]	->[ fo]	811
+[ man]	[y]	->[ many]	812
+[']	[m]	->['m]	813
+[ J]	[ack]	->[ Jack]	814
+[ b]	[etter]	->[ better]	815
+[ ]	[im]	->[ im]	816
+[im]	[al]	->[imal]	817
+[g]	[ry]	->[gry]	818
+[ an]	[imal]	->[ animal]	819
+[ur]	[t]	->[urt]	820
+[f]	[t]	->[ft]	821
+[ e]	[nd]	->[ end]	822
+[ s]	[n]	->[ sn]	823
+[a]	[ut]	->[aut]	824
+[ t]	[e]	->[ te]	825
+[ c]	[le]	->[ cle]	826
+[ J]	[o]	->[ Jo]	827
+[v]	[ent]	->[vent]	828
+[ur]	[p]	->[urp]	829
+[ g]	[r]	->[ gr]	830
+[ be]	[aut]	->[ beaut]	831
+[ j]	[ump]	->[ jump]	832
+[m]	[b]	->[mb]	833
+[ a]	[d]	->[ ad]	834
+[re]	[am]	->[ream]	835
+[p]	[t]	->[pt]	836
+[ S]	[o]	->[ So]	837
+[ H]	[er]	->[ Her]	838
+[ fl]	[ow]	->[ flow]	839
+[i]	[es]	->[ies]	840
+[ c]	[he]	->[ che]	841
+[ b]	[ra]	->[ bra]	842
+[ than]	[ked]	->[ thanked]	843
+[ e]	[ven]	->[ even]	844
+[ b]	[est]	->[ best]	845
+[ c]	[all]	->[ call]	846
+[ad]	[y]	->[ady]	847
+[H]	[e]	->[He]	848
+[ lot]	[s]	->[ lots]	849
+[ laug]	[hed]	->[ laughed]	850
+[sel]	[f]	->[self]	851
+[ r]	[a]	->[ ra]	852
+[ wa]	[y]	->[ way]	853
+[ur]	[n]	->[urn]	854
+[ar]	[s]	->[ars]	855
+[ fa]	[st]	->[ fast]	856
+[ b]	[y]	->[ by]	857
+[ll]	[y]	->[lly]	858
+[ f]	[am]	->[ fam]	859
+[ ]	[C]	->[ C]	860
+[v]	[es]	->[ves]	861
+[ard]	[en]	->[arden]	862
+[ g]	[arden]	->[ garden]	863
+[ beaut]	[i]	->[ beauti]	864
+[w]	[n]	->[wn]	865
+[T]	[h]	->[Th]	866
+[ beauti]	[ful]	->[ beautiful]	867
+[ l]	[oud]	->[ loud]	868
+[le]	[w]	->[lew]	869
+[ sk]	[y]	->[ sky]	870
+[ d]	[on]	->[ don]	871
+[h]	[n]	->[hn]	872
+[er]	[ed]	->[ered]	873
+[in]	[y]	->[iny]	874
+[ care]	[ful]	->[ careful]	875
+[ lo]	[ve]	->[ love]	876
+[ f]	[i]	->[ fi]	877
+[ The]	[n]	->[ Then]	878
+[�]	[�]	->[“]	879
+[�]	[�]	->[”]	880
+[a]	[se]	->[ase]	881
+[ec]	[t]	->[ect]	882
+[ sa]	[fe]	->[ safe]	883
+[ A]	[nd]	->[ And]	884
+[ u]	[nder]	->[ under]	885
+[ c]	[ome]	->[ come]	886
+[ F]	[rom]	->[ From]	887
+[Y]	[es]	->[Yes]	888
+[ M]	[ia]	->[ Mia]	889
+[m]	[e]	->[me]	890
+[ h]	[ard]	->[ hard]	891
+[ c]	[u]	->[ cu]	892
+[I]	[t]	->[It]	893
+[ w]	[o]	->[ wo]	894
+[ l]	[ist]	->[ list]	895
+[ st]	[ay]	->[ stay]	896
+[an]	[e]	->[ane]	897
+[s]	[h]	->[sh]	898
+[op]	[le]	->[ople]	899
+[ g]	[l]	->[ gl]	900
+[n]	[ing]	->[ning]	901
+[ st]	[ill]	->[ still]	902
+[oo]	[l]	->[ool]	903
+[ h]	[urt]	->[ hurt]	904
+[re]	[e]	->[ree]	905
+[ H]	[is]	->[ His]	906
+[ im]	[p]	->[ imp]	907
+[ fam]	[ily]	->[ family]	908
+[ b]	[oth]	->[ both]	909
+[r]	[m]	->[rm]	910
+[ig]	[h]	->[igh]	911
+[ li]	[ved]	->[ lived]	912
+[he]	[s]	->[hes]	913
+[W]	[hen]	->[When]	914
+[ pe]	[ople]	->[ people]	915
+[ animal]	[s]	->[ animals]	916
+[ co]	[l]	->[ col]	917
+[ bra]	[ve]	->[ brave]	918
+[ wal]	[ked]	->[ walked]	919
+[o]	[b]	->[ob]	920
+[T]	[im]	->[Tim]	921
+[c]	[t]	->[ct]	922
+[ l]	[et]	->[ let]	923
+[urp]	[r]	->[urpr]	924
+[ W]	[hen]	->[ When]	925
+[ tw]	[o]	->[ two]	926
+[ s]	[urpr]	->[ surpr]	927
+[ sh]	[ould]	->[ should]	928
+[is]	[hed]	->[ished]	929
+[re]	[ss]	->[ress]	930
+[ b]	[ad]	->[ bad]	931
+[ ke]	[pt]	->[ kept]	932
+[ f]	[ore]	->[ fore]	933
+[ ]	[“]	->[ “]	934
+[ f]	[lew]	->[ flew]	935
+[ f]	[in]	->[ fin]	936
+[ st]	[or]	->[ stor]	937
+[ f]	[ly]	->[ fly]	938
+[a]	[st]	->[ast]	939
+[is]	[ed]	->[ised]	940
+[i]	[p]	->[ip]	941
+[ it]	[s]	->[ its]	942
+[l]	[ed]	->[led]	943
+[o]	[ck]	->[ock]	944
+[uc]	[y]	->[ucy]	945
+[f]	[ore]	->[fore]	946
+[ go]	[ing]	->[ going]	947
+[ cle]	[an]	->[ clean]	948
+[ d]	[an]	->[ dan]	949
+[ so]	[on]	->[ soon]	950
+[ call]	[ed]	->[ called]	951
+[ p]	[ic]	->[ pic]	952
+[ sh]	[are]	->[ share]	953
+[k]	[ay]	->[kay]	954
+[ an]	[gry]	->[ angry]	955
+[ ro]	[ck]	->[ rock]	956
+[ pret]	[ty]	->[ pretty]	957
+[ c]	[on]	->[ con]	958
+[N]	[o]	->[No]	959
+[ ]	[ide]	->[ ide]	960
+[i]	[ed]	->[ied]	961
+[il]	[ly]	->[illy]	962
+[ g]	[round]	->[ ground]	963
+[ r]	[ed]	->[ red]	964
+[x]	[t]	->[xt]	965
+[ expl]	[ore]	->[ explore]	966
+[ c]	[ry]	->[ cry]	967
+[ ad]	[vent]	->[ advent]	968
+[ st]	[o]	->[ sto]	969
+[s]	[o]	->[so]	970
+[ re]	[al]	->[ real]	971
+[L]	[et]	->[Let]	972
+[ w]	[ind]	->[ wind]	973
+[ sh]	[iny]	->[ shiny]	974
+[b]	[e]	->[be]	975
+[ b]	[ook]	->[ book]	976
+[ al]	[so]	->[ also]	977
+[ do]	[ll]	->[ doll]	978
+[ ide]	[a]	->[ idea]	979
+[ be]	[fore]	->[ before]	980
+[ op]	[ened]	->[ opened]	981
+[dd]	[ed]	->[dded]	982
+[ wh]	[ile]	->[ while]	983
+[um]	[my]	->[ummy]	984
+[ ke]	[ep]	->[ keep]	985
+[ e]	[y]	->[ ey]	986
+[ n]	[ow]	->[ now]	987
+[ feel]	[ing]	->[ feeling]	988
+[ do]	[or]	->[ door]	989
+[o]	[on]	->[oon]	990
+[o]	[y]	->[oy]	991
+[ wal]	[king]	->[ walking]	992
+[ no]	[ise]	->[ noise]	993
+[le]	[s]	->[les]	994
+[ f]	[r]	->[ fr]	995
+[ag]	[e]	->[age]	996
+[ col]	[or]	->[ color]	997
+[i]	[ous]	->[ious]	998
+[ t]	[urn]	->[ turn]	999
+[t]	[hing]	->[thing]	1000
+[f]	[f]	->[ff]	1001
+[u]	[ch]	->[uch]	1002
+[t]	[h]	->[th]	1003
+[ b]	[ed]	->[ bed]	1004
+[ar]	[y]	->[ary]	1005
+[ d]	[ra]	->[ dra]	1006
+[ pick]	[ed]	->[ picked]	1007
+[im]	[b]	->[imb]	1008
+[e]	[et]	->[eet]	1009
+[ cl]	[imb]	->[ climb]	1010
+[ d]	[el]	->[ del]	1011
+[W]	[hat]	->[What]	1012
+[ be]	[ing]	->[ being]	1013
+[ f]	[ood]	->[ food]	1014
+[ u]	[n]	->[ un]	1015
+[ f]	[ar]	->[ far]	1016
+[t]	[ure]	->[ture]	1017
+[j]	[oy]	->[joy]	1018
+[ advent]	[ure]	->[ adventure]	1019
+[ smil]	[e]	->[ smile]	1020
+[a]	[c]	->[ac]	1021
+[ d]	[if]	->[ dif]	1022
+[�]	[�]	->[’]	1023
+[me]	[mb]	->[memb]	1024
+[ w]	[r]	->[ wr]	1025
+[ug]	[ht]	->[ught]	1026
+[ th]	[r]	->[ thr]	1027
+[ loo]	[king]	->[ looking]	1028
+[ ne]	[xt]	->[ next]	1029
+[ic]	[ed]	->[iced]	1030
+[ L]	[ucy]	->[ Lucy]	1031
+[ no]	[dded]	->[ nodded]	1032
+[ qu]	[ick]	->[ quick]	1033
+[ ]	[P]	->[ P]	1034
+[ d]	[is]	->[ dis]	1035
+[ re]	[pl]	->[ repl]	1036
+[ D]	[ad]	->[ Dad]	1037
+[ wa]	[it]	->[ wait]	1038
+[ fore]	[st]	->[ forest]	1039
+[iz]	[ed]	->[ized]	1040
+[ clo]	[s]	->[ clos]	1041
+[ S]	[uddenly]	->[ Suddenly]	1042
+[ t]	[ra]	->[ tra]	1043
+[ ey]	[es]	->[ eyes]	1044
+[T]	[hat]	->[That]	1045
+[g]	[er]	->[ger]	1046
+[bb]	[it]	->[bbit]	1047
+[t]	[ed]	->[ted]	1048
+[ o]	[wn]	->[ own]	1049
+[ r]	[ain]	->[ rain]	1050
+[ imp]	[ort]	->[ import]	1051
+[ gre]	[at]	->[ great]	1052
+[ re]	[memb]	->[ rememb]	1053
+[ pic]	[ture]	->[ picture]	1054
+[Th]	[ank]	->[Thank]	1055
+[S]	[uddenly]	->[Suddenly]	1056
+[ sto]	[pped]	->[ stopped]	1057
+[ en]	[joy]	->[ enjoy]	1058
+[ v]	[o]	->[ vo]	1059
+[B]	[en]	->[Ben]	1060
+[ g]	[ive]	->[ give]	1061
+[ import]	[ant]	->[ important]	1062
+[ wor]	[k]	->[ work]	1063
+[ ne]	[ar]	->[ near]	1064
+[g]	[an]	->[gan]	1065
+[p]	[ot]	->[pot]	1066
+[ e]	[ver]	->[ ever]	1067
+[ a]	[pp]	->[ app]	1068
+[ a]	[fter]	->[ after]	1069
+[ quick]	[ly]	->[ quickly]	1070
+[ list]	[en]	->[ listen]	1071
+[ b]	[re]	->[ bre]	1072
+[bb]	[ed]	->[bbed]	1073
+[t]	[ing]	->[ting]	1074
+[ m]	[a]	->[ ma]	1075
+[ repl]	[ied]	->[ replied]	1076
+[ f]	[ish]	->[ fish]	1077
+[ ra]	[bbit]	->[ rabbit]	1078
+[ hand]	[s]	->[ hands]	1079
+[ ]	[G]	->[ G]	1080
+[ not]	[iced]	->[ noticed]	1081
+[ br]	[o]	->[ bro]	1082
+[ sl]	[ide]	->[ slide]	1083
+[ wal]	[k]	->[ walk]	1084
+[ th]	[ink]	->[ think]	1085
+[ tr]	[uck]	->[ truck]	1086
+[ a]	[c]	->[ ac]	1087
+[k]	[es]	->[kes]	1088
+[ str]	[ong]	->[ strong]	1089
+[S]	[he]	->[She]	1090
+[ show]	[ed]	->[ showed]	1091
+[ d]	[e]	->[ de]	1092
+[ every]	[one]	->[ everyone]	1093
+[ wo]	[nder]	->[ wonder]	1094
+[fe]	[re]	->[fere]	1095
+[by]	[e]	->[bye]	1096
+[ dif]	[fere]	->[ differe]	1097
+[ir]	[st]	->[irst]	1098
+[S]	[o]	->[So]	1099
+[ s]	[ure]	->[ sure]	1100
+[ ha]	[s]	->[ has]	1101
+[ r]	[ight]	->[ right]	1102
+[ bec]	[ame]	->[ became]	1103
+[ be]	[en]	->[ been]	1104
+[ s]	[ound]	->[ sound]	1105
+[ma]	[z]	->[maz]	1106
+[ to]	[w]	->[ tow]	1107
+[ r]	[u]	->[ ru]	1108
+[ t]	[al]	->[ tal]	1109
+[ a]	[maz]	->[ amaz]	1110
+[ he]	[ad]	->[ head]	1111
+[ sh]	[out]	->[ shout]	1112
+[ br]	[ight]	->[ bright]	1113
+[ y]	[e]	->[ ye]	1114
+[ wat]	[ched]	->[ watched]	1115
+[ ]	[R]	->[ R]	1116
+[ m]	[or]	->[ mor]	1117
+[ ch]	[ild]	->[ child]	1118
+[a]	[ble]	->[able]	1119
+[ me]	[an]	->[ mean]	1120
+[ w]	[here]	->[ where]	1121
+[ll]	[ow]	->[llow]	1122
+[ h]	[igh]	->[ high]	1123
+[ S]	[ue]	->[ Sue]	1124
+[ fa]	[ce]	->[ face]	1125
+[ c]	[ook]	->[ cook]	1126
+[d]	[ay]	->[day]	1127
+[ wat]	[ch]	->[ watch]	1128
+[ay]	[be]	->[aybe]	1129
+[ bl]	[ue]	->[ blue]	1130
+[a]	[ught]	->[aught]	1131
+[ differe]	[nt]	->[ different]	1132
+[ st]	[ore]	->[ store]	1133
+[ ]	[N]	->[ N]	1134
+[ good]	[bye]	->[ goodbye]	1135
+[ d]	[ress]	->[ dress]	1136
+[u]	[ll]	->[ull]	1137
+[ B]	[ob]	->[ Bob]	1138
+[n]	[g]	->[ng]	1139
+[an]	[ge]	->[ange]	1140
+[ s]	[qu]	->[ squ]	1141
+[ o]	[kay]	->[ okay]	1142
+[is]	[y]	->[isy]	1143
+[ Mom]	[my]	->[ Mommy]	1144
+[le]	[ase]	->[lease]	1145
+[ vo]	[ice]	->[ voice]	1146
+[J]	[o]	->[Jo]	1147
+[at]	[h]	->[ath]	1148
+[ S]	[pot]	->[ Spot]	1149
+[ n]	[ight]	->[ night]	1150
+[ bo]	[at]	->[ boat]	1151
+[ u]	[s]	->[ us]	1152
+[ flow]	[ers]	->[ flowers]	1153
+[ pl]	[ace]	->[ place]	1154
+[ fo]	[llow]	->[ follow]	1155
+[ a]	[r]	->[ ar]	1156
+[ u]	[se]	->[ use]	1157
+[ clos]	[er]	->[ closer]	1158
+[un]	[ny]	->[unny]	1159
+[le]	[ep]	->[leep]	1160
+[ir]	[ed]	->[ired]	1161
+[ fa]	[v]	->[ fav]	1162
+[ y]	[ell]	->[ yell]	1163
+[ gra]	[bbed]	->[ grabbed]	1164
+[ cu]	[ri]	->[ curi]	1165
+[ wa]	[rm]	->[ warm]	1166
+[ for]	[g]	->[ forg]	1167
+[ c]	[r]	->[ cr]	1168
+[ Sara]	[h]	->[ Sarah]	1169
+[ Jo]	[hn]	->[ John]	1170
+[ m]	[ag]	->[ mag]	1171
+[ st]	[ick]	->[ stick]	1172
+[ jump]	[ed]	->[ jumped]	1173
+[W]	[e]	->[We]	1174
+[ c]	[ake]	->[ cake]	1175
+[ any]	[m]	->[ anym]	1176
+[ anym]	[ore]	->[ anymore]	1177
+[ t]	[ell]	->[ tell]	1178
+[A]	[fter]	->[After]	1179
+[ but]	[ter]	->[ butter]	1180
+[nd]	[ma]	->[ndma]	1181
+[ th]	[ree]	->[ three]	1182
+[ as]	[k]	->[ ask]	1183
+[c]	[o]	->[co]	1184
+[ ]	[our]	->[ our]	1185
+[ curi]	[ous]	->[ curious]	1186
+[l]	[ie]	->[lie]	1187
+[ou]	[nt]	->[ount]	1188
+[or]	[n]	->[orn]	1189
+[ con]	[t]	->[ cont]	1190
+[ fe]	[ll]	->[ fell]	1191
+[a]	[ched]	->[ached]	1192
+[ T]	[h]	->[ Th]	1193
+[ bird]	[s]	->[ birds]	1194
+[as]	[s]	->[ass]	1195
+[H]	[er]	->[Her]	1196
+[is]	[s]	->[iss]	1197
+[ help]	[ed]	->[ helped]	1198
+[ pu]	[ll]	->[ pull]	1199
+[ J]	[ane]	->[ Jane]	1200
+[ f]	[irst]	->[ first]	1201
+[it]	[c]	->[itc]	1202
+[ bl]	[ock]	->[ block]	1203
+[ h]	[op]	->[ hop]	1204
+[ b]	[it]	->[ bit]	1205
+[ d]	[r]	->[ dr]	1206
+[ real]	[ized]	->[ realized]	1207
+[ k]	[id]	->[ kid]	1208
+[L]	[ook]	->[Look]	1209
+[il]	[a]	->[ila]	1210
+[ m]	[on]	->[ mon]	1211
+[ br]	[other]	->[ brother]	1212
+[A]	[nna]	->[Anna]	1213
+[ ]	[z]	->[ z]	1214
+[S]	[ara]	->[Sara]	1215
+[ Every]	[one]	->[ Everyone]	1216
+[ at]	[e]	->[ ate]	1217
+[ do]	[es]	->[ does]	1218
+[im]	[es]	->[imes]	1219
+[ happ]	[ened]	->[ happened]	1220
+[ st]	[op]	->[ stop]	1221
+[z]	[y]	->[zy]	1222
+[ fav]	[or]	->[ favor]	1223
+[ y]	[ummy]	->[ yummy]	1224
+[ k]	[itc]	->[ kitc]	1225
+[ kitc]	[hen]	->[ kitchen]	1226
+[pp]	[y]	->[ppy]	1227
+[ sw]	[eet]	->[ sweet]	1228
+[u]	[s]	->[us]	1229
+[ p]	[er]	->[ per]	1230
+[ re]	[ally]	->[ really]	1231
+[a]	[isy]	->[aisy]	1232
+[ favor]	[ite]	->[ favorite]	1233
+[ gra]	[ss]	->[ grass]	1234
+[ be]	[gan]	->[ began]	1235
+["]	[I]	->["I]	1236
+[ re]	[st]	->[ rest]	1237
+[ re]	[ady]	->[ ready]	1238
+[ le]	[a]	->[ lea]	1239
+[ re]	[ached]	->[ reached]	1240
+[ under]	[st]	->[ underst]	1241
+[a]	[ir]	->[air]	1242
+[ st]	[e]	->[ ste]	1243
+[ stor]	[y]	->[ story]	1244
+[ b]	[unny]	->[ bunny]	1245
+[ A]	[s]	->[ As]	1246
+[ p]	[ain]	->[ pain]	1247
+[']	[re]	->['re]	1248
+[ s]	[ing]	->[ sing]	1249
+[st]	[er]	->[ster]	1250
+[ sa]	[nd]	->[ sand]	1251
+[ he]	[re]	->[ here]	1252
+[ on]	[ly]	->[ only]	1253
+[ fl]	[o]	->[ flo]	1254
+[ a]	[m]	->[ am]	1255
+[ gl]	[ad]	->[ glad]	1256
+[ t]	[ri]	->[ tri]	1257
+[ be]	[h]	->[ beh]	1258
+[ op]	[en]	->[ open]	1259
+[ wor]	[ld]	->[ world]	1260
+[ c]	[re]	->[ cre]	1261
+[fu]	[lly]	->[fully]	1262
+[ pr]	[in]	->[ prin]	1263
+[w]	[here]	->[where]	1264
+[are]	[nt]	->[arent]	1265
+[ flow]	[er]	->[ flower]	1266
+[ thr]	[ough]	->[ through]	1267
+[ b]	[a]	->[ ba]	1268
+[ fi]	[re]	->[ fire]	1269
+[ d]	[one]	->[ done]	1270
+[ ha]	[ving]	->[ having]	1271
+[ th]	[ing]	->[ thing]	1272
+[ del]	[ic]	->[ delic]	1273
+[ him]	[self]	->[ himself]	1274
+[ t]	[ired]	->[ tired]	1275
+[ p]	[arent]	->[ parent]	1276
+[ so]	[ft]	->[ soft]	1277
+[ f]	[ro]	->[ fro]	1278
+[Tim]	[my]	->[Timmy]	1279
+[ ta]	[st]	->[ tast]	1280
+[ butter]	[f]	->[ butterf]	1281
+[ L]	[et]	->[ Let]	1282
+[ wh]	[y]	->[ why]	1283
+[ p]	[art]	->[ part]	1284
+[ c]	[ut]	->[ cut]	1285
+[k]	[en]	->[ken]	1286
+[ m]	[ess]	->[ mess]	1287
+[C]	[an]	->[Can]	1288
+[ wor]	[ry]	->[ worry]	1289
+[Mom]	[my]	->[Mommy]	1290
+[i]	[ver]	->[iver]	1291
+[ d]	[in]	->[ din]	1292
+[u]	[ff]	->[uff]	1293
+[ mag]	[ic]	->[ magic]	1294
+[at]	[er]	->[ater]	1295
+[ shout]	[ed]	->[ shouted]	1296
+[ wa]	[ved]	->[ waved]	1297
+[ po]	[nd]	->[ pond]	1298
+[ kid]	[s]	->[ kids]	1299
+[ h]	[at]	->[ hat]	1300
+[ d]	[uck]	->[ duck]	1301
+[ se]	[es]	->[ sees]	1302
+[ill]	[ed]	->[illed]	1303
+[o]	[lly]	->[olly]	1304
+[ g]	[ame]	->[ game]	1305
+[i]	[ent]	->[ient]	1306
+[ ma]	[king]	->[ making]	1307
+[at]	[her]	->[ather]	1308
+[Jo]	[hn]	->[John]	1309
+[A]	[s]	->[As]	1310
+[ak]	[es]	->[akes]	1311
+[ cat]	[ch]	->[ catch]	1312
+[”]	[\u000a]	->[”\u000a]	1313
+[ se]	[en]	->[ seen]	1314
+[ c]	[ool]	->[ cool]	1315
+[at]	[ion]	->[ation]	1316
+[ com]	[ing]	->[ coming]	1317
+[ l]	[ess]	->[ less]	1318
+[ u]	[sed]	->[ used]	1319
+[ d]	[ark]	->[ dark]	1320
+[ed]	[dy]	->[eddy]	1321
+[ fi]	[x]	->[ fix]	1322
+[ Jo]	[e]	->[ Joe]	1323
+[ than]	[k]	->[ thank]	1324
+[ to]	[p]	->[ top]	1325
+[m]	[er]	->[mer]	1326
+[ l]	[ady]	->[ lady]	1327
+[ ha]	[ir]	->[ hair]	1328
+[ar]	[ing]	->[aring]	1329
+[ p]	[rom]	->[ prom]	1330
+[ C]	[an]	->[ Can]	1331
+[ ho]	[pped]	->[ hopped]	1332
+[ig]	[n]	->[ign]	1333
+[ surpr]	[ise]	->[ surprise]	1334
+[ dra]	[w]	->[ draw]	1335
+["]	[O]	->["O]	1336
+[ m]	[um]	->[ mum]	1337
+[ fun]	[ny]	->[ funny]	1338
+[ m]	[ouse]	->[ mouse]	1339
+[re]	[l]	->[rel]	1340
+[ c]	[ra]	->[ cra]	1341
+[ ]	[-]	->[ -]	1342
+[ap]	[er]	->[aper]	1343
+[ f]	[ull]	->[ full]	1344
+[ to]	[uch]	->[ touch]	1345
+[ l]	[ight]	->[ light]	1346
+[ sp]	[ot]	->[ spot]	1347
+[re]	[n]	->[ren]	1348
+[ d]	[ro]	->[ dro]	1349
+[ Ben]	[ny]	->[ Benny]	1350
+[ parent]	[s]	->[ parents]	1351
+[ wor]	[ked]	->[ worked]	1352
+[in]	[s]	->[ins]	1353
+[one]	[y]	->[oney]	1354
+[ D]	[o]	->[ Do]	1355
+[ surpr]	[ised]	->[ surprised]	1356
+[ care]	[fully]	->[ carefully]	1357
+[ tre]	[es]	->[ trees]	1358
+[ fro]	[g]	->[ frog]	1359
+[ sw]	[ing]	->[ swing]	1360
+[ do]	[ing]	->[ doing]	1361
+[D]	[on]	->[Don]	1362
+[ s]	[at]	->[ sat]	1363
+[in]	[ally]	->[inally]	1364
+[ T]	[hat]	->[ That]	1365
+[ ]	[ice]	->[ ice]	1366
+[ I]	[n]	->[ In]	1367
+[ he]	[ld]	->[ held]	1368
+[W]	[ow]	->[Wow]	1369
+[ run]	[ning]	->[ running]	1370
+[ pret]	[end]	->[ pretend]	1371
+[ sw]	[im]	->[ swim]	1372
+[ s]	[et]	->[ set]	1373
+[ re]	[ad]	->[ read]	1374
+[ delic]	[ious]	->[ delicious]	1375
+[ need]	[ed]	->[ needed]	1376
+[ t]	[ight]	->[ tight]	1377
+[ rememb]	[ered]	->[ remembered]	1378
+[ sl]	[ow]	->[ slow]	1379
+[ co]	[ld]	->[ cold]	1380
+[ lo]	[st]	->[ lost]	1381
+[ sm]	[ell]	->[ smell]	1382
+[ard]	[s]	->[ards]	1383
+[ happ]	[ily]	->[ happily]	1384
+[ w]	[ood]	->[ wood]	1385
+[h]	[y]	->[hy]	1386
+[el]	[y]	->[ely]	1387
+[ beh]	[ind]	->[ behind]	1388
+[ look]	[s]	->[ looks]	1389
+[ her]	[self]	->[ herself]	1390
+[ c]	[ried]	->[ cried]	1391
+[ enjoy]	[ed]	->[ enjoyed]	1392
+[ nam]	[e]	->[ name]	1393
+[as]	[k]	->[ask]	1394
+[ ye]	[ars]	->[ years]	1395
+[ ho]	[le]	->[ hole]	1396
+[ bu]	[y]	->[ buy]	1397
+[ block]	[s]	->[ blocks]	1398
+[ d]	[ri]	->[ dri]	1399
+[ s]	[leep]	->[ sleep]	1400
+[ yell]	[ow]	->[ yellow]	1401
+[ g]	[i]	->[ gi]	1402
+[c]	[ess]	->[cess]	1403
+[ butterf]	[ly]	->[ butterfly]	1404
+[u]	[ed]	->[ued]	1405
+[i]	[ke]	->[ike]	1406
+[ w]	[ished]	->[ wished]	1407
+[ per]	[f]	->[ perf]	1408
+[ an]	[other]	->[ another]	1409
+[ D]	[aisy]	->[ Daisy]	1410
+[ gre]	[en]	->[ green]	1411
+[ mo]	[ve]	->[ move]	1412
+[ t]	[all]	->[ tall]	1413
+[ b]	[ag]	->[ bag]	1414
+[ a]	[ir]	->[ air]	1415
+[ flo]	[or]	->[ floor]	1416
+[ less]	[on]	->[ lesson]	1417
+[ car]	[s]	->[ cars]	1418
+[u]	[l]	->[ul]	1419
+[ b]	[ow]	->[ bow]	1420
+[ ar]	[ri]	->[ arri]	1421
+[ wind]	[ow]	->[ window]	1422
+[ sh]	[o]	->[ sho]	1423
+[ child]	[ren]	->[ children]	1424
+[n]	[er]	->[ner]	1425
+[ fin]	[ished]	->[ finished]	1426
+[ h]	[ill]	->[ hill]	1427
+[and]	[y]	->[andy]	1428
+[ A]	[fter]	->[ After]	1429
+[s]	[p]	->[sp]	1430
+[en]	[s]	->[ens]	1431
+[ p]	[aper]	->[ paper]	1432
+[ li]	[kes]	->[ likes]	1433
+[F]	[rom]	->[From]	1434
+[ ho]	[ld]	->[ hold]	1435
+[s]	[y]	->[sy]	1436
+[S]	[am]	->[Sam]	1437
+[ wr]	[ong]	->[ wrong]	1438
+[re]	[ed]	->[reed]	1439
+[ cont]	[in]	->[ contin]	1440
+[ underst]	[and]	->[ understand]	1441
+[at]	[ter]	->[atter]	1442
+[u]	[it]	->[uit]	1443
+[re]	[w]	->[rew]	1444
+[ any]	[thing]	->[ anything]	1445
+[ clo]	[se]	->[ close]	1446
+[ g]	[ent]	->[ gent]	1447
+[ e]	[l]	->[ el]	1448
+[ wa]	[ll]	->[ wall]	1449
+[as]	[ure]	->[asure]	1450
+[ le]	[ft]	->[ left]	1451
+[ a]	[ble]	->[ able]	1452
+[ arri]	[ved]	->[ arrived]	1453
+[ h]	[un]	->[ hun]	1454
+[ro]	[ss]	->[ross]	1455
+[a]	[v]	->[av]	1456
+[’]	[s]	->[’s]	1457
+[ he]	[ar]	->[ hear]	1458
+[ friend]	[ly]	->[ friendly]	1459
+[ forg]	[ot]	->[ forgot]	1460
+[ g]	[one]	->[ gone]	1461
+[am]	[a]	->[ama]	1462
+[ cre]	[at]	->[ creat]	1463
+[ li]	[on]	->[ lion]	1464
+[ w]	[et]	->[ wet]	1465
+[H]	[ell]	->[Hell]	1466
+[Hell]	[o]	->[Hello]	1467
+[ d]	[ream]	->[ dream]	1468
+[ h]	[ot]	->[ hot]	1469
+[b]	[o]	->[bo]	1470
+[b]	[er]	->[ber]	1471
+[ S]	[ally]	->[ Sally]	1472
+[ d]	[ir]	->[ dir]	1473
+[ f]	[illed]	->[ filled]	1474
+[ cook]	[ies]	->[ cookies]	1475
+[ie]	[ld]	->[ield]	1476
+[ laug]	[h]	->[ laugh]	1477
+[ din]	[ner]	->[ dinner]	1478
+[ bro]	[ken]	->[ broken]	1479
+[ el]	[se]	->[ else]	1480
+[l]	[f]	->[lf]	1481
+[ h]	[id]	->[ hid]	1482
+[c]	[ed]	->[ced]	1483
+[ follow]	[ed]	->[ followed]	1484
+[ p]	[ink]	->[ pink]	1485
+[ ta]	[ble]	->[ table]	1486
+[ m]	[ar]	->[ mar]	1487
+[ color]	[s]	->[ colors]	1488
+[ mom]	[ent]	->[ moment]	1489
+[ou]	[p]	->[oup]	1490
+[ contin]	[ued]	->[ continued]	1491
+[ wonder]	[ful]	->[ wonderful]	1492
+[ E]	[m]	->[ Em]	1493
+[e]	[y]	->[ey]	1494
+[ir]	[rel]	->[irrel]	1495
+[in]	[ed]	->[ined]	1496
+[ fin]	[ally]	->[ finally]	1497
+[r]	[ot]	->[rot]	1498
+[ a]	[rm]	->[ arm]	1499
+[ m]	[ight]	->[ might]	1500
+[J]	[ack]	->[Jack]	1501
+[ N]	[ow]	->[ Now]	1502
+[ y]	[es]	->[ yes]	1503
+[ bu]	[ild]	->[ build]	1504
+[ c]	[ast]	->[ cast]	1505
+[ en]	[ough]	->[ enough]	1506
+[ B]	[illy]	->[ Billy]	1507
+[ some]	[one]	->[ someone]	1508
+[ The]	[re]	->[ There]	1509
+[ perf]	[ect]	->[ perfect]	1510
+[ stay]	[ed]	->[ stayed]	1511
+[ fa]	[ir]	->[ fair]	1512
+[ mor]	[ning]	->[ morning]	1513
+[a]	[pp]	->[app]	1514
+[ pu]	[ppy]	->[ puppy]	1515
+[ dad]	[dy]	->[ daddy]	1516
+[o]	[l]	->[ol]	1517
+[ try]	[ing]	->[ trying]	1518
+[']	[ll]	->['ll]	1519
+[ j]	[u]	->[ ju]	1520
+[ other]	[s]	->[ others]	1521
+[ book]	[s]	->[ books]	1522
+[ ag]	[reed]	->[ agreed]	1523
+[ mu]	[s]	->[ mus]	1524
+[ sn]	[ow]	->[ snow]	1525
+[ squ]	[irrel]	->[ squirrel]	1526
+[ c]	[ream]	->[ cream]	1527
+[ro]	[om]	->[room]	1528
+[ get]	[ting]	->[ getting]	1529
+[ gra]	[ndma]	->[ grandma]	1530
+[ lea]	[ves]	->[ leaves]	1531
+[ ba]	[by]	->[ baby]	1532
+[ L]	[ila]	->[ Lila]	1533
+[ic]	[y]	->[icy]	1534
+[ fe]	[w]	->[ few]	1535
+[ c]	[ount]	->[ count]	1536
+[ f]	[all]	->[ fall]	1537
+[The]	[n]	->[Then]	1538
+[A]	[t]	->[At]	1539
+[g]	[on]	->[gon]	1540
+[ bre]	[ak]	->[ break]	1541
+[ climb]	[ed]	->[ climbed]	1542
+[ri]	[es]	->[ries]	1543
+[ be]	[ach]	->[ beach]	1544
+[as]	[h]	->[ash]	1545
+[ b]	[ug]	->[ bug]	1546
+[ p]	[lease]	->[ please]	1547
+[ m]	[other]	->[ mother]	1548
+[ tra]	[in]	->[ train]	1549
+[ br]	[ought]	->[ brought]	1550
+[ Th]	[is]	->[ This]	1551
+[an]	[ce]	->[ance]	1552
+[ de]	[ep]	->[ deep]	1553
+[ v]	[is]	->[ vis]	1554
+[at]	[ed]	->[ated]	1555
+[s]	[hed]	->[shed]	1556
+[ m]	[et]	->[ met]	1557
+[ Tom]	[my]	->[ Tommy]	1558
+[ somet]	[imes]	->[ sometimes]	1559
+[ every]	[thing]	->[ everything]	1560
+[ was]	[n]	->[ wasn]	1561
+[i]	[ch]	->[ich]	1562
+[ mus]	[ic]	->[ music]	1563
+[ke]	[y]	->[key]	1564
+[Th]	[is]	->[This]	1565
+[l]	[ing]	->[ling]	1566
+[o]	[s]	->[os]	1567
+[ turn]	[ed]	->[ turned]	1568
+[ r]	[ide]	->[ ride]	1569
+[l]	[c]	->[lc]	1570
+[ s]	[ong]	->[ song]	1571
+[or]	[ing]	->[oring]	1572
+[o]	[om]	->[oom]	1573
+[ sp]	[ark]	->[ spark]	1574
+[ f]	[ight]	->[ fight]	1575
+[ hun]	[gry]	->[ hungry]	1576
+[ picture]	[s]	->[ pictures]	1577
+[on]	[s]	->[ons]	1578
+[d]	[s]	->[ds]	1579
+[ m]	[akes]	->[ makes]	1580
+[ se]	[ar]	->[ sear]	1581
+[ list]	[ened]	->[ listened]	1582
+[uck]	[y]	->[ucky]	1583
+[ jo]	[y]	->[ joy]	1584
+[ po]	[l]	->[ pol]	1585
+[\u000a]	[ \u000a]	->[\u000a \u000a]	1586
+[ W]	[hat]	->[ What]	1587
+[e]	[e]	->[ee]	1588
+[ cl]	[ot]	->[ clot]	1589
+[H]	[is]	->[His]	1590
+[ sa]	[il]	->[ sail]	1591
+[a]	[pped]	->[apped]	1592
+[b]	[ble]	->[bble]	1593
+[ com]	[p]	->[ comp]	1594
+[ clot]	[hes]	->[ clothes]	1595
+[ pl]	[an]	->[ plan]	1596
+[ want]	[s]	->[ wants]	1597
+[ po]	[in]	->[ poin]	1598
+[ ]	[K]	->[ K]	1599
+[ str]	[ange]	->[ strange]	1600
+[z]	[z]	->[zz]	1601
+[ ball]	[oon]	->[ balloon]	1602
+[m]	[an]	->[man]	1603
+[en]	[ny]	->[enny]	1604
+[ fly]	[ing]	->[ flying]	1605
+[ gr]	[ow]	->[ grow]	1606
+[ p]	[i]	->[ pi]	1607
+[ sc]	[ary]	->[ scary]	1608
+[r]	[ow]	->[row]	1609
+[ tre]	[at]	->[ treat]	1610
+[ wa]	[ited]	->[ waited]	1611
+[ amaz]	[ed]	->[ amazed]	1612
+[ t]	[eddy]	->[ teddy]	1613
+[ cast]	[le]	->[ castle]	1614
+[is]	[ter]	->[ister]	1615
+[ e]	[le]	->[ ele]	1616
+[ amaz]	[ing]	->[ amazing]	1617
+[m]	[ed]	->[med]	1618
+[ sp]	[l]	->[ spl]	1619
+[ le]	[ave]	->[ leave]	1620
+[ own]	[er]	->[ owner]	1621
+[ prom]	[ised]	->[ promised]	1622
+[ dan]	[ger]	->[ danger]	1623
+[e]	[ver]	->[ever]	1624
+["]	[Look]	->["Look]	1625
+[ s]	[uch]	->[ such]	1626
+[ wh]	[ite]	->[ white]	1627
+[ tal]	[k]	->[ talk]	1628
+[ p]	[at]	->[ pat]	1629
+[uff]	[y]	->[uffy]	1630
+["]	[.]	->[".]	1631
+[ f]	[ur]	->[ fur]	1632
+[ p]	[ie]	->[ pie]	1633
+[op]	[e]	->[ope]	1634
+[r]	[ed]	->[red]	1635
+[ pull]	[ed]	->[ pulled]	1636
+[ p]	[re]	->[ pre]	1637
+[ wood]	[s]	->[ woods]	1638
+[ T]	[o]	->[ To]	1639
+[ sh]	[ared]	->[ shared]	1640
+[ al]	[one]	->[ alone]	1641
+[ tow]	[ards]	->[ towards]	1642
+[ M]	[aybe]	->[ Maybe]	1643
+[c]	[le]	->[cle]	1644
+[ color]	[ful]	->[ colorful]	1645
+[ s]	[it]	->[ sit]	1646
+[ n]	[ap]	->[ nap]	1647
+[am]	[p]	->[amp]	1648
+[p]	[h]	->[ph]	1649
+[ vis]	[it]	->[ visit]	1650
+[ug]	[g]	->[ugg]	1651
+[ig]	[g]	->[igg]	1652
+[th]	[y]	->[thy]	1653
+[ ta]	[il]	->[ tail]	1654
+[en]	[ce]	->[ence]	1655
+[ct]	[or]	->[ctor]	1656
+[ magic]	[al]	->[ magical]	1657
+[ r]	[iver]	->[ river]	1658
+[ be]	[lie]	->[ belie]	1659
+[ h]	[ig]	->[ hig]	1660
+[ gr]	[ate]	->[ grate]	1661
+[ot]	[t]	->[ott]	1662
+[an]	[g]	->[ang]	1663
+[u]	[ally]	->[ually]	1664
+[ h]	[ide]	->[ hide]	1665
+[ s]	[illy]	->[ silly]	1666
+[ smil]	[es]	->[ smiles]	1667
+[ow]	[er]	->[ower]	1668
+[ s]	[ide]	->[ side]	1669
+[ ro]	[ll]	->[ roll]	1670
+[M]	[ax]	->[Max]	1671
+[ pr]	[o]	->[ pro]	1672
+[ A]	[my]	->[ Amy]	1673
+[ g]	[u]	->[ gu]	1674
+[ fast]	[er]	->[ faster]	1675
+[ grate]	[ful]	->[ grateful]	1676
+[et]	[er]	->[eter]	1677
+[ tre]	[asure]	->[ treasure]	1678
+[as]	[ed]	->[ased]	1679
+[ sn]	[ack]	->[ snack]	1680
+[ la]	[nd]	->[ land]	1681
+[av]	[y]	->[avy]	1682
+[u]	[p]	->[up]	1683
+[ mor]	[al]	->[ moral]	1684
+[ain]	[ed]	->[ained]	1685
+[ s]	[ister]	->[ sister]	1686
+[ G]	[ra]	->[ Gra]	1687
+[ pain]	[t]	->[ paint]	1688
+[ sh]	[ap]	->[ shap]	1689
+[ slow]	[ly]	->[ slowly]	1690
+[ f]	[ield]	->[ field]	1691
+[ p]	[et]	->[ pet]	1692
+[or]	[m]	->[orm]	1693
+[ J]	[im]	->[ Jim]	1694
+[ s]	[ec]	->[ sec]	1695
+[ br]	[an]	->[ bran]	1696
+[ mu]	[st]	->[ must]	1697
+[ m]	[in]	->[ min]	1698
+[ help]	[ing]	->[ helping]	1699
+[ wor]	[ried]	->[ worried]	1700
+[ jo]	[b]	->[ job]	1701
+[ fo]	[x]	->[ fox]	1702
+[s]	[et]	->[set]	1703
+[ m]	[oney]	->[ money]	1704
+[ p]	[ot]	->[ pot]	1705
+[ qu]	[i]	->[ qui]	1706
+[ be]	[l]	->[ bel]	1707
+[ ac]	[c]	->[ acc]	1708
+[ li]	[ving]	->[ living]	1709
+[ mon]	[ster]	->[ monster]	1710
+[ part]	[y]	->[ party]	1711
+[le]	[ss]	->[less]	1712
+[ mo]	[st]	->[ most]	1713
+[e]	[ar]	->[ear]	1714
+[ we]	[ar]	->[ wear]	1715
+[ rememb]	[er]	->[ remember]	1716
+[ s]	[ign]	->[ sign]	1717
+[ ]	[O]	->[ O]	1718
+[i]	[re]	->[ire]	1719
+[w]	[l]	->[wl]	1720
+[ cl]	[oud]	->[ cloud]	1721
+[ c]	[andy]	->[ candy]	1722
+[ hig]	[her]	->[ higher]	1723
+[ A]	[ll]	->[ All]	1724
+[id]	[ent]	->[ident]	1725
+[i]	[pped]	->[ipped]	1726
+[d]	[er]	->[der]	1727
+[z]	[e]	->[ze]	1728
+[ qui]	[et]	->[ quiet]	1729
+[ to]	[wn]	->[ town]	1730
+[un]	[ch]	->[unch]	1731
+[ prin]	[cess]	->[ princess]	1732
+[ask]	[et]	->[asket]	1733
+[ run]	[s]	->[ runs]	1734
+[ every]	[where]	->[ everywhere]	1735
+[e]	[m]	->[em]	1736
+[ jo]	[in]	->[ join]	1737
+[ ste]	[pped]	->[ stepped]	1738
+[ b]	[asket]	->[ basket]	1739
+[ l]	[ake]	->[ lake]	1740
+[ cu]	[p]	->[ cup]	1741
+[out]	[h]	->[outh]	1742
+[ car]	[rot]	->[ carrot]	1743
+[s]	[w]	->[sw]	1744
+[ co]	[ll]	->[ coll]	1745
+[ Dad]	[dy]	->[ Daddy]	1746
+["]	[S]	->["S]	1747
+[ pl]	[ant]	->[ plant]	1748
+[ sc]	[ream]	->[ scream]	1749
+[ he]	[avy]	->[ heavy]	1750
+[ b]	[uck]	->[ buck]	1751
+[ ch]	[o]	->[ cho]	1752
+[ bl]	[ank]	->[ blank]	1753
+[ big]	[ger]	->[ bigger]	1754
+[ clo]	[sed]	->[ closed]	1755
+[ w]	[on]	->[ won]	1756
+[ an]	[sw]	->[ answ]	1757
+[ p]	[h]	->[ ph]	1758
+[is]	[es]	->[ises]	1759
+[ blank]	[et]	->[ blanket]	1760
+[b]	[r]	->[br]	1761
+[ m]	[outh]	->[ mouth]	1762
+[ eat]	[ing]	->[ eating]	1763
+[am]	[es]	->[ames]	1764
+[ pi]	[ec]	->[ piec]	1765
+[ piec]	[es]	->[ pieces]	1766
+[ st]	[re]	->[ stre]	1767
+[ we]	[lc]	->[ welc]	1768
+[ck]	[et]	->[cket]	1769
+[ would]	[n]	->[ wouldn]	1770
+[ re]	[ach]	->[ reach]	1771
+[ bro]	[ke]	->[ broke]	1772
+[ danger]	[ous]	->[ dangerous]	1773
+[e]	[ared]	->[eared]	1774
+[g]	[s]	->[gs]	1775
+[ M]	[olly]	->[ Molly]	1776
+[ c]	[e]	->[ ce]	1777
+[ M]	[r]	->[ Mr]	1778
+[or]	[d]	->[ord]	1779
+[f]	[ort]	->[fort]	1780
+[ doll]	[s]	->[ dolls]	1781
+[m]	[ing]	->[ming]	1782
+[ dan]	[ce]	->[ dance]	1783
+["]	[Yes]	->["Yes]	1784
+[ ask]	[s]	->[ asks]	1785
+[ think]	[s]	->[ thinks]	1786
+[ dra]	[gon]	->[ dragon]	1787
+[ ac]	[ross]	->[ across]	1788
+[ ch]	[air]	->[ chair]	1789
+[ te]	[ac]	->[ teac]	1790
+[ b]	[ott]	->[ bott]	1791
+[H]	[i]	->[Hi]	1792
+[ p]	[a]	->[ pa]	1793
+[ ne]	[igh]	->[ neigh]	1794
+[ b]	[ar]	->[ bar]	1795
+[ b]	[ike]	->[ bike]	1796
+[ p]	[ack]	->[ pack]	1797
+[ neigh]	[b]	->[ neighb]	1798
+[ dis]	[app]	->[ disapp]	1799
+[it]	[ing]	->[iting]	1800
+[ st]	[uck]	->[ stuck]	1801
+[ belie]	[ve]	->[ believe]	1802
+[ fr]	[uit]	->[ fruit]	1803
+[ g]	[if]	->[ gif]	1804
+[d]	[e]	->[de]	1805
+[ ]	[ve]	->[ ve]	1806
+[c]	[y]	->[cy]	1807
+[ cry]	[ing]	->[ crying]	1808
+[i]	[er]	->[ier]	1809
+[ph]	[ant]	->[phant]	1810
+[ r]	[ace]	->[ race]	1811
+[ s]	[uddenly]	->[ suddenly]	1812
+[ s]	[oup]	->[ soup]	1813
+[ th]	[rew]	->[ threw]	1814
+[ far]	[mer]	->[ farmer]	1815
+[ acc]	[ident]	->[ accident]	1816
+[ dir]	[ty]	->[ dirty]	1817
+[ ele]	[phant]	->[ elephant]	1818
+["]	[No]	->["No]	1819
+[ mon]	[key]	->[ monkey]	1820
+[ he]	[al]	->[ heal]	1821
+[’]	[t]	->[’t]	1822
+[ re]	[m]	->[ rem]	1823
+[w]	[eet]	->[weet]	1824
+[or]	[ed]	->[ored]	1825
+[ p]	[ers]	->[ pers]	1826
+[vent]	[ually]	->[ventually]	1827
+[ sa]	[me]	->[ same]	1828
+[e]	[ad]	->[ead]	1829
+[pp]	[ing]	->[pping]	1830
+[ gent]	[le]	->[ gentle]	1831
+[ br]	[own]	->[ brown]	1832
+[ f]	[ree]	->[ free]	1833
+[ be]	[e]	->[ bee]	1834
+[ in]	[st]	->[ inst]	1835
+[M]	[aybe]	->[Maybe]	1836
+[i]	[x]	->[ix]	1837
+[ b]	[en]	->[ ben]	1838
+[ w]	[in]	->[ win]	1839
+[ bl]	[ack]	->[ black]	1840
+[ long]	[er]	->[ longer]	1841
+[ al]	[ong]	->[ along]	1842
+[i]	[ble]	->[ible]	1843
+[ sp]	[r]	->[ spr]	1844
+[ cl]	[apped]	->[ clapped]	1845
+[W]	[hy]	->[Why]	1846
+[F]	[inally]	->[Finally]	1847
+[ F]	[l]	->[ Fl]	1848
+[ wor]	[ds]	->[ words]	1849
+[ teac]	[her]	->[ teacher]	1850
+[ck]	[ed]	->[cked]	1851
+[ pie]	[ce]	->[ piece]	1852
+[ up]	[set]	->[ upset]	1853
+[ch]	[ool]	->[chool]	1854
+[ we]	[ll]	->[ well]	1855
+[ che]	[ered]	->[ cheered]	1856
+[ sa]	[ng]	->[ sang]	1857
+[ h]	[it]	->[ hit]	1858
+[ bow]	[l]	->[ bowl]	1859
+[m]	[ent]	->[ment]	1860
+["]	[Wow]	->["Wow]	1861
+[ b]	[ite]	->[ bite]	1862
+[ do]	[ctor]	->[ doctor]	1863
+[ J]	[ill]	->[ Jill]	1864
+[ buck]	[et]	->[ bucket]	1865
+["]	[Let]	->["Let]	1866
+[M]	[ia]	->[Mia]	1867
+[ b]	[ath]	->[ bath]	1868
+[ c]	[aught]	->[ caught]	1869
+[ he]	[art]	->[ heart]	1870
+[ for]	[get]	->[ forget]	1871
+[ m]	[ark]	->[ mark]	1872
+[ but]	[t]	->[ butt]	1873
+[ you]	[ng]	->[ young]	1874
+[ se]	[a]	->[ sea]	1875
+[ d]	[ry]	->[ dry]	1876
+[.]	[”\u000a]	->[.”\u000a]	1877
+[ dro]	[pped]	->[ dropped]	1878
+[ c]	[our]	->[ cour]	1879
+[ y]	[ard]	->[ yard]	1880
+[es]	[e]	->[ese]	1881
+[ pl]	[ac]	->[ plac]	1882
+[our]	[n]	->[ourn]	1883
+[ sw]	[ings]	->[ swings]	1884
+[bb]	[y]	->[bby]	1885
+[ s]	[chool]	->[ school]	1886
+[ w]	[ings]	->[ wings]	1887
+[b]	[s]	->[bs]	1888
+[ expl]	[ained]	->[ explained]	1889
+[ j]	[ourn]	->[ journ]	1890
+[ stre]	[et]	->[ street]	1891
+[ dr]	[ink]	->[ drink]	1892
+[ br]	[ing]	->[ bring]	1893
+[ ju]	[ice]	->[ juice]	1894
+[un]	[g]	->[ung]	1895
+[ near]	[by]	->[ nearby]	1896
+[ Em]	[ma]	->[ Emma]	1897
+[ pu]	[shed]	->[ pushed]	1898
+[ sm]	[o]	->[ smo]	1899
+[ sm]	[art]	->[ smart]	1900
+[ stor]	[ies]	->[ stories]	1901
+[ dro]	[ve]	->[ drove]	1902
+[ cour]	[se]	->[ course]	1903
+[ t]	[iny]	->[ tiny]	1904
+[ p]	[en]	->[ pen]	1905
+[ ]	[es]	->[ es]	1906
+[ m]	[ine]	->[ mine]	1907
+[ to]	[day]	->[ today]	1908
+[aught]	[er]	->[aughter]	1909
+[ po]	[cket]	->[ pocket]	1910
+[ ye]	[ar]	->[ year]	1911
+[ j]	[e]	->[ je]	1912
+[ sec]	[ret]	->[ secret]	1913
+[ ex]	[p]	->[ exp]	1914
+[ sing]	[ing]	->[ singing]	1915
+[ with]	[out]	->[ without]	1916
+[ welc]	[ome]	->[ welcome]	1917
+[ happ]	[en]	->[ happen]	1918
+[t]	[o]	->[to]	1919
+[ f]	[it]	->[ fit]	1920
+[ st]	[u]	->[ stu]	1921
+[ra]	[ct]	->[ract]	1922
+[ve]	[l]	->[vel]	1923
+[ bu]	[s]	->[ bus]	1924
+[ cr]	[ay]	->[ cray]	1925
+[ che]	[ese]	->[ cheese]	1926
+[ fair]	[y]	->[ fairy]	1927
+[ turn]	[s]	->[ turns]	1928
+[ j]	[ar]	->[ jar]	1929
+[ bu]	[sh]	->[ bush]	1930
+[ expl]	[oring]	->[ exploring]	1931
+[b]	[ow]	->[bow]	1932
+[ll]	[o]	->[llo]	1933
+[ l]	[on]	->[ lon]	1934
+[ st]	[and]	->[ stand]	1935
+[itt]	[ing]	->[itting]	1936
+[ see]	[med]	->[ seemed]	1937
+[ sp]	[oon]	->[ spoon]	1938
+[ F]	[inally]	->[ Finally]	1939
+[ g]	[ames]	->[ games]	1940
+[ wo]	[ke]	->[ woke]	1941
+[is]	[sed]	->[issed]	1942
+[ hop]	[ed]	->[ hoped]	1943
+[ tr]	[ou]	->[ trou]	1944
+[ tw]	[ins]	->[ twins]	1945
+[ re]	[sp]	->[ resp]	1946
+[ lon]	[ely]	->[ lonely]	1947
+[ at]	[t]	->[ att]	1948
+[ a]	[nt]	->[ ant]	1949
+[ M]	[ama]	->[ Mama]	1950
+[or]	[row]	->[orrow]	1951
+[ount]	[ain]	->[ountain]	1952
+[ no]	[ises]	->[ noises]	1953
+[ hug]	[s]	->[ hugs]	1954
+[ ke]	[y]	->[ key]	1955
+[y]	[ard]	->[yard]	1956
+[ d]	[aughter]	->[ daughter]	1957
+[ in]	[v]	->[ inv]	1958
+[ rock]	[s]	->[ rocks]	1959
+[a]	[il]	->[ail]	1960
+[ dis]	[co]	->[ disco]	1961
+[ l]	[unch]	->[ lunch]	1962
+[ s]	[u]	->[ su]	1963
+[re]	[ad]	->[read]	1964
+[ou]	[n]	->[oun]	1965
+[ver]	[ed]	->[vered]	1966
+[ back]	[yard]	->[ backyard]	1967
+[ c]	[ow]	->[ cow]	1968
+[ s]	[uc]	->[ suc]	1969
+[ app]	[le]	->[ apple]	1970
+[e]	[k]	->[ek]	1971
+[ sw]	[am]	->[ swam]	1972
+[ sho]	[es]	->[ shoes]	1973
+[ sh]	[ook]	->[ shook]	1974
+[ st]	[ars]	->[ stars]	1975
+[itt]	[ens]	->[ittens]	1976
+[ m]	[iss]	->[ miss]	1977
+[c]	[hes]	->[ches]	1978
+[!]	[”]	->[!”]	1979
+[ w]	[ish]	->[ wish]	1980
+[fu]	[sed]	->[fused]	1981
+[ shap]	[es]	->[ shapes]	1982
+[ re]	[lie]	->[ relie]	1983
+[urp]	[le]	->[urple]	1984
+[ tow]	[er]	->[ tower]	1985
+[ mo]	[ved]	->[ moved]	1986
+[sh]	[ine]	->[shine]	1987
+[ c]	[orn]	->[ corn]	1988
+[it]	[y]	->[ity]	1989
+[ th]	[ough]	->[ though]	1990
+["]	[What]	->["What]	1991
+[ c]	[ir]	->[ cir]	1992
+[ ta]	[king]	->[ taking]	1993
+[um]	[b]	->[umb]	1994
+[ap]	[e]	->[ape]	1995
+[ T]	[weet]	->[ Tweet]	1996
+[ rain]	[bow]	->[ rainbow]	1997
+[t]	[s]	->[ts]	1998
+[ thr]	[ow]	->[ throw]	1999
+[<|endoftext|>]	2000
