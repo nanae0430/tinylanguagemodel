@@ -184,7 +184,7 @@ class RegexTokenizer(Tokenizer):
             r"|\s"
         )
 
-    def train_original(self, text, vocab_size=266):
+    def _train_original(self, text, vocab_size=266):
         if vocab_size < 256:
             raise ValueError("vocab_size不能小于256")
 
@@ -220,7 +220,7 @@ class RegexTokenizer(Tokenizer):
         self.merges = merges
         self.vocab = self._build_vocab()
 
-    def train_include_special_token(self, corpus, vocab_size=1027):
+    def train(self, corpus, vocab_size=1027):
         if vocab_size < 256:
             raise ValueError("vocab_size不能小于256")
         new_id = 256
