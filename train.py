@@ -24,14 +24,15 @@ tokenizer = RegexTokenizer()
 tokenizer.load("./tiny_story.model")
 vocab_size = len(tokenizer.vocab)
 
-train_data = tokenizer.encode(train_text, {"<|endoftext|>": 2000})
-val_data = tokenizer.encode(val_text, tokenizer.special_tokens)
+train_data = tokenizer.encode(train_text, {"<|endoftext|>"})
+val_data = tokenizer.encode(val_text, {"<|endoftext|>"})
 train_data = torch.tensor(train_data, dtype=torch.long)
 val_data = torch.tensor(val_data, dtype=torch.long)
 
 model = TinyLanguageModel(
     vocab_size, n_embd, block_size, num_head, num_layer, dropout=0.1
 )
+model = model.to(device)
 optimizer = torch.optim.AdamW(params=model.parameters(), lr=5e-4)
 train(
     model=model,

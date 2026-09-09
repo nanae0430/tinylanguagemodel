@@ -167,7 +167,12 @@ class TinyLanguageModel(nn.Module):
 
     @torch.no_grad()
     def generate(
-        self, idx, max_new_tokens, top_k: int = None, temperature: float = 0.8
+        self,
+        idx,
+        max_new_tokens,
+        eos_token,
+        top_k: int = None,
+        temperature: float = 0.8,
     ):
 
         result = idx
@@ -194,7 +199,8 @@ class TinyLanguageModel(nn.Module):
                 new_token = torch.multinomial(prob, 1)
 
             result = torch.concat((result, new_token), dim=-1)
-
+            if new_token == eos_token:
+                break
         return result
 
 
