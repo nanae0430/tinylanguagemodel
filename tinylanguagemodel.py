@@ -172,6 +172,7 @@ class TinyLanguageModel(nn.Module):
         max_new_tokens,
         eos_token,
         top_k: int = None,
+        top_p: float = None,
         temperature: float = 0.8,
     ):
 
@@ -184,20 +185,34 @@ class TinyLanguageModel(nn.Module):
             logits, _ = self(context)
             logits = logits[:, -1, :]
             k = logits.shape[-1]
-            if top_k == 1:
-                new_token = torch.argmax(logits, dim=-1, keepdim=True)
-            elif top_k is not None and top_k <= 0:
-                raise ValueError("top_k必须大于0")
-            elif top_k is not None:
-                k = min(top_k, logits.shape[-1])
-                topk_logits, topk_indices = torch.topk(logits / temperature, k, dim=-1)
-                topk_prob = torch.softmax(topk_logits, dim=-1)
-                sample_position = torch.multinomial(topk_prob, 1)
-                new_token = torch.gather(topk_indices, dim=-1, index=sample_position)
-            else:
-                prob = torch.softmax(logits / temperature, dim=-1)
-                new_token = torch.multinomial(prob, 1)
+            if top_p is None:
+                if top_k == 1:
+                    new_token = torch.argmax(logits, dim=-1, keepdim=True)
+                elif top_k is not None and top_k <= 0:
+                    raise ValueError("top_k必须大于0")
+                elif top_k is not None:
+                    k = min(top_k, logits.shape[-1])
+                    topk_logits, topk_indices = torch.topk(
+                        logits / temperature, k, dim=-1
+                    )
+                    topk_prob = torch.softmax(topk_logits, dim=-1)
+                    sample_position = torch.multinomial(topk_prob, 1)
+                    new_token = torch.gather(
+                        topk_indices, dim=-1, index=sample_position
+                    )
+                else:
+                    prob = torch.softmax(logits / temperature, dim=-1)
+                    new_token = torch.multinomial(prob, 1)
 
+            else:
+                sorted_prob, sorted_indices = torch.sort(
+                    torch.softmax(logits / temperature, dim=-1), dim=-1, descending=True
+                )
+                cumsum_prob = torch.cumsum(sorted_prob, dim=-1)
+                cutoff_index = torch.searchsorted(cumsum_prob, top_p)
+                topp_prob = torch.softmax(sorted_prob[:cutoff_index], dim=-1)
+                sample_position = torch.multinomial(topp_prob, 1)
+                new_token = torch.gather(sorted_indices, dim=-1, index=sample_position)
             result = torch.concat((result, new_token), dim=-1)
             if new_token == eos_token:
                 break

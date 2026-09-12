@@ -29,7 +29,7 @@ prompt = tokenizer.encode(prompt)
 prompt = torch.tensor(prompt, dtype=torch.long).unsqueeze(0)
 model.eval()
 result = model.generate(
-    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_k=1
+    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_k=50
 )
 result = tokenizer.decode(result[0].tolist())
 print(result)
