@@ -33,3 +33,16 @@ result = model.generate(
 )
 result = tokenizer.decode(result[0].tolist())
 print(result)
+print("*" * 20)
+result = model.generate(
+    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_p=0.9
+)
+result = tokenizer.decode(result[0].tolist())
+print(result)
+print("*" * 20)
+result = model.generate(
+    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_p=0.9
+)
+result = tokenizer.decode(result[0].tolist())
+print(result)
+print("*" * 20)

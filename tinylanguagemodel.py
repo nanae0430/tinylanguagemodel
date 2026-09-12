@@ -210,7 +210,7 @@ class TinyLanguageModel(nn.Module):
                 )
                 cumsum_prob = torch.cumsum(sorted_prob, dim=-1)
                 cutoff_index = torch.searchsorted(
-                    cumsum_prob, torch.ones(size=(cumsum_prob.shape[0],)) * top_p
+                    cumsum_prob, torch.ones(size=(cumsum_prob.shape[0], 1)) * top_p
                 ).item()
                 topp_prob = sorted_prob[:, : cutoff_index + 1] / torch.sum(
                     sorted_prob[:, : cutoff_index + 1], dim=-1, keepdim=True
