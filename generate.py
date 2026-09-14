@@ -22,27 +22,24 @@ model = TinyLanguageModel(
     dropout=0.2,
 )
 model.load_state_dict(best_checkpoint["model_state_dict"])
+model = model.to(device)
 tokenizer = RegexTokenizer()
 tokenizer.load("./tiny_story.model")
 prompt = "once upon a time"
 prompt = tokenizer.encode(prompt)
-prompt = torch.tensor(prompt, dtype=torch.long).unsqueeze(0)
+prompt = torch.tensor(prompt, dtype=torch.long, device=device).unsqueeze(0)
+prompt = prompt.repeat(4, 1)
 model.eval()
 result = model.generate(
     prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_k=50
 )
-result = tokenizer.decode(result[0].tolist())
-print(result)
-print("*" * 20)
-result = model.generate(
-    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_p=0.9
-)
-result = tokenizer.decode(result[0].tolist())
-print(result)
-print("*" * 20)
-result = model.generate(
-    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_p=0.9
-)
-result = tokenizer.decode(result[0].tolist())
-print(result)
-print("*" * 20)
+eos_token = tokenizer.special_tokens["<|endoftext|>"]
+for response in result:
+
+    response = response.tolist()
+
+    if eos_token in response:
+        response = response[: 1 + response.index(eos_token)]
+    response = tokenizer.decode(response)
+    print(response)
+    print("*" * 20)
