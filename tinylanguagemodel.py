@@ -209,6 +209,11 @@ class TinyLanguageModel(nn.Module):
                     torch.softmax(logits / temperature, dim=-1), dim=-1, descending=True
                 )
                 cumsum_prob = torch.cumsum(sorted_prob, dim=-1)
+                mask = cumsum_prob > top_p
+                mask[:, 1:] = mask[:, :-1].clone()
+                mask[:, 0] = False
+                filter_prob = torch.masked_fill(sorted_prob, mask=mask, value=0)
+                filter_prob = filter_prob / torch.sum(filter_prob, dim=-1, keepdim=True)
                 cutoff_index = torch.searchsorted(
                     cumsum_prob, torch.ones(size=(cumsum_prob.shape[0], 1)) * top_p
                 ).item()
