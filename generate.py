@@ -31,15 +31,16 @@ prompt = torch.tensor(prompt, dtype=torch.long, device=device).unsqueeze(0)
 prompt = prompt.repeat(4, 1)
 model.eval()
 result = model.generate(
-    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_k=50
+    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_p=0.8
 )
 eos_token = tokenizer.special_tokens["<|endoftext|>"]
+i = 0
 for response in result:
-
+    i += 1
+    print("*" * 20, i, "*" * 20)
     response = response.tolist()
 
     if eos_token in response:
         response = response[: 1 + response.index(eos_token)]
     response = tokenizer.decode(response)
     print(response)
-    print("*" * 20)

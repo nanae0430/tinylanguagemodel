@@ -187,6 +187,8 @@ class TinyLanguageModel(nn.Module):
             logits, _ = self(context)
             logits = logits[:, -1, :]
             k = logits.shape[-1]
+            if top_p is not None and top_k is not None:
+                raise ValueError("不可以同时启用topk和topp")
             if top_p is None:
                 if top_k == 1:
                     new_token = torch.argmax(logits, dim=-1, keepdim=True)
