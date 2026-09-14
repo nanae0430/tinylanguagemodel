@@ -217,12 +217,6 @@ class TinyLanguageModel(nn.Module):
                 mask[:, 0] = False
                 filter_prob = torch.masked_fill(sorted_prob, mask=mask, value=0)
                 filter_prob = filter_prob / torch.sum(filter_prob, dim=-1, keepdim=True)
-                # cutoff_index = torch.searchsorted(
-                #     cumsum_prob, torch.ones(size=(cumsum_prob.shape[0], 1)) * top_p
-                # ).item()
-                # topp_prob = sorted_prob[:, : cutoff_index + 1] / torch.sum(
-                #     sorted_prob[:, : cutoff_index + 1], dim=-1, keepdim=True
-                # )
                 sample_position = torch.multinomial(filter_prob, 1)
                 new_token = torch.gather(sorted_indices, dim=-1, index=sample_position)
             new_token = new_token.masked_fill(stop, eos_token)
