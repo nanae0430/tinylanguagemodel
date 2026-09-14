@@ -177,6 +177,8 @@ class TinyLanguageModel(nn.Module):
     ):
 
         result = idx
+
+        stop = torch.zeros(size=(idx.shape[0], 1), dtype=torch.bool, device=idx.device)
         if temperature <= 0:
             raise ValueError("temperature必须大于0")
 
@@ -203,7 +205,8 @@ class TinyLanguageModel(nn.Module):
                 else:
                     prob = torch.softmax(logits / temperature, dim=-1)
                     new_token = torch.multinomial(prob, 1)
-
+            elif top_p <= 0 or top_p > 1:
+                raise ValueError("invalid top_p")
             else:
                 sorted_prob, sorted_indices = torch.sort(
                     torch.softmax(logits / temperature, dim=-1), dim=-1, descending=True
@@ -214,16 +217,18 @@ class TinyLanguageModel(nn.Module):
                 mask[:, 0] = False
                 filter_prob = torch.masked_fill(sorted_prob, mask=mask, value=0)
                 filter_prob = filter_prob / torch.sum(filter_prob, dim=-1, keepdim=True)
-                cutoff_index = torch.searchsorted(
-                    cumsum_prob, torch.ones(size=(cumsum_prob.shape[0], 1)) * top_p
-                ).item()
-                topp_prob = sorted_prob[:, : cutoff_index + 1] / torch.sum(
-                    sorted_prob[:, : cutoff_index + 1], dim=-1, keepdim=True
-                )
-                sample_position = torch.multinomial(topp_prob, 1)
+                # cutoff_index = torch.searchsorted(
+                #     cumsum_prob, torch.ones(size=(cumsum_prob.shape[0], 1)) * top_p
+                # ).item()
+                # topp_prob = sorted_prob[:, : cutoff_index + 1] / torch.sum(
+                #     sorted_prob[:, : cutoff_index + 1], dim=-1, keepdim=True
+                # )
+                sample_position = torch.multinomial(filter_prob, 1)
                 new_token = torch.gather(sorted_indices, dim=-1, index=sample_position)
+            new_token = new_token.masked_fill(stop, eos_token)
             result = torch.concat((result, new_token), dim=-1)
-            if new_token == eos_token:
+            stop |= new_token == eos_token
+            if stop.all():
                 break
         return result
 
