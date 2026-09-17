@@ -250,11 +250,10 @@ def train(
     min_delta=0.01,
     best_val_loss=float("inf"),
     start_step=1,
+    non_improve=0,
 ):
 
     model.train()
-
-    non_improve = 0
 
     for step in range(start_step, start_step + steps):
         input_x, target = get_batch(
@@ -304,18 +303,6 @@ def save_model(
     optimizer,
     step,
 ):
-    torch.save(
-        {
-            "step": step,
-            "model_state_dict": model.state_dict(),
-            "model_config": model.model_config,
-            "optimizer_state_dict": optimizer.state_dict(),
-            "train_loss": current_train_loss,
-            "val_loss": current_eval_loss,
-            "best_val_loss": best_val_loss,
-        },
-        "last_checkpoint.pt",
-    )
     if current_eval_loss < best_val_loss - min_delta:
         best_val_loss = current_eval_loss
         non_improve = 0
@@ -328,11 +315,25 @@ def save_model(
                 "train_loss": current_train_loss,
                 "val_loss": best_val_loss,
                 "best_val_loss": best_val_loss,
+                "non_improve": non_improve,
             },
             "best_checkpoint.pt",
         )
     else:
         non_improve += 1
+    torch.save(
+        {
+            "step": step,
+            "model_state_dict": model.state_dict(),
+            "model_config": model.model_config,
+            "optimizer_state_dict": optimizer.state_dict(),
+            "train_loss": current_train_loss,
+            "val_loss": current_eval_loss,
+            "best_val_loss": best_val_loss,
+            "non_improve": non_improve,
+        },
+        "last_checkpoint.pt",
+    )
     return best_val_loss, non_improve
 
 
