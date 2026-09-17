@@ -255,7 +255,7 @@ def train(
 
     model.train()
 
-    for step in range(start_step, start_step + steps):
+    for step in range(start_step, 1 + steps):
         input_x, target = get_batch(
             data=train_data,
             batch_size=batch_size,
