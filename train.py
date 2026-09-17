@@ -33,9 +33,8 @@ if load_checkpoint:
     print(check_point.keys())
     model = TinyLanguageModel(**check_point["model_config"]).to(device)
     model.load_state_dict(check_point["model_state_dict"])
-    optimizer = torch.optim.AdamW(params=model.parameters()).load_state_dict(
-        check_point["optimizer_state_dict"]
-    )
+    optimizer = torch.optim.AdamW(params=model.parameters())
+    optimizer.load_state_dict(check_point["optimizer_state_dict"])
     start_step = check_point["step"]
     non_improve = check_point["non_improve"]
     best_val_loss = check_point["best_val_loss"]
