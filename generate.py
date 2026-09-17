@@ -13,14 +13,7 @@ lr = 0.001
 device = "cuda" if torch.cuda.is_available() else "cpu"
 vocab_size = 2001
 best_checkpoint = torch.load("./best_checkpoint.pt", device)
-model = TinyLanguageModel(
-    vocab_size=vocab_size,
-    n_embd=n_embd,
-    block_size=block_size,
-    num_head=num_head,
-    num_layer=num_layer,
-    dropout=0.2,
-)
+model = TinyLanguageModel(**best_checkpoint["model_config"])
 model.load_state_dict(best_checkpoint["model_state_dict"])
 model = model.to(device)
 tokenizer = RegexTokenizer()

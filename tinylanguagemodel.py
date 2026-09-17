@@ -306,6 +306,7 @@ def save_model(
         {
             "step": step,
             "model_state_dict": model.state_dict(),
+            "model_config": model.model_config,
             "optimizer_state_dict": optimizer.state_dict(),
             "train_loss": current_train_loss,
             "val_loss": current_eval_loss,
