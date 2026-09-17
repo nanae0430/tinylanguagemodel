@@ -2,8 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-torch.manual_seed(39)
-
 
 def get_batch(
     data: torch.Tensor,
@@ -291,6 +289,16 @@ def train(
             )
             if non_improve >= patience:
                 return
+    best_val_loss, non_improve = save_model(
+        best_val_loss=best_val_loss,
+        current_train_loss=train_loss,
+        current_eval_loss=eval_loss,
+        min_delta=min_delta,
+        model=model,
+        non_improve=non_improve,
+        optimizer=optimizer,
+        step=step,
+    )
 
 
 def save_model(

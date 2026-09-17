@@ -1,6 +1,6 @@
 from MinBPE import RegexTokenizer
-from tinylanguagemodel import TinyLanguageModel, train, estimate_loss, get_batch
-import time, torch
+from tinylanguagemodel import TinyLanguageModel, train
+import torch
 
 torch.manual_seed(39)
 
@@ -8,7 +8,7 @@ with open("./train_text.txt", "r", encoding="utf-8") as f:
     train_text = f.read()
 with open("./val_text.txt", "r", encoding="utf-8") as f:
     val_text = f.read()
-load_checkpoint = True
+load_checkpoint = False
 
 batch_size = 32
 block_size = 128
@@ -45,7 +45,7 @@ if load_checkpoint:
         val_data=val_data,
         batch_size=batch_size,
         block_size=model.block_size,
-        steps=3000,
+        steps=steps + 1000,
         eval_iters=100,
         device=device,
         best_val_loss=best_val_loss,
