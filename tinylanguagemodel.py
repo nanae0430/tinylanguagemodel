@@ -248,12 +248,13 @@ def train(
     device,
     patience=3,
     min_delta=0.01,
+    best_val_loss=float("inf"),
 ):
 
     model.train()
 
     non_improve = 0
-    best_val_loss = float("inf")
+    best_val_loss = best_val_loss
     for step in range(1, 1 + steps):
         input_x, target = get_batch(
             data=train_data,
@@ -310,6 +311,7 @@ def save_model(
             "optimizer_state_dict": optimizer.state_dict(),
             "train_loss": current_train_loss,
             "val_loss": current_eval_loss,
+            "best_val_loss": best_val_loss,
         },
         "last_checkpoint.pt",
     )
@@ -324,6 +326,7 @@ def save_model(
                 "optimizer_state_dict": optimizer.state_dict(),
                 "train_loss": current_train_loss,
                 "val_loss": best_val_loss,
+                "best_val_loss": best_val_loss,
             },
             "best_checkpoint.pt",
         )

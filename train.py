@@ -10,12 +10,12 @@ with open("./val_text.txt", "r", encoding="utf-8") as f:
     val_text = f.read()
 
 
-batch_size = 16
+batch_size = 32
 block_size = 128
 n_embd = 128
 num_head = 8
-num_layer = 6
-steps = 10000
+num_layer = 8
+steps = 20000
 eval_iters = 100
 lr = 0.001
 device = "cuda" if torch.cuda.is_available() else "cpu"
