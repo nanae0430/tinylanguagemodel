@@ -125,12 +125,20 @@ class TinyLanguageModel(nn.Module):
         block_size: int,
         num_head: int,
         num_layer: int,
-        dropout: int = 0,
+        dropout: float = 0,
     ):
         super().__init__()
         self.vocab_size = vocab_size
         self.n_embd = n_embd
         self.block_size = block_size
+        self.model_config = {
+            "vocab_size": vocab_size,
+            "n_embd": n_embd,
+            "block_size": block_size,
+            "num_layer": num_layer,
+            "num_head": num_head,
+            "dropout": dropout,
+        }
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
         self.position_embedding_table = nn.Embedding(block_size, n_embd)
         self.lm_head = nn.Linear(n_embd, vocab_size)
@@ -310,6 +318,7 @@ def save_model(
         torch.save(
             {
                 "step": step,
+                "model_config": model.model_config,
                 "model_state_dict": model.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
                 "train_loss": current_train_loss,
