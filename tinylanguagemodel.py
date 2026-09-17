@@ -249,13 +249,14 @@ def train(
     patience=3,
     min_delta=0.01,
     best_val_loss=float("inf"),
+    start_step=1,
 ):
 
     model.train()
 
     non_improve = 0
     best_val_loss = best_val_loss
-    for step in range(1, 1 + steps):
+    for step in range(start_step, start_step + steps):
         input_x, target = get_batch(
             data=train_data,
             batch_size=batch_size,
