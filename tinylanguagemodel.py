@@ -255,7 +255,7 @@ def train(
     model.train()
 
     non_improve = 0
-    best_val_loss = best_val_loss
+
     for step in range(start_step, start_step + steps):
         input_x, target = get_batch(
             data=train_data,
