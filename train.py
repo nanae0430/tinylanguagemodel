@@ -10,15 +10,15 @@ with open("./val_text.txt", "r", encoding="utf-8") as f:
     val_text = f.read()
 
 
-batch_size = 32
-block_size = 128
-n_embd = 128
-num_head = 8
-num_layer = 8
-steps = 20000
-eval_iters = 100
-lr = 0.001
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# batch_size = 32
+# block_size = 128
+# n_embd = 128
+# num_head = 8
+# num_layer = 8
+# steps = 20000
+# eval_iters = 100
+# lr = 0.001
+# device = "cuda" if torch.cuda.is_available() else "cpu"
 
 tokenizer = RegexTokenizer()
 tokenizer.load("./tiny_story.model")
@@ -29,19 +29,41 @@ val_data = tokenizer.encode(val_text, {"<|endoftext|>"})
 train_data = torch.tensor(train_data, dtype=torch.long)
 val_data = torch.tensor(val_data, dtype=torch.long)
 
-model = TinyLanguageModel(
-    vocab_size, n_embd, block_size, num_head, num_layer, dropout=0.1
-)
-model = model.to(device)
-optimizer = torch.optim.AdamW(params=model.parameters(), lr=5e-4)
+# model = TinyLanguageModel(
+#     vocab_size, n_embd, block_size, num_head, num_layer, dropout=0.1
+# )
+# model = model.to(device)
+# optimizer = torch.optim.AdamW(params=model.parameters(), lr=5e-4)
+# train(
+#     model=model,
+#     optimizer=optimizer,
+#     train_data=train_data,
+#     val_data=val_data,
+#     batch_size=batch_size,
+#     block_size=block_size,
+#     steps=steps,
+#     eval_iters=eval_iters,
+#     device=device,
+# )
+device = "cuda" if torch.cuda.is_available() else "cpu"
+check_point = torch.load("./last_checkpoint.pt", device)
+model = TinyLanguageModel(**check_point["model_config"]).to(device)
+model.load_state_dict(check_point["model_state_dict"])
+optimizer = torch.optim.AdamW(**check_point["optimizer_state_dict"])
+start_step = check_point["step"]
+non_improve = check_point["non_improve"]
+best_val_loss = check_point["best_val_loss"]
 train(
     model=model,
     optimizer=optimizer,
     train_data=train_data,
     val_data=val_data,
-    batch_size=batch_size,
-    block_size=block_size,
-    steps=steps,
-    eval_iters=eval_iters,
+    batch_size=model.batch_size,
+    block_size=model.block_size,
+    steps=21000,
+    eval_iters=100,
     device=device,
+    best_val_loss=best_val_loss,
+    start_step=start_step,
+    non_improve=non_improve,
 )
