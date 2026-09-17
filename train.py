@@ -15,7 +15,7 @@ block_size = 128
 n_embd = 128
 num_head = 8
 num_layer = 8
-steps = 20000
+steps = 2000
 eval_iters = 100
 lr = 0.001
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -30,6 +30,7 @@ train_data = torch.tensor(train_data, dtype=torch.long)
 val_data = torch.tensor(val_data, dtype=torch.long)
 if load_checkpoint:
     check_point = torch.load("./last_checkpoint.pt", device)
+    print(check_point.keys())
     model = TinyLanguageModel(**check_point["model_config"]).to(device)
     model.load_state_dict(check_point["model_state_dict"])
     optimizer = torch.optim.AdamW(params=model.parameters()).load_state_dict(
@@ -43,9 +44,9 @@ if load_checkpoint:
         optimizer=optimizer,
         train_data=train_data,
         val_data=val_data,
-        batch_size=model.batch_size,
+        batch_size=batch_size,
         block_size=model.block_size,
-        steps=21000,
+        steps=3000,
         eval_iters=100,
         device=device,
         best_val_loss=best_val_loss,
