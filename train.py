@@ -49,7 +49,9 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 check_point = torch.load("./last_checkpoint.pt", device)
 model = TinyLanguageModel(**check_point["model_config"]).to(device)
 model.load_state_dict(check_point["model_state_dict"])
-optimizer = torch.optim.AdamW(**check_point["optimizer_state_dict"])
+optimizer = torch.optim.AdamW(params=model.parameters()).load_state_dict(
+    check_point["optimizer_state_dict"]
+)
 start_step = check_point["step"]
 non_improve = check_point["non_improve"]
 best_val_loss = check_point["best_val_loss"]
