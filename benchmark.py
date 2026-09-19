@@ -11,6 +11,7 @@ def benchmark_training(
     device,
     warmup_steps=20,
     measure_steps=200,
+    use_amp=False,
 ):
     model.train()
     for step in range(warmup_steps):
@@ -21,17 +22,21 @@ def benchmark_training(
         _, loss = model(input_data, target_data)
         loss.backward()
         optimizer.step()
+
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
     start_time = time.perf_counter()
+
     for step in range(measure_steps):
         input_data, target_data = get_batch(
             data=data, batch_size=batch_size, block_size=block_size, device=device
         )
         optimizer.zero_grad()
-        _, loss = model(input_data, target_data)
+        with torch.autocast(device_type=device, dtype=torch.bfloat16, use_amp=use_amp):
+            _, loss = model(input_data, target_data)
         loss.backward()
         optimizer.step()
+
     torch.cuda.synchronize()
     end_time = time.perf_counter()
     peak_memory = torch.cuda.max_memory_allocated() / 1024**2
@@ -40,11 +45,11 @@ def benchmark_training(
     token_num = measure_steps * batch_size * block_size
     tokens_per_second = token_num / elapsed_seconds
     print(
-        f"elapsed:{elapsed_seconds}s\nms/step:{time_per_step}ms\ntokens/s:{tokens_per_second}\npeak_memory:{peak_memory}"
+        f"elapsed:{elapsed_seconds:.6f}s\nms/step:{time_per_step:.6f}ms\ntokens/s:{tokens_per_second:.6f}\npeak_memory:{peak_memory:.6f}"
     )
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     from MinBPE import RegexTokenizer
 
     with open("./train_text.txt", "r", encoding="utf-8") as f:
