@@ -19,7 +19,8 @@ def benchmark_training(
             data=data, batch_size=batch_size, block_size=block_size, device=device
         )
         optimizer.zero_grad()
-        _, loss = model(input_data, target_data)
+        with torch.autocast(device_type=device, dtype=torch.bfloat16, enabled=use_amp):
+            _, loss = model(input_data, target_data)
         loss.backward()
         optimizer.step()
 
@@ -32,7 +33,7 @@ def benchmark_training(
             data=data, batch_size=batch_size, block_size=block_size, device=device
         )
         optimizer.zero_grad()
-        with torch.autocast(device_type=device, dtype=torch.bfloat16, use_amp=use_amp):
+        with torch.autocast(device_type=device, dtype=torch.bfloat16, enabled=use_amp):
             _, loss = model(input_data, target_data)
         loss.backward()
         optimizer.step()
