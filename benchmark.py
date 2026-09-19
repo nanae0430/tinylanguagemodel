@@ -14,21 +14,21 @@ def benchmark_training(
     use_amp=False,
 ):
     model.train()
-    for step in range(warmup_steps):
+    for _ in range(warmup_steps):
         input_data, target_data = get_batch(
             data=data, batch_size=batch_size, block_size=block_size, device=device
         )
         optimizer.zero_grad()
         with torch.autocast(device_type=device, dtype=torch.bfloat16, enabled=use_amp):
-            _, loss = model(input_data, target_data)
+            logits, loss = model(input_data, target_data)
         loss.backward()
         optimizer.step()
-
+    print(f"logits.dtype:{logits.dtype}\tloss.dtype:{loss.dtype}")
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
     start_time = time.perf_counter()
 
-    for step in range(measure_steps):
+    for _ in range(measure_steps):
         input_data, target_data = get_batch(
             data=data, batch_size=batch_size, block_size=block_size, device=device
         )
@@ -81,12 +81,24 @@ if __name__ == "__main__":
     start_step = check_point["step"]
     non_improve = check_point["non_improve"]
     best_val_loss = check_point["best_val_loss"]
-
-    benchmark_training(
-        model=model,
-        optimizer=optimizer,
-        data=train_data,
-        batch_size=batch_size,
-        block_size=block_size,
-        device=device,
-    )
+    for i in range(3):
+        print("*" * 10, f"batch_size={32*2**i}", "*" * 10)
+        benchmark_training(
+            model=model,
+            optimizer=optimizer,
+            data=train_data,
+            batch_size=32 * 2**i,
+            block_size=block_size,
+            device=device,
+            use_amp=True,
+        )
+        print("-" * 20)
+        benchmark_training(
+            model=model,
+            optimizer=optimizer,
+            data=train_data,
+            batch_size=32 * 2**i,
+            block_size=block_size,
+            device=device,
+            use_amp=False,
+        )
