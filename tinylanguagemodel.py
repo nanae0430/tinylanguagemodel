@@ -264,6 +264,7 @@ def train(
         optimizer.zero_grad()
         _, loss = model(input_x, target)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
         optimizer.step()
         if step % 100 == 0:
             print(step, "train loss:", loss.item())
