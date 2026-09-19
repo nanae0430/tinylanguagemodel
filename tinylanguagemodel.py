@@ -249,6 +249,7 @@ def train(
     best_val_loss=float("inf"),
     start_step=0,
     non_improve=0,
+    is_eval=True,
 ):
 
     model.train()
@@ -266,7 +267,7 @@ def train(
         optimizer.step()
         if step % 100 == 0:
             print(step, "train loss:", loss.item())
-        if step % 1000 == 0:
+        if step % 1000 == 0 and is_eval:
             train_loss, eval_loss = estimate_loss(
                 model=model,
                 train_data=train_data,
