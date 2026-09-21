@@ -1,4 +1,4 @@
-import torch
+import torch, math
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -255,6 +255,10 @@ def train(
     model.train()
 
     for step in range(start_step + 1, 1 + steps):
+
+        lr = get_lr(step, 0.05 * steps, steps, optimizer.lr, 0.1 * optimizer.lr)
+        optimizer.lr = lr
+
         input_x, target = get_batch(
             data=train_data,
             batch_size=batch_size,
@@ -264,10 +268,10 @@ def train(
         optimizer.zero_grad()
         _, loss = model(input_x, target)
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
+        grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
         optimizer.step()
         if step % 100 == 0:
-            print(step, "train loss:", loss.item())
+            print(f"{step} train loss:{ loss.item()} lr:{lr} grad norm:{grad_norm}")
         if step % 1000 == 0 and is_eval:
             train_loss, eval_loss = estimate_loss(
                 model=model,
@@ -387,53 +391,70 @@ def estimate_loss(
     return sum(train_loss) / len(train_loss), sum(eval_loss) / len(eval_loss)
 
 
-# if __name__ == "__main__":
-#     device = "cuda" if torch.cuda.is_available() else "cpu"
-#     batch_size = 4
-#     vocab_size = 100
-#     block_size = 16
-#     n_embd = 128
-#     num_head = 8
-#     num_layer = 12
-#     dropout = 0.1
-#     steps = 100
-#     data = torch.randint(
-#         0,
-#         100,
-#         size=(1000,),
-#         dtype=torch.long,
-#         device=device,
-#     )
-#     train_data, val_data = data[:900], data[900:]
-#     model = TinyLanguageModel(
-#         vocab_size=vocab_size,
-#         n_embd=n_embd,
-#         block_size=block_size,
-#         num_head=num_head,
-#         num_layer=num_layer,
-#         dropout=dropout,
-#     ).to(device)
-#     optimizer = torch.optim.AdamW(
-#         params=model.parameters(),
-#         lr=1e-3,
-#     )
-#     model, optimizer = train(
-#         model=model,
-#         optimizer=optimizer,
-#         data=train_data,
-#         batch_size=batch_size,
-#         block_size=block_size,
-#         steps=steps,
-#         device=device,
-#     )
-#     train_loss, eval_loss = estimate_loss(
-#         model=model,
-#         train_data=train_data,
-#         val_data=val_data,
-#         batch_size=batch_size,
-#         block_size=block_size,
-#         eval_iters=20,
-#         device=device,
-#     )
-#     print("average train loss:", train_loss)
-#     print("average eval loss:", eval_loss)
+def get_lr(step, warmup_step, total_step, max_lr, min_lr):
+    if 0 <= step < warmup_step:
+        return max_lr * step / warmup_step
+    elif step <= total_step:
+        return min_lr + (max_lr - min_lr) * 0.5 * (
+            1 + math.cos(math.pi * (step - warmup_step) / (total_step - warmup_step))
+        )
+    else:
+        return min_lr
+
+
+if __name__ == "__main__":
+    #     device = "cuda" if torch.cuda.is_available() else "cpu"
+    #     batch_size = 4
+    #     vocab_size = 100
+    #     block_size = 16
+    #     n_embd = 128
+    #     num_head = 8
+    #     num_layer = 12
+    #     dropout = 0.1
+    #     steps = 100
+    #     data = torch.randint(
+    #         0,
+    #         100,
+    #         size=(1000,),
+    #         dtype=torch.long,
+    #         device=device,
+    #     )
+    #     train_data, val_data = data[:900], data[900:]
+    #     model = TinyLanguageModel(
+    #         vocab_size=vocab_size,
+    #         n_embd=n_embd,
+    #         block_size=block_size,
+    #         num_head=num_head,
+    #         num_layer=num_layer,
+    #         dropout=dropout,
+    #     ).to(device)
+    #     optimizer = torch.optim.AdamW(
+    #         params=model.parameters(),
+    #         lr=1e-3,
+    #     )
+    #     model, optimizer = train(
+    #         model=model,
+    #         optimizer=optimizer,
+    #         data=train_data,
+    #         batch_size=batch_size,
+    #         block_size=block_size,
+    #         steps=steps,
+    #         device=device,
+    #     )
+    #     train_loss, eval_loss = estimate_loss(
+    #         model=model,
+    #         train_data=train_data,
+    #         val_data=val_data,
+    #         batch_size=batch_size,
+    #         block_size=block_size,
+    #         eval_iters=20,
+    #         device=device,
+    #     )
+    #     print("average train loss:", train_loss)
+    #     print("average eval loss:", eval_loss)
+    print("step:0,lr:", get_lr(0, 100, 1000, 1e-3, 1e-4))
+    print("step:50,lr:", get_lr(50, 100, 1000, 1e-3, 1e-4))
+    print("step:100,lr:", get_lr(100, 100, 1000, 1e-3, 1e-4))
+    print("step:550,lr:", get_lr(550, 100, 1000, 1e-3, 1e-4))
+    print("step:1000,lr:", get_lr(1000, 100, 1000, 1e-3, 1e-4))
+    print("step:1100,lr:", get_lr(1100, 100, 1000, 1e-3, 1e-4))
