@@ -272,7 +272,9 @@ def train(
         grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
         optimizer.step()
         if step % 100 == 0:
-            print(f"{step} train loss:{ loss.item()} lr:{lr} grad norm:{grad_norm}")
+            print(
+                f"{step}\ttrain loss:{loss.item():.6f}\tlr:{lr:.6f}\tgrad norm:{grad_norm:.6f}"
+            )
         if (step % 1000 == 0 or step == steps) and is_eval:
             train_loss, eval_loss = estimate_loss(
                 model=model,
@@ -283,7 +285,7 @@ def train(
                 eval_iters=eval_iters,
                 device=device,
             )
-            print(f"{step}\ttrain loss:{train_loss}\teval loss:{eval_loss}")
+            print(f"{step}\ttrain loss:{train_loss:.6f}\teval loss:{eval_loss:.6f}")
             best_val_loss, non_improve = save_model(
                 best_val_loss=best_val_loss,
                 current_train_loss=train_loss,

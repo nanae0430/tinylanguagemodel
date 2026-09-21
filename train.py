@@ -4,10 +4,10 @@ import torch
 
 torch.manual_seed(39)
 
-with open("./train_text.txt", "r", encoding="utf-8") as f:
-    train_text = f.read()
-with open("./val_text.txt", "r", encoding="utf-8") as f:
-    val_text = f.read()
+# with open("./train_text.txt", "r", encoding="utf-8") as f:
+#     train_text = f.read()
+# with open("./val_text.txt", "r", encoding="utf-8") as f:
+#     val_text = f.read()
 load_checkpoint = False
 
 batch_size = 32
@@ -15,7 +15,7 @@ block_size = 128
 n_embd = 128
 num_head = 8
 num_layer = 8
-steps = 2000
+steps = 20000
 eval_iters = 100
 lr = 0.001
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -24,10 +24,14 @@ tokenizer = RegexTokenizer()
 tokenizer.load("./tiny_story.model")
 vocab_size = len(tokenizer.vocab)
 
-train_data = tokenizer.encode(train_text, {"<|endoftext|>"})
-val_data = tokenizer.encode(val_text, {"<|endoftext|>"})
-train_data = torch.tensor(train_data, dtype=torch.long)
-val_data = torch.tensor(val_data, dtype=torch.long)
+# train_data = tokenizer.encode(train_text, {"<|endoftext|>"})
+# val_data = tokenizer.encode(val_text, {"<|endoftext|>"})
+# train_data = torch.tensor(train_data, dtype=torch.long)
+# val_data = torch.tensor(val_data, dtype=torch.long)
+# torch.save(train_data, "./train_tensor.pt")
+# torch.save(val_data, "./val_tensor.pt")
+train_data = torch.load("./train_tensor.pt")
+val_data = torch.load("./val_tensor.pt")
 if load_checkpoint:
     check_point = torch.load("./last_checkpoint.pt", device)
     print(check_point.keys())
@@ -57,7 +61,7 @@ else:
         vocab_size, n_embd, block_size, num_head, num_layer, dropout=0.1
     )
     model = model.to(device)
-    optimizer = torch.optim.AdamW(params=model.parameters(), lr=5e-4)
+    optimizer = torch.optim.AdamW(params=model.parameters(), lr=0.001)
     train(
         model=model,
         optimizer=optimizer,
@@ -68,4 +72,5 @@ else:
         steps=steps,
         eval_iters=eval_iters,
         device=device,
+        max_lr=lr,
     )
