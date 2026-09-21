@@ -244,6 +244,7 @@ def train(
     steps,
     eval_iters,
     device,
+    max_lr=1e-4,
     patience=3,
     min_delta=0.01,
     best_val_loss=float("inf"),
@@ -253,10 +254,9 @@ def train(
 ):
 
     model.train()
-    max_lr = optimizer.lr
 
     for step in range(start_step + 1, 1 + steps):
-        lr = get_lr(step, 0.05 * steps, steps, max_lr, 0.1 * max_lr)
+        lr = get_lr(step, int(0.05 * steps), steps, max_lr, 0.1 * max_lr)
         for param_group in optimizer.param_groups:
             param_group["lr"] = lr
 
@@ -273,7 +273,7 @@ def train(
         optimizer.step()
         if step % 100 == 0:
             print(f"{step} train loss:{ loss.item()} lr:{lr} grad norm:{grad_norm}")
-        if step % 1000 == 0 and is_eval:
+        if (step % 1000 == 0 or step == steps) and is_eval:
             train_loss, eval_loss = estimate_loss(
                 model=model,
                 train_data=train_data,
@@ -296,19 +296,6 @@ def train(
             )
             if non_improve >= patience:
                 return
-    torch.save(
-        {
-            "step": step,
-            "model_state_dict": model.state_dict(),
-            "model_config": model.model_config,
-            "optimizer_state_dict": optimizer.state_dict(),
-            "train_loss": train_loss,
-            "val_loss": eval_loss,
-            "best_val_loss": best_val_loss,
-            "non_improve": non_improve,
-        },
-        "last_checkpoint.pt",
-    )
 
 
 def save_model(
