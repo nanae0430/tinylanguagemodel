@@ -253,11 +253,12 @@ def train(
 ):
 
     model.train()
+    max_lr = optimizer.lr
 
     for step in range(start_step + 1, 1 + steps):
-
-        lr = get_lr(step, 0.05 * steps, steps, optimizer.lr, 0.1 * optimizer.lr)
-        optimizer.lr = lr
+        lr = get_lr(step, 0.05 * steps, steps, max_lr, 0.1 * max_lr)
+        for param_group in optimizer.param_groups:
+            param_group["lr"] = lr
 
         input_x, target = get_batch(
             data=train_data,
@@ -295,15 +296,18 @@ def train(
             )
             if non_improve >= patience:
                 return
-    best_val_loss, non_improve = save_model(
-        best_val_loss=best_val_loss,
-        current_train_loss=train_loss,
-        current_eval_loss=eval_loss,
-        min_delta=min_delta,
-        model=model,
-        non_improve=non_improve,
-        optimizer=optimizer,
-        step=step,
+    torch.save(
+        {
+            "step": step,
+            "model_state_dict": model.state_dict(),
+            "model_config": model.model_config,
+            "optimizer_state_dict": optimizer.state_dict(),
+            "train_loss": train_loss,
+            "val_loss": eval_loss,
+            "best_val_loss": best_val_loss,
+            "non_improve": non_improve,
+        },
+        "last_checkpoint.pt",
     )
 
 
