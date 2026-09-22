@@ -86,6 +86,42 @@ class MultiHeadAttention(nn.Module):
         return self.dropout(projection)
 
 
+class MultiHeadAttention_v2(nn.Module):
+    def __init__(self, n_embd, num_head, block_size, dropout=0.0):
+        super().__init__()
+        assert n_embd % num_head == 0
+        self.num_head = num_head
+        self.head_size = n_embd // num_head
+        self.qkv = nn.Linear(n_embd, 3 * n_embd, bias=False)
+        self.attention_dropout = nn.Dropout(dropout)
+        self.residual_dropout = nn.Dropout(dropout)
+        self.projection = nn.Linear(n_embd, n_embd)
+        self.register_buffer(
+            "tril",
+            torch.tril(torch.ones(1, 1, block_size, block_size)),
+            persistent=False,
+        )
+
+    def forward(self, x):
+        B, T, C = x.shape
+        qkv = self.qkv(x)
+        q, k, v = qkv.chunk(3, dim=-1)
+        q = q.view(B, T, self.num_head, self.head_size).transpose(1, 2)
+        k = k.view(B, T, self.num_head, self.head_size).transpose(1, 2)
+        v = v.view(B, T, self.num_head, self.head_size).transpose(1, 2)
+        k_t = k.transpose(-1, -2)
+        mask = self.tril[:, :, :T, :T]
+
+        attention_score = torch.masked_fill(
+            q @ k_t / self.head_size**0.5, mask, float("-inf")
+        )
+        attention_weight = F.softmax(attention_score, dim=-1)
+        heads_output = self.attention_dropout(attention_weight) @ v
+        concat_output = heads_output.transpose(1, 2).view(B, T, C)
+        projection_output = self.projection(concat_output)
+        return self.residual_dropout(projection_output)
+
+
 class FeedForward(nn.Module):
     def __init__(self, n_embd, dropout=0):
         super().__init__()
