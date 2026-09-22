@@ -136,15 +136,11 @@ class MultiHeadAttentionSDPA(nn.Module):
         self.attention_dropout = nn.Dropout(dropout)
         self.residual_dropout = nn.Dropout(dropout)
         self.projection = nn.Linear(n_embd, n_embd)
-        self.register_buffer(
-            "tril",
-            torch.tril(torch.ones(1, 1, block_size, block_size)),
-            persistent=False,
-        )
+        self.block_size = block_size
 
     def forward(self, x):
         B, T, C = x.shape
-        if T > self.tril.shape[-1]:
+        if T > self.block_size:
             raise ValueError(f"序列长度{T}超出上下文长度")
         qkv = self.qkv(x)
         q, k, v = qkv.chunk(3, dim=-1)
@@ -184,7 +180,7 @@ class TransformerBlock(nn.Module):
 
     def __init__(self, n_embd, num_head, block_size, dropout=0):
         super().__init__()
-        self.heads = MultiHeadAttention_v2(n_embd, num_head, block_size, dropout)
+        self.heads = MultiHeadAttentionSDPA(n_embd, num_head, block_size, dropout)
         self.attention_norm = nn.LayerNorm(n_embd)
         self.feedforward_norm = nn.LayerNorm(n_embd)
         self.feedforward = FeedForward(n_embd, dropout)
