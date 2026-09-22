@@ -98,7 +98,7 @@ class MultiHeadAttention_v2(nn.Module):
         self.projection = nn.Linear(n_embd, n_embd)
         self.register_buffer(
             "tril",
-            torch.tril(torch.ones(1, 1, block_size, block_size, dtype=torch.bool)),
+            torch.tril(torch.ones(1, 1, block_size, block_size)),
             persistent=False,
         )
 
@@ -115,7 +115,7 @@ class MultiHeadAttention_v2(nn.Module):
         mask = self.tril[:, :, :T, :T]
 
         attention_score = torch.masked_fill(
-            q @ k_t / self.head_size**0.5, mask, float("-inf")
+            q @ k_t / self.head_size**0.5, mask == 0, float("-inf")
         )
         attention_weight = F.softmax(attention_score, dim=-1)
         heads_output = self.attention_dropout(attention_weight) @ v
