@@ -119,6 +119,48 @@ class MultiHeadAttention_v2(nn.Module):
         )
         attention_weight = F.softmax(attention_score, dim=-1)
         heads_output = self.attention_dropout(attention_weight) @ v
+
+        concat_output = heads_output.transpose(1, 2).contiguous().view(B, T, C)
+        projection_output = self.projection(concat_output)
+        return self.residual_dropout(projection_output)
+
+
+class MultiHeadAttentionSDPA(nn.Module):
+
+    def __init__(self, n_embd, num_head, block_size, dropout=0.0):
+        super().__init__()
+        assert n_embd % num_head == 0
+        self.num_head = num_head
+        self.head_size = n_embd // num_head
+        self.qkv = nn.Linear(n_embd, 3 * n_embd, bias=False)
+        self.attention_dropout = nn.Dropout(dropout)
+        self.residual_dropout = nn.Dropout(dropout)
+        self.projection = nn.Linear(n_embd, n_embd)
+        self.register_buffer(
+            "tril",
+            torch.tril(torch.ones(1, 1, block_size, block_size)),
+            persistent=False,
+        )
+
+    def forward(self, x):
+        B, T, C = x.shape
+        if T > self.tril.shape[-1]:
+            raise ValueError(f"序列长度{T}超出上下文长度")
+        qkv = self.qkv(x)
+        q, k, v = qkv.chunk(3, dim=-1)
+        q = q.view(B, T, self.num_head, self.head_size).transpose(1, 2)
+        k = k.view(B, T, self.num_head, self.head_size).transpose(1, 2)
+        v = v.view(B, T, self.num_head, self.head_size).transpose(1, 2)
+
+        heads_output = F.scaled_dot_product_attention(
+            q,
+            k,
+            v,
+            attn_mask=None,
+            dropout_p=self.attention_dropout.p if self.training else 0.0,
+            is_causal=True,
+        )
+
         concat_output = heads_output.transpose(1, 2).contiguous().view(B, T, C)
         projection_output = self.projection(concat_output)
         return self.residual_dropout(projection_output)
