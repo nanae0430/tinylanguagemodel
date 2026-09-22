@@ -98,12 +98,14 @@ class MultiHeadAttention_v2(nn.Module):
         self.projection = nn.Linear(n_embd, n_embd)
         self.register_buffer(
             "tril",
-            torch.tril(torch.ones(1, 1, block_size, block_size)),
+            torch.tril(torch.ones(1, 1, block_size, block_size, dtype=torch.bool)),
             persistent=False,
         )
 
     def forward(self, x):
         B, T, C = x.shape
+        if T > self.tril.shape[-1]:
+            raise ValueError(f"序列长度{T}超出上下文长度")
         qkv = self.qkv(x)
         q, k, v = qkv.chunk(3, dim=-1)
         q = q.view(B, T, self.num_head, self.head_size).transpose(1, 2)
@@ -117,7 +119,7 @@ class MultiHeadAttention_v2(nn.Module):
         )
         attention_weight = F.softmax(attention_score, dim=-1)
         heads_output = self.attention_dropout(attention_weight) @ v
-        concat_output = heads_output.transpose(1, 2).view(B, T, C)
+        concat_output = heads_output.transpose(1, 2).contiguous().view(B, T, C)
         projection_output = self.projection(concat_output)
         return self.residual_dropout(projection_output)
 
@@ -140,7 +142,7 @@ class TransformerBlock(nn.Module):
 
     def __init__(self, n_embd, num_head, block_size, dropout=0):
         super().__init__()
-        self.heads = MultiHeadAttention(n_embd, num_head, block_size, dropout)
+        self.heads = MultiHeadAttention_v2(n_embd, num_head, block_size, dropout)
         self.attention_norm = nn.LayerNorm(n_embd)
         self.feedforward_norm = nn.LayerNorm(n_embd)
         self.feedforward = FeedForward(n_embd, dropout)
