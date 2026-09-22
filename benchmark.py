@@ -46,7 +46,7 @@ def benchmark_training(
     token_num = measure_steps * batch_size * block_size
     tokens_per_second = token_num / elapsed_seconds
     print(
-        f"elapsed:{elapsed_seconds:.6f}s\nms/step:{time_per_step:.6f}ms\ntokens/s:{tokens_per_second:.6f}\npeak_memory:{peak_memory:.6f}"
+        f"elapsed:\t{elapsed_seconds:.6f}s\nms/step:\t{time_per_step:.6f}ms\ntokens/s:\t{tokens_per_second:.6f}\npeak_memory:\t{peak_memory:.6f}"
     )
 
 
@@ -83,41 +83,41 @@ if __name__ == "__main__":
     non_improve = check_point["non_improve"]
     best_val_loss = check_point["best_val_loss"]
 
-    # for i in range(3):
-    #     print("*" * 10, f"batch_size={32*2**i}", "*" * 10)
-    #     benchmark_training(
-    #         model=model,
-    #         optimizer=optimizer,
-    #         data=train_data,
-    #         batch_size=32 * 2**i,
-    #         block_size=block_size,
-    #         device=device,
-    #         use_amp=True,
-    #     )
-    #     print("-" * 20)
-    #     benchmark_training(
-    #         model=model,
-    #         optimizer=optimizer,
-    #         data=train_data,
-    #         batch_size=32 * 2**i,
-    #         block_size=block_size,
-    #         device=device,
-    #         use_amp=False,
-    #     )
-    grad_norm = torch.empty(steps, device=device)
-    for step in range(steps):
-        input_data, target_data = get_batch(
-            data=train_data, batch_size=batch_size, block_size=block_size, device=device
+    for i in range(3):
+        print("*" * 10, f"batch_size={32*2**i}", "*" * 10)
+        benchmark_training(
+            model=model,
+            optimizer=optimizer,
+            data=train_data,
+            batch_size=32 * 2**i,
+            block_size=block_size,
+            device=device,
+            use_amp=True,
         )
-        optimizer.zero_grad()
-        with torch.autocast(device_type=device, dtype=torch.bfloat16):
-            logits, loss = model(input_data, target_data)
-        loss.backward()
-        grad_norm[step] = torch.nn.utils.clip_grad_norm_(
-            model.parameters(), float("inf")
+        print("-" * 20)
+        benchmark_training(
+            model=model,
+            optimizer=optimizer,
+            data=train_data,
+            batch_size=32 * 2**i,
+            block_size=block_size,
+            device=device,
+            use_amp=False,
         )
+    # grad_norm = torch.empty(steps, device=device)
+    # for step in range(steps):
+    #     input_data, target_data = get_batch(
+    #         data=train_data, batch_size=batch_size, block_size=block_size, device=device
+    #     )
+    #     optimizer.zero_grad()
+    #     with torch.autocast(device_type=device, dtype=torch.bfloat16):
+    #         logits, loss = model(input_data, target_data)
+    #     loss.backward()
+    #     grad_norm[step] = torch.nn.utils.clip_grad_norm_(
+    #         model.parameters(), float("inf")
+    #     )
 
-        optimizer.step()
-    print(f"max grad norm:{torch.max(grad_norm)}")
-    print(f"average grad norm:{torch.mean(grad_norm)}")
-    print(f"min grad norm:{torch.min(grad_norm)}")
+    #     optimizer.step()
+    # print(f"max grad norm:{torch.max(grad_norm)}")
+    # print(f"average grad norm:{torch.mean(grad_norm)}")
+    # print(f"min grad norm:{torch.min(grad_norm)}")
