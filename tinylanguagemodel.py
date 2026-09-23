@@ -147,7 +147,7 @@ class MultiHeadAttentionSDPA(nn.Module):
         q = q.view(B, T, self.num_head, self.head_size).transpose(1, 2)
         k = k.view(B, T, self.num_head, self.head_size).transpose(1, 2)
         v = v.view(B, T, self.num_head, self.head_size).transpose(1, 2)
-
+        q, k = rope(q, k)
         heads_output = F.scaled_dot_product_attention(
             q,
             k,
@@ -308,6 +308,46 @@ class TinyLanguageModel(nn.Module):
             if stop.all():
                 break
         return result
+
+
+def rope(q, k):
+    B, H, T, d = q.shape
+    frequency = 10000.0 ** (torch.arange(0, d // 2, device=q.device) / -d * 2)
+    frequency = torch.arange(0, T, device=q.device).view(T, 1) * frequency
+    sin_vector = torch.sin(frequency)
+    cos_vector = torch.cos(frequency)
+    even_q, odd_q = (
+        q[:, :, :, ::2] * cos_vector - q[:, :, :, 1::2] * sin_vector,
+        q[:, :, :, ::2] * sin_vector + q[:, :, :, 1::2] * cos_vector,
+    )
+    even_q = even_q.view(B, H, T, d // 2, 1)
+    odd_q = odd_q.view(B, H, T, d // 2, 1)
+    q = torch.concat(tensors=[even_q, odd_q], dim=-1).reshape(B, H, T, d)
+    even_k, odd_k = (
+        k[:, :, :, ::2] * cos_vector - k[:, :, :, 1::2] * sin_vector,
+        k[:, :, :, ::2] * sin_vector + k[:, :, :, 1::2] * cos_vector,
+    )
+    even_k = even_k.view(B, H, T, d // 2, 1)
+    odd_k = odd_k.view(B, H, T, d // 2, 1)
+    k = torch.concat(tensors=[even_k, odd_k], dim=-1).reshape(B, H, T, d)
+    return q, k
+
+
+def rope_(q, k):
+    B, H, T, d = q.shape
+    frequency = 10000.0 ** (torch.arange(0, d // 2, device=q.device) / -d * 2)
+    frequency = torch.arange(0, T, device=q.device).view(T, 1) * frequency
+    sin_vector = torch.sin(frequency)
+    cos_vector = torch.cos(frequency)
+    q[:, :, :, ::2], q[:, :, :, 1::2] = (
+        q[:, :, :, ::2] * cos_vector - q[:, :, :, 1::2] * sin_vector,
+        q[:, :, :, ::2] * sin_vector + q[:, :, :, 1::2] * cos_vector,
+    )
+    k[:, :, :, ::2], k[:, :, :, 1::2] = (
+        k[:, :, :, ::2] * cos_vector - k[:, :, :, 1::2] * sin_vector,
+        k[:, :, :, ::2] * sin_vector + k[:, :, :, 1::2] * cos_vector,
+    )
+    return q, k
 
 
 def train(
@@ -521,9 +561,11 @@ if __name__ == "__main__":
     #     )
     #     print("average train loss:", train_loss)
     #     print("average eval loss:", eval_loss)
-    print("step:0,lr:", get_lr(0, 100, 1000, 1e-3, 1e-4))
-    print("step:50,lr:", get_lr(50, 100, 1000, 1e-3, 1e-4))
-    print("step:100,lr:", get_lr(100, 100, 1000, 1e-3, 1e-4))
-    print("step:550,lr:", get_lr(550, 100, 1000, 1e-3, 1e-4))
-    print("step:1000,lr:", get_lr(1000, 100, 1000, 1e-3, 1e-4))
-    print("step:1100,lr:", get_lr(1100, 100, 1000, 1e-3, 1e-4))
+    # print("step:0,lr:", get_lr(0, 100, 1000, 1e-3, 1e-4))
+    # print("step:50,lr:", get_lr(50, 100, 1000, 1e-3, 1e-4))
+    # print("step:100,lr:", get_lr(100, 100, 1000, 1e-3, 1e-4))
+    # print("step:550,lr:", get_lr(550, 100, 1000, 1e-3, 1e-4))
+    # print("step:1000,lr:", get_lr(1000, 100, 1000, 1e-3, 1e-4))
+    # print("step:1100,lr:", get_lr(1100, 100, 1000, 1e-3, 1e-4))
+
+    print(rope(8, 8))
