@@ -214,7 +214,6 @@ class TinyLanguageModel(nn.Module):
             "dropout": dropout,
         }
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
-        self.position_embedding_table = nn.Embedding(block_size, n_embd)
         self.lm_head = nn.Linear(n_embd, vocab_size)
         self.model = nn.Sequential(
             *[
