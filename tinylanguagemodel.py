@@ -230,11 +230,7 @@ class TinyLanguageModel(nn.Module):
         targets: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
 
-        B, T = idx.shape
-        position = torch.arange(T, device=idx.device)
         token_embedding = self.token_embedding_table(idx)
-        position_embedding = self.position_embedding_table(position)
-        token_embedding = token_embedding + position_embedding
         result = self.model(token_embedding)
         logits = self.lm_head(result)
 
