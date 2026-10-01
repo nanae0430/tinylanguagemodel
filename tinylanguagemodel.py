@@ -159,7 +159,7 @@ class MultiHeadAttentionSDPA(nn.Module):
 
         concat_output = heads_output.transpose(1, 2).contiguous().view(B, T, C)
         projection_output = self.projection(concat_output)
-        return self.residual_dropout(projection_output), q, k
+        return self.residual_dropout(projection_output), k, v
 
 
 class FeedForward(nn.Module):
@@ -216,13 +216,12 @@ class TinyLanguageModel(nn.Module):
         }
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
         self.lm_head = nn.Linear(n_embd, vocab_size)
-        self.model = nn.Sequential(
-            *[
-                TransformerBlock(n_embd, num_head, block_size, dropout)
-                for _ in range(num_layer)
-            ],
-            nn.LayerNorm(n_embd),
-        )
+        self.model = [
+            TransformerBlock(n_embd, num_head, block_size, dropout)
+            for _ in range(num_layer)
+        ].append(nn.LayerNorm(n_embd))
+        self.K = []
+        self.V = []
 
     def forward(
         self,
@@ -231,7 +230,11 @@ class TinyLanguageModel(nn.Module):
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
 
         token_embedding = self.token_embedding_table(idx)
-        result, k, v = self.model(token_embedding)
+        for i in range(len(self.model) - 1):
+            token_embedding, k, v = self.model[i](token_embedding)
+            self.K.append(k)
+            self.V.append(v)
+        result = self.model[-1](token_embedding)
         logits = self.lm_head(result)
 
         if targets is None:
