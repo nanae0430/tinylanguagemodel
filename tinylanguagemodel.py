@@ -274,7 +274,7 @@ class TinyLanguageModel(nn.Module):
         for _ in range(max_new_tokens):
             context = result[:, max(0, result.shape[1] - self.block_size) :]
             logits, _, K, V = self(
-                context if K is None else result[:, -1, :], generate=True, K=K, V=V
+                context if K is None else result[:, -1:], generate=True, K=K, V=V
             )
             logits = logits[:, -1, :]
             k = logits.shape[-1]
