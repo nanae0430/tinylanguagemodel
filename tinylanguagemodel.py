@@ -189,7 +189,7 @@ class TransformerBlock(nn.Module):
         self.feedforward = FeedForward(n_embd, dropout)
 
     def forward(self, x, K: torch.Tensor | None = None, V: torch.Tensor | None = None):
-        x1, k, v = self.heads(self.attention_norm(x, K, V))
+        x1, k, v = self.heads(self.attention_norm(x), K, V)
         x1 += x
         y = x1 + self.feedforward(self.feedforward_norm(x1))
         return y, k, v
@@ -235,7 +235,8 @@ class TinyLanguageModel(nn.Module):
         K: torch.Tensor | None = None,
         V: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
-
+        if K is None:
+            K, V = [None] * len(self.model) - 1
         token_embedding = self.token_embedding_table(idx)
         for i in range(len(self.model) - 1):
             token_embedding, k, v = self.model[i](token_embedding, K[i], V[i])
