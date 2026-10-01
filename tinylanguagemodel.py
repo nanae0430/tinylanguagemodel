@@ -138,7 +138,8 @@ class MultiHeadAttentionSDPA(nn.Module):
         self.projection = nn.Linear(n_embd, n_embd)
         self.block_size = block_size
 
-    def forward(self, x, K=None, V=None):
+    def forward(self, x, K: torch.Tensor | None = None, V: torch.Tensor | None = None):
+        seq_len = K.shape[2] if K is not None else 0
         B, T, C = x.shape
         if T > self.block_size:
             raise ValueError(f"序列长度{T}超出上下文长度")
@@ -147,14 +148,16 @@ class MultiHeadAttentionSDPA(nn.Module):
         q = q.view(B, T, self.num_head, self.head_size).transpose(1, 2)
         k = k.view(B, T, self.num_head, self.head_size).transpose(1, 2)
         v = v.view(B, T, self.num_head, self.head_size).transpose(1, 2)
-        q, k = rope(q, k)
+        q, k = rope(q, k, seq_len)
+        k = torch.concat((K, k), dim=2) if K is not None else k
+        v = torch.concat((V, v), dim=2) if V is not None else v
         heads_output = F.scaled_dot_product_attention(
             q,
             k,
             v,
             attn_mask=None,
             dropout_p=self.attention_dropout.p if self.training else 0.0,
-            is_causal=True,
+            is_causal=True if K is None else False,
         )
 
         concat_output = heads_output.transpose(1, 2).contiguous().view(B, T, C)
@@ -185,8 +188,8 @@ class TransformerBlock(nn.Module):
         self.feedforward_norm = nn.LayerNorm(n_embd)
         self.feedforward = FeedForward(n_embd, dropout)
 
-    def forward(self, x):
-        x1, k, v = self.heads(self.attention_norm(x))
+    def forward(self, x, K: torch.Tensor | None = None, V: torch.Tensor | None = None):
+        x1, k, v = self.heads(self.attention_norm(x, K, V))
         x1 += x
         y = x1 + self.feedforward(self.feedforward_norm(x1))
         return y, k, v
@@ -225,14 +228,19 @@ class TinyLanguageModel(nn.Module):
         )
 
     def forward(
-        self, idx: torch.Tensor, targets: torch.Tensor | None = None, generate=False
+        self,
+        idx: torch.Tensor,
+        targets: torch.Tensor | None = None,
+        generate=False,
+        K: torch.Tensor | None = None,
+        V: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
-        K, V = [], []
+
         token_embedding = self.token_embedding_table(idx)
         for i in range(len(self.model) - 1):
-            token_embedding, k, v = self.model[i](token_embedding)
-            K.append(k)
-            V.append(v)
+            token_embedding, k, v = self.model[i](token_embedding, K[i], V[i])
+            K[i] = k
+            V[i] = v
         result = self.model[-1](token_embedding)
         logits = self.lm_head(result)
 
@@ -276,10 +284,10 @@ class TinyLanguageModel(nn.Module):
         return result
 
 
-def rope(q, k):
+def rope(q, k, offset: int = 0):
     B, H, T, d = q.shape
     frequency = 10000.0 ** (torch.arange(0, d // 2, device=q.device) / -d * 2)
-    frequency = torch.arange(0, T, device=q.device).view(T, 1) * frequency
+    frequency = torch.arange(offset, offset + T, device=q.device).view(T, 1) * frequency
     sin_vector = torch.sin(frequency)
     cos_vector = torch.cos(frequency)
     even_q, odd_q = (
