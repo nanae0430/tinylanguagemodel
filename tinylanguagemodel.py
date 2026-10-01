@@ -236,7 +236,7 @@ class TinyLanguageModel(nn.Module):
         V: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
         if K is None:
-            K, V = [None] * len(self.model) - 1
+            K, V = [None] * (len(self.model) - 1), [None] * (len(self.model) - 1)
         token_embedding = self.token_embedding_table(idx)
         for i in range(len(self.model) - 1):
             token_embedding, k, v = self.model[i](token_embedding, K[i], V[i])
@@ -345,6 +345,7 @@ def sample(
         sample_position = torch.multinomial(filter_prob, 1)
         new_token = torch.gather(sorted_indices, dim=-1, index=sample_position)
         new_token = new_token.masked_fill(stop, eos_token)
+    return new_token
 
 
 def rope_(q, k):
