@@ -138,7 +138,7 @@ class MultiHeadAttentionSDPA(nn.Module):
         self.projection = nn.Linear(n_embd, n_embd)
         self.block_size = block_size
 
-    def forward(self, x):
+    def forward(self, x, K=None, V=None):
         B, T, C = x.shape
         if T > self.block_size:
             raise ValueError(f"序列长度{T}超出上下文长度")
@@ -264,43 +264,11 @@ class TinyLanguageModel(nn.Module):
 
         for _ in range(max_new_tokens):
             context = result[:, max(0, result.shape[1] - self.block_size) :]
-            logits, _ = self(context, generate=True)
+            logits, _, K, V = self(context, generate=True)
             logits = logits[:, -1, :]
             k = logits.shape[-1]
 
-            if top_p is None:
-                if top_k == 1:
-                    new_token = torch.argmax(logits, dim=-1, keepdim=True)
-                elif top_k is not None and top_k <= 0:
-                    raise ValueError("top_k必须大于0")
-                elif top_k is not None:
-                    k = min(top_k, logits.shape[-1])
-                    topk_logits, topk_indices = torch.topk(
-                        logits / temperature, k, dim=-1
-                    )
-                    topk_prob = torch.softmax(topk_logits, dim=-1)
-                    sample_position = torch.multinomial(topk_prob, 1)
-                    new_token = torch.gather(
-                        topk_indices, dim=-1, index=sample_position
-                    )
-                else:
-                    prob = torch.softmax(logits / temperature, dim=-1)
-                    new_token = torch.multinomial(prob, 1)
-            elif top_p <= 0 or top_p > 1:
-                raise ValueError("invalid top_p")
-            else:
-                sorted_prob, sorted_indices = torch.sort(
-                    torch.softmax(logits / temperature, dim=-1), dim=-1, descending=True
-                )
-                cumsum_prob = torch.cumsum(sorted_prob, dim=-1)
-                mask = cumsum_prob > top_p
-                mask[:, 1:] = mask[:, :-1].clone()
-                mask[:, 0] = False
-                filter_prob = torch.masked_fill(sorted_prob, mask=mask, value=0)
-                filter_prob = filter_prob / torch.sum(filter_prob, dim=-1, keepdim=True)
-                sample_position = torch.multinomial(filter_prob, 1)
-                new_token = torch.gather(sorted_indices, dim=-1, index=sample_position)
-            new_token = new_token.masked_fill(stop, eos_token)
+            new_token = sample(logits, temperature, stop, eos_token, top_p, top_k)
             result = torch.concat((result, new_token), dim=-1)
             stop |= new_token == eos_token
             if stop.all():
@@ -329,6 +297,45 @@ def rope(q, k):
     odd_k = odd_k.view(B, H, T, d // 2, 1)
     k = torch.concat(tensors=[even_k, odd_k], dim=-1).reshape(B, H, T, d)
     return q, k
+
+
+def sample(
+    logits,
+    temperature,
+    stop,
+    eos_token,
+    top_p,
+    top_k,
+):
+    if top_p is None:
+        if top_k == 1:
+            new_token = torch.argmax(logits, dim=-1, keepdim=True)
+        elif top_k is not None and top_k <= 0:
+            raise ValueError("top_k必须大于0")
+        elif top_k is not None:
+            k = min(top_k, logits.shape[-1])
+            topk_logits, topk_indices = torch.topk(logits / temperature, k, dim=-1)
+            topk_prob = torch.softmax(topk_logits, dim=-1)
+            sample_position = torch.multinomial(topk_prob, 1)
+            new_token = torch.gather(topk_indices, dim=-1, index=sample_position)
+        else:
+            prob = torch.softmax(logits / temperature, dim=-1)
+            new_token = torch.multinomial(prob, 1)
+    elif top_p <= 0 or top_p > 1:
+        raise ValueError("invalid top_p")
+    else:
+        sorted_prob, sorted_indices = torch.sort(
+            torch.softmax(logits / temperature, dim=-1), dim=-1, descending=True
+        )
+        cumsum_prob = torch.cumsum(sorted_prob, dim=-1)
+        mask = cumsum_prob > top_p
+        mask[:, 1:] = mask[:, :-1].clone()
+        mask[:, 0] = False
+        filter_prob = torch.masked_fill(sorted_prob, mask=mask, value=0)
+        filter_prob = filter_prob / torch.sum(filter_prob, dim=-1, keepdim=True)
+        sample_position = torch.multinomial(filter_prob, 1)
+        new_token = torch.gather(sorted_indices, dim=-1, index=sample_position)
+        new_token = new_token.masked_fill(stop, eos_token)
 
 
 def rope_(q, k):
