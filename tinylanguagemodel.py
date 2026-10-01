@@ -219,12 +219,10 @@ class TinyLanguageModel(nn.Module):
         self.model = [
             TransformerBlock(n_embd, num_head, block_size, dropout)
             for _ in range(num_layer)
-        ].append(nn.LayerNorm(n_embd))
+        ] + [nn.LayerNorm(n_embd)]
 
     def forward(
-        self,
-        idx: torch.Tensor,
-        targets: torch.Tensor | None = None,
+        self, idx: torch.Tensor, targets: torch.Tensor | None = None, generate=False
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
         K, V = [], []
         token_embedding = self.token_embedding_table(idx)
@@ -242,7 +240,7 @@ class TinyLanguageModel(nn.Module):
             targets_reshaped = targets.reshape((-1))
             loss = F.cross_entropy(result_reshaped, targets_reshaped)
 
-        return (logits, loss, K, V)
+        return (logits, loss, K, V) if generate else (logits, loss)
 
     @torch.no_grad()
     def generate(
