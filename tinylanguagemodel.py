@@ -241,7 +241,7 @@ class TinyLanguageModel(nn.Module):
             targets_reshaped = targets.reshape((-1))
             loss = F.cross_entropy(result_reshaped, targets_reshaped)
 
-        return (logits, loss)
+        return (logits, loss, k, v)
 
     @torch.no_grad()
     def generate(
