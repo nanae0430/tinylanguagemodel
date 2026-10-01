@@ -3,7 +3,7 @@ import torch
 from MinBPE import RegexTokenizer
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-best_checkpoint = torch.load("./best_checkpoint.pt", device)
+best_checkpoint = torch.load("./best_checkpoint_rope.pt", device)
 model = TinyLanguageModel(**best_checkpoint["model_config"])
 model.load_state_dict(best_checkpoint["model_state_dict"])
 model = model.to(device)

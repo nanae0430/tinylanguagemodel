@@ -159,7 +159,7 @@ class MultiHeadAttentionSDPA(nn.Module):
 
         concat_output = heads_output.transpose(1, 2).contiguous().view(B, T, C)
         projection_output = self.projection(concat_output)
-        return self.residual_dropout(projection_output)
+        return self.residual_dropout(projection_output), q, k
 
 
 class FeedForward(nn.Module):
@@ -186,9 +186,10 @@ class TransformerBlock(nn.Module):
         self.feedforward = FeedForward(n_embd, dropout)
 
     def forward(self, x):
-        x1 = x + self.heads(self.attention_norm(x))
+        x1, k, v = self.heads(self.attention_norm(x))
+        x1 += x
         y = x1 + self.feedforward(self.feedforward_norm(x1))
-        return y
+        return y, k, v
 
 
 class TinyLanguageModel(nn.Module):
@@ -230,7 +231,7 @@ class TinyLanguageModel(nn.Module):
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
 
         token_embedding = self.token_embedding_table(idx)
-        result = self.model(token_embedding)
+        result, k, v = self.model(token_embedding)
         logits = self.lm_head(result)
 
         if targets is None:
