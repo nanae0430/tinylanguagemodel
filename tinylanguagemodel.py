@@ -216,10 +216,13 @@ class TinyLanguageModel(nn.Module):
         }
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
         self.lm_head = nn.Linear(n_embd, vocab_size)
-        self.model = [
-            TransformerBlock(n_embd, num_head, block_size, dropout)
-            for _ in range(num_layer)
-        ] + [nn.LayerNorm(n_embd)]
+        self.model = nn.ModuleList(
+            [
+                TransformerBlock(n_embd, num_head, block_size, dropout)
+                for _ in range(num_layer)
+            ]
+            + [nn.LayerNorm(n_embd)]
+        )
 
     def forward(
         self, idx: torch.Tensor, targets: torch.Tensor | None = None, generate=False
@@ -261,7 +264,7 @@ class TinyLanguageModel(nn.Module):
 
         for _ in range(max_new_tokens):
             context = result[:, max(0, result.shape[1] - self.block_size) :]
-            logits, _ = self(context)
+            logits, _ = self(context, generate=True)
             logits = logits[:, -1, :]
             k = logits.shape[-1]
 
