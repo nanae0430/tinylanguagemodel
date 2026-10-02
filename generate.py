@@ -37,5 +37,4 @@ for i in range(10):
         top_p=0.8,
     )
 
-    prompt = result
-    print(f"{i+1}:\t", (logits_1 - logits_2).abs().max().item())
+    print(f"{i+1}:\t{ (logits_1 - logits_2).abs().max().item():.3e}")
