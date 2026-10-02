@@ -264,6 +264,7 @@ class TinyLanguageModel(nn.Module):
         top_k: int = None,
         top_p: float = None,
         temperature: float = 0.8,
+        use_cache=True,
         K=None,
         V=None,
     ):
@@ -279,7 +280,10 @@ class TinyLanguageModel(nn.Module):
             if K is not None and K[0].shape[2] + 1 > self.block_size:
                 break
             logits, _, K, V = self(
-                context if K is None else result[:, -1:], generate=True, K=K, V=V
+                context if not use_cache or K is None else result[:, -1:],
+                generate=True,
+                K=K if use_cache else None,
+                V=V if use_cache else None,
             )
             logits = logits[:, -1, :]
             k = logits.shape[-1]
@@ -289,7 +293,7 @@ class TinyLanguageModel(nn.Module):
             stop |= new_token == eos_token
             if stop.all():
                 break
-        return result, logits, K, V
+        return result, logits, K, V if use_cache else result, logits
 
 
 def rope(q, k, offset: int = 0):
