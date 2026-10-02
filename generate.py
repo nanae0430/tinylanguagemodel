@@ -12,8 +12,8 @@ tokenizer.load("./tiny_story.model")
 data = torch.load("./val_tensor.pt")
 
 model.eval()
+prompt, _ = get_batch(data, 1, 10, device)
 for i in range(10):
-    prompt, _ = get_batch(data, 1, 10, device)
     result, logits_1 = model.generate(
         prompt,
         1,
@@ -34,4 +34,5 @@ for i in range(10):
         eos_token=tokenizer.special_tokens["<|endoftext|>"],
         top_p=0.8,
     )
+    prompt = result
     print(f"{i+1}:\t", (logits_1 - logits_2).abs().max().item())
