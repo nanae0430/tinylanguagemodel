@@ -166,50 +166,51 @@ if __name__ == "__main__":
     # print(f"max grad norm:{torch.max(grad_norm)}")
     # print(f"average grad norm:{torch.mean(grad_norm)}")
     # print(f"min grad norm:{torch.min(grad_norm)}")
-    # print("*" * 10 + "use_cache=True" + "*" * 10)
-    # benchmark_generate(
-    #     model,
-    #     train_data,
-    #     batch_size=16,
-    #     max_new_token=32,
-    #     use_cache=True,
-    #     device=device,
-    # )
-    # print("*" * 10 + "use_cache=False" + "*" * 10)
-    # benchmark_generate(
-    #     model,
-    #     train_data,
-    #     batch_size=16,
-    #     max_new_token=32,
-    #     use_cache=False,
-    #     device=device,
-    # )
-    # 提前准备输入，两种模式使用同一份数据
-    data, _ = get_batch(train_data, batch_size, 32, device)
-    model.eval()
-    for cache_enabled in (
-        False,
-        True,
-        False,
-        True,
-    ):
-        torch.cuda.synchronize()
 
-        with torch.profiler.profile(
-            activities=[
-                torch.profiler.ProfilerActivity.CPU,
-                torch.profiler.ProfilerActivity.CUDA,
-            ],
-        ) as prof:
-            model.generate(
-                data,
-                32,
-                eos_token=-1,
-                top_k=1,
-                use_cache=cache_enabled,
-            )
-            torch.cuda.synchronize()
+    print("*" * 10 + "use_cache=True" + "*" * 10)
+    benchmark_generate(
+        model,
+        train_data,
+        batch_size=16,
+        max_new_token=32,
+        use_cache=True,
+        device=device,
+    )
+    print("*" * 10 + "use_cache=False" + "*" * 10)
+    benchmark_generate(
+        model,
+        train_data,
+        batch_size=16,
+        max_new_token=32,
+        use_cache=False,
+        device=device,
+    )
+    # # 提前准备输入，两种模式使用同一份数据
+    # data, _ = get_batch(train_data, batch_size, 32, device)
+    # model.eval()
+    # for cache_enabled in (
+    #     False,
+    #     True,
+    #     False,
+    #     True,
+    # ):
+    #     torch.cuda.synchronize()
 
-        print(f"use_cache={cache_enabled}")
-        print(prof.key_averages().table(sort_by="self_cpu_time_total", row_limit=10))
-        print(prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10))
+    #     with torch.profiler.profile(
+    #         activities=[
+    #             torch.profiler.ProfilerActivity.CPU,
+    #             torch.profiler.ProfilerActivity.CUDA,
+    #         ],
+    #     ) as prof:
+    #         model.generate(
+    #             data,
+    #             32,
+    #             eos_token=-1,
+    #             top_k=1,
+    #             use_cache=cache_enabled,
+    #         )
+    #         torch.cuda.synchronize()
+
+    #     print(f"use_cache={cache_enabled}")
+    #     print(prof.key_averages().table(sort_by="self_cpu_time_total", row_limit=10))
+    #     print(prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10))
