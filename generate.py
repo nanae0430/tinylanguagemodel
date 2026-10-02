@@ -14,27 +14,22 @@ data = torch.load("./val_tensor.pt")
 
 model.eval()
 prompt, _ = get_batch(data, 1, model.block_size, device)
-_, _, K, V = model.generate(
+print(f"prompt len:{prompt.shape[1]}")
+
+
+result, logits_1, K, V = model.generate(
     prompt[:, :-1],
-    1,
+    10,
     eos_token=tokenizer.special_tokens["<|endoftext|>"],
     top_p=0.8,
 )
-for i in range(1, 10):
-    result, logits_1, _, _ = model.generate(
-        prompt[:, :-i],
-        2,
-        eos_token=tokenizer.special_tokens["<|endoftext|>"],
-        top_p=0.8,
-    )
-
-    _, logits_2, K, V = model.generate(
-        prompt[:, i + 10 : i + 11],
-        1,
-        K=K,
-        V=V,
-        eos_token=tokenizer.special_tokens["<|endoftext|>"],
-        top_p=0.8,
-    )
-
-    print(f"{i+1}:\t{ (logits_1 - logits_2).abs().max().item():.3e}")
+print(f"result seq_len:{result.shape[1]}")
+result, logits_2, K, V = model.generate(
+    prompt,
+    10,
+    K=K,
+    V=V,
+    eos_token=tokenizer.special_tokens["<|endoftext|>"],
+    top_p=0.8,
+)
+print(f"result seq_len:{result.shape[1]}")
