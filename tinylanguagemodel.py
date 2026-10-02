@@ -137,6 +137,12 @@ class MultiHeadAttentionSDPA(nn.Module):
         self.residual_dropout = nn.Dropout(dropout)
         self.projection = nn.Linear(n_embd, n_embd)
         self.block_size = block_size
+        frequency = 10000.0 ** (
+            torch.arange(0, self.head_size // 2) / -self.head_size * 2
+        )
+        frequency = torch.arange(0, block_size).view(block_size, 1) * frequency
+        self.register_buffer("sin_cache", torch.sin(frequency), persistent=False)
+        self.register_buffer("cos_cache", torch.cos(frequency), persistent=False)
 
     def forward(self, x, K: torch.Tensor | None = None, V: torch.Tensor | None = None):
         seq_len = K.shape[2] if K is not None else 0
@@ -148,7 +154,9 @@ class MultiHeadAttentionSDPA(nn.Module):
         q = q.view(B, T, self.num_head, self.head_size).transpose(1, 2)
         k = k.view(B, T, self.num_head, self.head_size).transpose(1, 2)
         v = v.view(B, T, self.num_head, self.head_size).transpose(1, 2)
-        q, k = rope(q, k, seq_len)
+        sin_vector = self.sin_cache[seq_len : seq_len + T]
+        cos_vector = self.cos_cache[seq_len : seq_len + T]
+        q, k = rope(q, k, sin_vector, cos_vector)
         k = torch.concat((K, k), dim=2) if K is not None else k
         v = torch.concat((V, v), dim=2) if V is not None else v
         heads_output = F.scaled_dot_product_attention(
@@ -295,12 +303,8 @@ class TinyLanguageModel(nn.Module):
         return result, logits, K, V
 
 
-def rope(q, k, offset: int = 0):
+def rope(q, k, sin_vector, cos_vector):
     B, H, T, d = q.shape
-    frequency = 10000.0 ** (torch.arange(0, d // 2, device=q.device) / -d * 2)
-    frequency = torch.arange(offset, offset + T, device=q.device).view(T, 1) * frequency
-    sin_vector = torch.sin(frequency)
-    cos_vector = torch.cos(frequency)
     even_q, odd_q = (
         q[:, :, :, ::2] * cos_vector - q[:, :, :, 1::2] * sin_vector,
         q[:, :, :, ::2] * sin_vector + q[:, :, :, 1::2] * cos_vector,
