@@ -1,4 +1,4 @@
-from tinylanguagemodel import TinyLanguageModel
+from tinylanguagemodel import TinyLanguageModel, get_batch
 import torch
 from MinBPE import RegexTokenizer
 
@@ -9,12 +9,11 @@ model.load_state_dict(best_checkpoint["model_state_dict"])
 model = model.to(device)
 tokenizer = RegexTokenizer()
 tokenizer.load("./tiny_story.model")
-prompt = "once upon a time"
-prompt = tokenizer.encode(prompt)
-prompt = torch.tensor(prompt, dtype=torch.long, device=device).unsqueeze(0)
+data = torch.load("./val_tensor.pt")
 
 model.eval()
 for i in range(10):
+    prompt, _ = get_batch(data, 1, 10, device)
     result, logits_1 = model.generate(
         prompt,
         1,
@@ -27,6 +26,4 @@ for i in range(10):
         eos_token=tokenizer.special_tokens["<|endoftext|>"],
         top_p=0.8,
     )
-    print("*" * 10 + str(i + 1) + "*" * 10)
-    print(max(logits_1 - logits_2))
-    prompt = result
+    print(f"{i+1}:\t", (logits_1 - logits_2).abs().max().item())
