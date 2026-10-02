@@ -69,7 +69,7 @@ def benchmark_generate(
         )
         K, V = None, None
         result, logits, K, V = model.generate(
-            data, max_new_token, top_p=0.8, use_cache=use_cache, eos_token=-1
+            data, max_new_token, top_k=1, use_cache=use_cache, eos_token=-1
         )
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
@@ -81,7 +81,7 @@ def benchmark_generate(
         )
         K, V = None, None
         result, logits, K, V = model.generate(
-            data, max_new_token, top_p=0.8, use_cache=use_cache, K=K, V=V, eos_token=-1
+            data, max_new_token, top_k=1, use_cache=use_cache, K=K, V=V, eos_token=-1
         )
     torch.cuda.synchronize()
     end_time = time.perf_counter()
