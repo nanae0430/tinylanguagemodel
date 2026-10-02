@@ -226,8 +226,6 @@ class TinyLanguageModel(nn.Module):
             ]
             + [nn.LayerNorm(n_embd)]
         )
-        self.K = None
-        self.V = None
 
     def forward(
         self,
@@ -289,7 +287,7 @@ class TinyLanguageModel(nn.Module):
             stop |= new_token == eos_token
             if stop.all():
                 break
-        return result, logits
+        return result, logits, K, V
 
 
 def rope(q, k, offset: int = 0):
