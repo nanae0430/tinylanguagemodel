@@ -277,7 +277,7 @@ class TinyLanguageModel(nn.Module):
 
         for _ in range(max_new_tokens):
             context = result[:, max(0, result.shape[1] - self.block_size) :]
-            if K is not None and K[0].shape[2] + 1 > self.block_size:
+            if use_cache and K is not None and K[0].shape[2] + 1 > self.block_size:
                 break
             logits, _, K, V = self(
                 context if not use_cache or K is None else result[:, -1:],
@@ -286,14 +286,13 @@ class TinyLanguageModel(nn.Module):
                 V=V if use_cache else None,
             )
             logits = logits[:, -1, :]
-            k = logits.shape[-1]
 
             new_token = sample(logits, temperature, stop, eos_token, top_p, top_k)
             result = torch.concat((result, new_token), dim=-1)
             stop |= new_token == eos_token
             if stop.all():
                 break
-        return result, logits, K, V if use_cache else result, logits
+        return result, logits, K, V
 
 
 def rope(q, k, offset: int = 0):
