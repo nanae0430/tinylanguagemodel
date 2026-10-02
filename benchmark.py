@@ -61,11 +61,13 @@ def benchmark_generate(
     use_cache=True,
 ):
     model.eval()
-    K, V = None, None
+
     for _ in range(warmup_steps):
+
         data, _ = get_batch(
             data=data_in, batch_size=batch_size, block_size=max_new_token, device=device
         )
+        K, V = None, None
         result, logits, K, V = model.generate(
             data, max_new_token, top_p=0.8, use_cache=use_cache, eos_token=-1
         )
@@ -77,6 +79,7 @@ def benchmark_generate(
         data, _ = get_batch(
             data=data_in, batch_size=batch_size, block_size=max_new_token, device=device
         )
+        K, V = None, None
         result, logits, K, V = model.generate(
             data, max_new_token, top_p=0.8, use_cache=use_cache, K=K, V=V, eos_token=-1
         )
@@ -85,10 +88,10 @@ def benchmark_generate(
     peak_memory = torch.cuda.max_memory_allocated() / 1024**2
     elapsed_seconds = end_time - start_time
     time_per_step = elapsed_seconds / measure_steps * 1000
-    token_num = measure_steps * batch_size * block_size
+    token_num = measure_steps * batch_size * max_new_token
     tokens_per_second = token_num / elapsed_seconds
     print(
-        f"elapsed:\t{elapsed_seconds:.6f}s\nms/step:\t{time_per_step:.6f}ms\ntokens/s:\t{tokens_per_second:.6f}\npeak_memory:\t{peak_memory:.6f}"
+        f"elapsed:\t{elapsed_seconds:.6f}s\nms/step:\t{time_per_step:.6f}ms\ntokens/s:\t{tokens_per_second:.6f}\npeak_memory:\t{peak_memory:.6f}M"
     )
 
 
