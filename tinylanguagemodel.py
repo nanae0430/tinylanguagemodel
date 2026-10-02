@@ -226,6 +226,8 @@ class TinyLanguageModel(nn.Module):
             ]
             + [nn.LayerNorm(n_embd)]
         )
+        self.K = None
+        self.V = None
 
     def forward(
         self,
@@ -251,7 +253,8 @@ class TinyLanguageModel(nn.Module):
             result_reshaped = logits.reshape((-1, self.vocab_size))
             targets_reshaped = targets.reshape((-1))
             loss = F.cross_entropy(result_reshaped, targets_reshaped)
-
+        self.K = K
+        self.V = V
         return (logits, loss, K, V) if generate else (logits, loss)
 
     @torch.no_grad()
@@ -263,10 +266,12 @@ class TinyLanguageModel(nn.Module):
         top_k: int = None,
         top_p: float = None,
         temperature: float = 0.8,
+        K=None,
+        V=None,
     ):
 
         result = idx
-        K, V = None, None
+
         stop = torch.zeros(size=(idx.shape[0], 1), dtype=torch.bool, device=idx.device)
         if temperature <= 0:
             raise ValueError("temperature必须大于0")

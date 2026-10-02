@@ -20,9 +20,17 @@ for i in range(10):
         eos_token=tokenizer.special_tokens["<|endoftext|>"],
         top_p=0.8,
     )
-    result, logits_2 = model.generate(
+    result, _ = model.generate(
         prompt[:, :-1],
-        2,
+        1,
+        eos_token=tokenizer.special_tokens["<|endoftext|>"],
+        top_p=0.8,
+    )
+    result, logits_2 = model.generate(
+        prompt[:, -1:],
+        1,
+        K=model.K,
+        V=model.V,
         eos_token=tokenizer.special_tokens["<|endoftext|>"],
         top_p=0.8,
     )
