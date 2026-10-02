@@ -273,7 +273,8 @@ class TinyLanguageModel(nn.Module):
         stop = torch.zeros(size=(idx.shape[0], 1), dtype=torch.bool, device=idx.device)
         if temperature <= 0:
             raise ValueError("temperature必须大于0")
-
+        if K is not None and K[0].shape[2] + 1 > self.block_size:
+            return result, logits, K, V
         for _ in range(max_new_tokens):
             context = result[:, max(0, result.shape[1] - self.block_size) :]
             logits, _, K, V = self(
@@ -285,7 +286,7 @@ class TinyLanguageModel(nn.Module):
             new_token = sample(logits, temperature, stop, eos_token, top_p, top_k)
             result = torch.concat((result, new_token), dim=-1)
             stop |= new_token == eos_token
-            if stop.all() or K[0].shape + 1 > self.block_size:
+            if stop.all():
                 break
         return result, logits, K, V
 
