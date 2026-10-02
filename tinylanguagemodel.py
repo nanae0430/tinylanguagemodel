@@ -141,7 +141,7 @@ class MultiHeadAttentionSDPA(nn.Module):
     def forward(self, x, K: torch.Tensor | None = None, V: torch.Tensor | None = None):
         seq_len = K.shape[2] if K is not None else 0
         B, T, C = x.shape
-        if T > self.block_size:
+        if T + seq_len > self.block_size:
             raise ValueError(f"序列长度{T}超出上下文长度")
         qkv = self.qkv(x)
         q, k, v = qkv.chunk(3, dim=-1)
@@ -273,8 +273,7 @@ class TinyLanguageModel(nn.Module):
         stop = torch.zeros(size=(idx.shape[0], 1), dtype=torch.bool, device=idx.device)
         if temperature <= 0:
             raise ValueError("temperature必须大于0")
-        if K is not None and K.shape[2] + 1 > self.block_size:
-            ValueError("超过上限")
+
         for _ in range(max_new_tokens):
             context = result[:, max(0, result.shape[1] - self.block_size) :]
             logits, _, K, V = self(
