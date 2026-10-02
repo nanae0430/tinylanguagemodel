@@ -290,7 +290,7 @@ class TinyLanguageModel(nn.Module):
             new_token = sample(logits, temperature, stop, eos_token, top_p, top_k)
             result = torch.concat((result, new_token), dim=-1)
             stop |= new_token == eos_token
-            if stop.all():
+            if eos_token >= 0 and stop.all():
                 break
         return result, logits, K, V
 
