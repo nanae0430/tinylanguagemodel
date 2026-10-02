@@ -284,7 +284,7 @@ class TinyLanguageModel(nn.Module):
             stop |= new_token == eos_token
             if stop.all():
                 break
-        return result
+        return result, logits
 
 
 def rope(q, k, offset: int = 0):

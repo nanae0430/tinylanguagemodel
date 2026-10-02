@@ -12,19 +12,21 @@ tokenizer.load("./tiny_story.model")
 prompt = "once upon a time"
 prompt = tokenizer.encode(prompt)
 prompt = torch.tensor(prompt, dtype=torch.long, device=device).unsqueeze(0)
-prompt = prompt.repeat(4, 1)
-model.eval()
-result = model.generate(
-    prompt, 1000, eos_token=tokenizer.special_tokens["<|endoftext|>"], top_p=0.8
-)
-eos_token = tokenizer.special_tokens["<|endoftext|>"]
-i = 0
-for response in result:
-    i += 1
-    print("*" * 20, i, "*" * 20)
-    response = response.tolist()
 
-    if eos_token in response:
-        response = response[: 1 + response.index(eos_token)]
-    response = tokenizer.decode(response)
-    print(response)
+model.eval()
+for i in range(10):
+    result, logits_1 = model.generate(
+        prompt,
+        1,
+        eos_token=tokenizer.special_tokens["<|endoftext|>"],
+        top_p=0.8,
+    )
+    result, logits_2 = model.generate(
+        prompt[:, :-1],
+        2,
+        eos_token=tokenizer.special_tokens["<|endoftext|>"],
+        top_p=0.8,
+    )
+    print("*" * 10 + str(i + 1) + "*" * 10)
+    print(max(logits_1 - logits_2))
+    prompt = result
