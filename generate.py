@@ -13,17 +13,17 @@ tokenizer.load("./tiny_story.model")
 data = torch.load("./val_tensor.pt")
 
 model.eval()
-prompt, _ = get_batch(data, 1, 20, device)
+prompt, _ = get_batch(data, 1, model.block_size, device)
 _, _, K, V = model.generate(
-    prompt[:, :10],
+    prompt[:, :-1],
     1,
     eos_token=tokenizer.special_tokens["<|endoftext|>"],
     top_p=0.8,
 )
-for i in range(10):
+for i in range(1, 10):
     result, logits_1, _, _ = model.generate(
-        prompt[:, : i + 11],
-        1,
+        prompt[:, :-i],
+        2,
         eos_token=tokenizer.special_tokens["<|endoftext|>"],
         top_p=0.8,
     )

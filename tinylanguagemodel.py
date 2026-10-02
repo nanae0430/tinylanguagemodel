@@ -142,7 +142,7 @@ class MultiHeadAttentionSDPA(nn.Module):
         seq_len = K.shape[2] if K is not None else 0
         B, T, C = x.shape
         if T + seq_len > self.block_size:
-            raise ValueError(f"序列长度{T}超出上下文长度")
+            raise ValueError(f"序列长度{T+seq_len}超出上下文长度")
         qkv = self.qkv(x)
         q, k, v = qkv.chunk(3, dim=-1)
         q = q.view(B, T, self.num_head, self.head_size).transpose(1, 2)
@@ -285,7 +285,7 @@ class TinyLanguageModel(nn.Module):
             new_token = sample(logits, temperature, stop, eos_token, top_p, top_k)
             result = torch.concat((result, new_token), dim=-1)
             stop |= new_token == eos_token
-            if stop.all():
+            if stop.all() or K[0].shape + 1 > self.block_size:
                 break
         return result, logits, K, V
 
