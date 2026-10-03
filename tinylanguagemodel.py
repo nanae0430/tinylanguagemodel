@@ -178,7 +178,7 @@ class RMSNorm(nn.Module):
         super().__init__()
         self.dim = dim
         self.eps = eps
-        self.gamma = torch.ones(size=(dim,), requires_grad=True)
+        self.gamma = nn.Parameter(data=torch.ones(size=(dim,)), requires_grad=True)
         # TODO：创建形状为 [dim]、初始值全为 1 的可学习参数 gamma
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -188,7 +188,7 @@ class RMSNorm(nn.Module):
         """
         # TODO：完成 RMSNorm 计算
         B, T, C = x.shape
-        r = torch.sqrt(torch.sum(x * x, dim=-1) / C + self.eps)
+        r = torch.sqrt(torch.sum(x * x, dim=-1, keepdim=True) / C + self.eps)
         y = x / r * self.gamma
         return y
 
@@ -617,4 +617,20 @@ if __name__ == "__main__":
     # print("step:1000,lr:", get_lr(1000, 100, 1000, 1e-3, 1e-4))
     # print("step:1100,lr:", get_lr(1100, 100, 1000, 1e-3, 1e-4))
 
-    print(rope(8, 8))
+    norm = RMSNorm(dim=8)
+
+    x = torch.randn(2, 4, 8)
+    y = norm(x)
+
+    print("输入形状：", x.shape)  # torch.Size([2, 4, 8])
+    print("输出形状：", y.shape)  # torch.Size([2, 4, 8])
+
+    assert y.shape == x.shape
+    norm = RMSNorm(dim=2)
+
+    x = torch.tensor([[[3.0, 4.0]]])  # [1, 1, 2]
+    y = norm(x)
+
+    print(y)
+    # gamma 初始为全 1 时，预期约为：
+    # tensor([[[0.8485, 1.1314]]])
