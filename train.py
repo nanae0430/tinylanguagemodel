@@ -23,7 +23,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = RegexTokenizer()
 tokenizer.load("./tiny_story.model")
 vocab_size = len(tokenizer.vocab)
-path = "LayerNorm"
+path = "RMSNorm"
 # train_data = tokenizer.encode(train_text, {"<|endoftext|>"})
 # val_data = tokenizer.encode(val_text, {"<|endoftext|>"})
 # train_data = torch.tensor(train_data, dtype=torch.long)
@@ -33,8 +33,7 @@ path = "LayerNorm"
 train_data = torch.load("./train_tensor.pt", weights_only=True)
 val_data = torch.load("./val_tensor.pt", weights_only=True)
 if load_checkpoint:
-    check_point = torch.load("./last_checkpoint.pt", device)
-    print(check_point.keys())
+    check_point = torch.load(f"./last_checkpoint_{path}.pt", device)
     model = TinyLanguageModel(**check_point["model_config"]).to(device)
     model.load_state_dict(check_point["model_state_dict"])
     optimizer = torch.optim.AdamW(params=model.parameters())
@@ -64,7 +63,7 @@ else:
         block_size,
         num_head,
         num_layer,
-        norm_type="RMSNorm",
+        norm_type=path,
         dropout=0.1,
     )
     model = model.to(device)
