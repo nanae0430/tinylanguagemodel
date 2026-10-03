@@ -194,7 +194,7 @@ class RMSNorm(nn.Module):
 
 
 class FeedForward(nn.Module):
-    def __init__(self, n_embd, dropout=0):
+    def __init__(self, n_embd, dropout: float = 0.0):
         super().__init__()
         self.feedforward = nn.Sequential(
             nn.Linear(n_embd, 4 * n_embd),
@@ -205,6 +205,19 @@ class FeedForward(nn.Module):
 
     def forward(self, x):
         return self.feedforward(x)
+
+
+class SwiGLU(nn.Module):
+
+    def __int__(self, n_embd):
+        self.up = nn.Linear(n_embd, int(n_embd * 8 / 3))
+        self.gate = nn.Linear(n_embd, int(n_embd * 8 / 3))
+        self.down = nn.Linear(int(n_embd * 8 / 3), n_embd)
+
+    def forward(self, x):
+        u = self.up(x)
+        g = nn.SiLU(self.gate(x))
+        return self.down(u * g)
 
 
 class TransformerBlock(nn.Module):
