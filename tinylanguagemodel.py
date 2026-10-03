@@ -194,11 +194,11 @@ class RMSNorm(nn.Module):
 
 
 class FeedForward(nn.Module):
-    def __init__(self, n_embd, dropout: float = 0.0):
+    def __init__(self, n_embd, ffn_cls, dropout: float = 0.0):
         super().__init__()
         self.feedforward = nn.Sequential(
             nn.Linear(n_embd, 4 * n_embd),
-            nn.GELU(),
+            ffn_cls(),
             nn.Linear(4 * n_embd, n_embd),
             nn.Dropout(dropout),
         )
@@ -224,18 +224,12 @@ class SwiGLU(nn.Module):
 
 class TransformerBlock(nn.Module):
 
-    def __init__(self, n_embd, num_head, block_size, norm_type, dropout=0):
+    def __init__(self, n_embd, num_head, block_size, norm_cls, ffn_cls, dropout=0):
         super().__init__()
-        if norm_type == "LayerNorm":
-            norm_cls = nn.LayerNorm
-        elif norm_type == "RMSNorm":
-            norm_cls = RMSNorm
-        else:
-            raise ValueError(f"未知归一化类型：{norm_type}")
         self.heads = MultiHeadAttentionSDPA(n_embd, num_head, block_size, dropout)
         self.attention_norm = norm_cls(n_embd)
         self.feedforward_norm = norm_cls(n_embd)
-        self.feedforward = FeedForward(n_embd, dropout)
+        self.feedforward = FeedForward(n_embd, ffn_cls, dropout)
 
     def forward(self, x, K: torch.Tensor | None = None, V: torch.Tensor | None = None):
         x1, k, v = self.heads(self.attention_norm(x), K, V)
@@ -253,6 +247,7 @@ class TinyLanguageModel(nn.Module):
         num_head: int,
         num_layer: int,
         norm_type: str,
+        ffn_type: str,
         dropout: float = 0,
     ):
         super().__init__()
@@ -262,10 +257,17 @@ class TinyLanguageModel(nn.Module):
             norm_cls = RMSNorm
         else:
             raise ValueError(f"未知归一化类型：{norm_type}")
+        if ffn_type == "GELU":
+            ffn_cls = nn.GELU
+        elif ffn_type == "SWiGLU":
+            ffn_cls = SwiGLU
+        else:
+            raise ValueError(f"未知前馈网络层类型：{ffn_type}")
         self.vocab_size = vocab_size
         self.n_embd = n_embd
         self.block_size = block_size
         self.norm_type = norm_type
+        self.ffn_type = ffn_type
         self.model_config = {
             "vocab_size": vocab_size,
             "n_embd": n_embd,
@@ -274,12 +276,15 @@ class TinyLanguageModel(nn.Module):
             "num_head": num_head,
             "dropout": dropout,
             "norm_type": norm_type,
+            "ffn_type": ffn_type,
         }
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
         self.lm_head = nn.Linear(n_embd, vocab_size)
         self.model = nn.ModuleList(
             [
-                TransformerBlock(n_embd, num_head, block_size, norm_type, dropout)
+                TransformerBlock(
+                    n_embd, num_head, block_size, norm_cls, ffn_cls, dropout
+                )
                 for _ in range(num_layer)
             ]
             + [norm_cls(n_embd)]
