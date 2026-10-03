@@ -194,11 +194,11 @@ class RMSNorm(nn.Module):
 
 
 class FeedForward(nn.Module):
-    def __init__(self, n_embd, ffn_cls, dropout: float = 0.0):
+    def __init__(self, n_embd, dropout: float = 0.0):
         super().__init__()
         self.feedforward = nn.Sequential(
             nn.Linear(n_embd, 4 * n_embd),
-            ffn_cls(),
+            nn.GELU(),
             nn.Linear(4 * n_embd, n_embd),
             nn.Dropout(dropout),
         )
@@ -229,7 +229,7 @@ class TransformerBlock(nn.Module):
         self.heads = MultiHeadAttentionSDPA(n_embd, num_head, block_size, dropout)
         self.attention_norm = norm_cls(n_embd)
         self.feedforward_norm = norm_cls(n_embd)
-        self.feedforward = FeedForward(n_embd, ffn_cls, dropout)
+        self.feedforward = ffn_cls(n_embd, dropout)
 
     def forward(self, x, K: torch.Tensor | None = None, V: torch.Tensor | None = None):
         x1, k, v = self.heads(self.attention_norm(x), K, V)
@@ -259,7 +259,7 @@ class TinyLanguageModel(nn.Module):
         else:
             raise ValueError(f"未知归一化类型：{norm_type}")
         if ffn_type == "GELU":
-            ffn_cls = nn.GELU
+            ffn_cls = FeedForward
         elif ffn_type == "SWiGLU":
             ffn_cls = SwiGLU
         else:
