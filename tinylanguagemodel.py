@@ -189,7 +189,7 @@ class RMSNorm(nn.Module):
         # TODO：完成 RMSNorm 计算
         B, T, C = x.shape
         r = torch.sqrt(torch.sum(x * x, dim=-1) / C + self.eps)
-        y = self.gamma * x / r
+        y = x / r * self.gamma
         return y
 
 
