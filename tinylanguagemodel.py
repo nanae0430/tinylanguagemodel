@@ -209,11 +209,17 @@ class FeedForward(nn.Module):
 
 class TransformerBlock(nn.Module):
 
-    def __init__(self, n_embd, num_head, block_size, dropout=0):
+    def __init__(self, n_embd, num_head, block_size, norm_type, dropout=0):
         super().__init__()
+        if norm_type == "LayerNorm":
+            norm_cls = nn.LayerNorm
+        elif norm_type == "RMSNorm":
+            norm_cls = RMSNorm
+        else:
+            raise ValueError(f"未知归一化类型：{norm_type}")
         self.heads = MultiHeadAttentionSDPA(n_embd, num_head, block_size, dropout)
-        self.attention_norm = nn.LayerNorm(n_embd)
-        self.feedforward_norm = nn.LayerNorm(n_embd)
+        self.attention_norm = norm_cls(n_embd)
+        self.feedforward_norm = norm_cls(n_embd)
         self.feedforward = FeedForward(n_embd, dropout)
 
     def forward(self, x, K: torch.Tensor | None = None, V: torch.Tensor | None = None):
@@ -231,12 +237,20 @@ class TinyLanguageModel(nn.Module):
         block_size: int,
         num_head: int,
         num_layer: int,
+        norm_type: str,
         dropout: float = 0,
     ):
         super().__init__()
+        if norm_type == "LayerNorm":
+            norm_cls = nn.LayerNorm
+        elif norm_type == "RMSNorm":
+            norm_cls = RMSNorm
+        else:
+            raise ValueError(f"未知归一化类型：{norm_type}")
         self.vocab_size = vocab_size
         self.n_embd = n_embd
         self.block_size = block_size
+        self.norm_type = norm_type
         self.model_config = {
             "vocab_size": vocab_size,
             "n_embd": n_embd,
@@ -244,15 +258,16 @@ class TinyLanguageModel(nn.Module):
             "num_layer": num_layer,
             "num_head": num_head,
             "dropout": dropout,
+            "norm_type": norm_type,
         }
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
         self.lm_head = nn.Linear(n_embd, vocab_size)
         self.model = nn.ModuleList(
             [
-                TransformerBlock(n_embd, num_head, block_size, dropout)
+                TransformerBlock(n_embd, num_head, block_size, norm_type, dropout)
                 for _ in range(num_layer)
             ]
-            + [nn.LayerNorm(n_embd)]
+            + [norm_cls(n_embd)]
         )
 
     def forward(
@@ -416,6 +431,7 @@ def train(
     start_step=0,
     non_improve=0,
     is_eval=True,
+    path="",
 ):
 
     model.train()
@@ -460,6 +476,7 @@ def train(
                 non_improve=non_improve,
                 optimizer=optimizer,
                 step=step,
+                path=path,
             )
             if non_improve >= patience:
                 return
@@ -474,6 +491,7 @@ def save_model(
     model,
     optimizer,
     step,
+    path,
 ):
     if current_eval_loss < best_val_loss - min_delta:
         best_val_loss = current_eval_loss
@@ -489,7 +507,7 @@ def save_model(
                 "best_val_loss": best_val_loss,
                 "non_improve": non_improve,
             },
-            "best_checkpoint.pt",
+            "best_checkpoint.pt" if path == "" else f"best_checkpoint_{path}.pt",
         )
     else:
         non_improve += 1
@@ -504,7 +522,7 @@ def save_model(
             "best_val_loss": best_val_loss,
             "non_improve": non_improve,
         },
-        "last_checkpoint.pt",
+        "last_checkpoint.pt" if path == "" else f"last_checkpoint_{path}.pt",
     )
     return best_val_loss, non_improve
 
@@ -561,90 +579,92 @@ def get_lr(step, warmup_step, total_step, max_lr, min_lr):
 
 
 if __name__ == "__main__":
+    path = "miku"
+    print(f"aaa{path}")
     #     device = "cuda" if torch.cuda.is_available() else "cpu"
     #     batch_size = 4
-    #     vocab_size = 100
-    #     block_size = 16
-    #     n_embd = 128
-    #     num_head = 8
-    #     num_layer = 12
-    #     dropout = 0.1
-    #     steps = 100
-    #     data = torch.randint(
-    #         0,
-    #         100,
-    #         size=(1000,),
-    #         dtype=torch.long,
-    #         device=device,
-    #     )
-    #     train_data, val_data = data[:900], data[900:]
-    #     model = TinyLanguageModel(
-    #         vocab_size=vocab_size,
-    #         n_embd=n_embd,
-    #         block_size=block_size,
-    #         num_head=num_head,
-    #         num_layer=num_layer,
-    #         dropout=dropout,
-    #     ).to(device)
-    #     optimizer = torch.optim.AdamW(
-    #         params=model.parameters(),
-    #         lr=1e-3,
-    #     )
-    #     model, optimizer = train(
-    #         model=model,
-    #         optimizer=optimizer,
-    #         data=train_data,
-    #         batch_size=batch_size,
-    #         block_size=block_size,
-    #         steps=steps,
-    #         device=device,
-    #     )
-    #     train_loss, eval_loss = estimate_loss(
-    #         model=model,
-    #         train_data=train_data,
-    #         val_data=val_data,
-    #         batch_size=batch_size,
-    #         block_size=block_size,
-    #         eval_iters=20,
-    #         device=device,
-    #     )
-    #     print("average train loss:", train_loss)
-    #     print("average eval loss:", eval_loss)
-    # print("step:0,lr:", get_lr(0, 100, 1000, 1e-3, 1e-4))
-    # print("step:50,lr:", get_lr(50, 100, 1000, 1e-3, 1e-4))
-    # print("step:100,lr:", get_lr(100, 100, 1000, 1e-3, 1e-4))
-    # print("step:550,lr:", get_lr(550, 100, 1000, 1e-3, 1e-4))
-    # print("step:1000,lr:", get_lr(1000, 100, 1000, 1e-3, 1e-4))
-    # print("step:1100,lr:", get_lr(1100, 100, 1000, 1e-3, 1e-4))
+    # #     vocab_size = 100
+    # #     block_size = 16
+    # #     n_embd = 128
+    # #     num_head = 8
+    # #     num_layer = 12
+    # #     dropout = 0.1
+    # #     steps = 100
+    # #     data = torch.randint(
+    # #         0,
+    # #         100,
+    # #         size=(1000,),
+    # #         dtype=torch.long,
+    # #         device=device,
+    # #     )
+    # #     train_data, val_data = data[:900], data[900:]
+    # #     model = TinyLanguageModel(
+    # #         vocab_size=vocab_size,
+    # #         n_embd=n_embd,
+    # #         block_size=block_size,
+    # #         num_head=num_head,
+    # #         num_layer=num_layer,
+    # #         dropout=dropout,
+    # #     ).to(device)
+    # #     optimizer = torch.optim.AdamW(
+    # #         params=model.parameters(),
+    # #         lr=1e-3,
+    # #     )
+    # #     model, optimizer = train(
+    # #         model=model,
+    # #         optimizer=optimizer,
+    # #         data=train_data,
+    # #         batch_size=batch_size,
+    # #         block_size=block_size,
+    # #         steps=steps,
+    # #         device=device,
+    # #     )
+    # #     train_loss, eval_loss = estimate_loss(
+    # #         model=model,
+    # #         train_data=train_data,
+    # #         val_data=val_data,
+    # #         batch_size=batch_size,
+    # #         block_size=block_size,
+    # #         eval_iters=20,
+    # #         device=device,
+    # #     )
+    # #     print("average train loss:", train_loss)
+    # #     print("average eval loss:", eval_loss)
+    # # print("step:0,lr:", get_lr(0, 100, 1000, 1e-3, 1e-4))
+    # # print("step:50,lr:", get_lr(50, 100, 1000, 1e-3, 1e-4))
+    # # print("step:100,lr:", get_lr(100, 100, 1000, 1e-3, 1e-4))
+    # # print("step:550,lr:", get_lr(550, 100, 1000, 1e-3, 1e-4))
+    # # print("step:1000,lr:", get_lr(1000, 100, 1000, 1e-3, 1e-4))
+    # # print("step:1100,lr:", get_lr(1100, 100, 1000, 1e-3, 1e-4))
 
-    norm = RMSNorm(dim=8)
-    norm2 = nn.RMSNorm(8, 1e-6)
-    weights = torch.randn_like(norm.gamma)
+    # norm = RMSNorm(dim=8)
+    # norm2 = nn.RMSNorm(8, 1e-6)
+    # weights = torch.randn_like(norm.gamma)
 
-    with torch.no_grad():
-        norm.gamma.copy_(weights)
-        norm2.weight.copy_(weights)
+    # with torch.no_grad():
+    #     norm.gamma.copy_(weights)
+    #     norm2.weight.copy_(weights)
 
-    x = torch.randn(
-        size=(2, 4, 8), dtype=torch.float32, requires_grad=True
-    )  # [1, 1, 2]
-    y = norm(x)
-    x2 = x.detach().clone().requires_grad_(True)
-    print("输入形状：", x.shape)  # torch.Size([2, 4, 8])
-    print("输出形状：", y.shape)  # torch.Size([2, 4, 8])
+    # x = torch.randn(
+    #     size=(2, 4, 8), dtype=torch.float32, requires_grad=True
+    # )  # [1, 1, 2]
+    # y = norm(x)
+    # x2 = x.detach().clone().requires_grad_(True)
+    # print("输入形状：", x.shape)  # torch.Size([2, 4, 8])
+    # print("输出形状：", y.shape)  # torch.Size([2, 4, 8])
 
-    assert y.shape == x.shape
-    loss = torch.sum(y)
-    loss.backward()
+    # assert y.shape == x.shape
+    # loss = torch.sum(y)
+    # loss.backward()
 
-    # print(loss)
-    # print(f"handmadeRMSNorm\nx.grad:\t{x.grad}\nnorm.gamma.grad:\t{norm.gamma.grad}")
-    # gamma 初始为全 1 时，预期约为：
-    # tensor([[[0.8485, 1.1314]]])
-    y2 = norm2(x2)
-    loss = torch.sum(y2)
-    loss.backward()
-    # print(f"nn.RMSNorm\nx.grad:\t{x2.grad}\nnorm.gamma.grad:\t{norm2.weight.grad}")
-    print("y2-y:", (y2 - y).abs().max().item())
-    print("x2-x:", (x2.grad - x.grad).abs().max().item())
-    print("norm2-norm:", (norm2.weight.grad - norm.gamma.grad).abs().max().item())
+    # # print(loss)
+    # # print(f"handmadeRMSNorm\nx.grad:\t{x.grad}\nnorm.gamma.grad:\t{norm.gamma.grad}")
+    # # gamma 初始为全 1 时，预期约为：
+    # # tensor([[[0.8485, 1.1314]]])
+    # y2 = norm2(x2)
+    # loss = torch.sum(y2)
+    # loss.backward()
+    # # print(f"nn.RMSNorm\nx.grad:\t{x2.grad}\nnorm.gamma.grad:\t{norm2.weight.grad}")
+    # print("y2-y:", (y2 - y).abs().max().item())
+    # print("x2-x:", (x2.grad - x.grad).abs().max().item())
+    # print("norm2-norm:", (norm2.weight.grad - norm.gamma.grad).abs().max().item())

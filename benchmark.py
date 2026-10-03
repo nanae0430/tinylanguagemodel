@@ -7,7 +7,6 @@ def benchmark_training(
     optimizer,
     data,
     batch_size,
-    block_size,
     device,
     warmup_steps=20,
     measure_steps=200,
@@ -16,7 +15,7 @@ def benchmark_training(
     model.train()
     for _ in range(warmup_steps):
         input_data, target_data = get_batch(
-            data=data, batch_size=batch_size, block_size=block_size, device=device
+            data=data, batch_size=batch_size, block_size=model.block_size, device=device
         )
         optimizer.zero_grad()
         with torch.autocast(device_type=device, dtype=torch.bfloat16, enabled=use_amp):
@@ -30,7 +29,7 @@ def benchmark_training(
 
     for _ in range(measure_steps):
         input_data, target_data = get_batch(
-            data=data, batch_size=batch_size, block_size=block_size, device=device
+            data=data, batch_size=batch_size, block_size=model.block_size, device=device
         )
         optimizer.zero_grad()
         with torch.autocast(device_type=device, dtype=torch.bfloat16, enabled=use_amp):
@@ -43,7 +42,7 @@ def benchmark_training(
     peak_memory = torch.cuda.max_memory_allocated() / 1024**2
     elapsed_seconds = end_time - start_time
     time_per_step = elapsed_seconds / measure_steps * 1000
-    token_num = measure_steps * batch_size * block_size
+    token_num = measure_steps * batch_size * model.block_size
     tokens_per_second = token_num / elapsed_seconds
     print(
         f"elapsed:\t{elapsed_seconds:.6f}s\nms/step:\t{time_per_step:.6f}ms\ntokens/s:\t{tokens_per_second:.6f}\npeak_memory:\t{peak_memory:.6f}"
@@ -96,19 +95,19 @@ def benchmark_generate(
 
 
 if __name__ == "__main__":
-    from MinBPE import RegexTokenizer
+    # from MinBPE import RegexTokenizer
 
-    with open("./train_text.txt", "r", encoding="utf-8") as f:
-        train_text = f.read()
+    # # with open("./train_text.txt", "r", encoding="utf-8") as f:
+    # #     train_text = f.read()
 
     batch_size = 32
-    block_size = 128
-    n_embd = 128
-    num_head = 8
-    num_layer = 8
-    steps = 200
-    eval_iters = 100
-    lr = 0.001
+    # block_size = 128
+    # n_embd = 128
+    # num_head = 8
+    # num_layer = 8
+    # steps = 200
+    # eval_iters = 100
+    # lr = 0.001
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # tokenizer = RegexTokenizer()
@@ -118,15 +117,20 @@ if __name__ == "__main__":
     # train_data = tokenizer.encode(train_text, {"<|endoftext|>"})
     # train_data = torch.tensor(train_data, dtype=torch.long)
     # torch.save(train_data, "./train_tensor.pt")
-    train_data = torch.load("./train_tensor.pt")
-    check_point = torch.load("./last_checkpoint_rope.pt", device)
-    model = TinyLanguageModel(**check_point["model_config"]).to(device)
-    model.load_state_dict(check_point["model_state_dict"])
-    optimizer = torch.optim.AdamW(params=model.parameters())
-    optimizer.load_state_dict(check_point["optimizer_state_dict"])
-    start_step = check_point["step"]
-    non_improve = check_point["non_improve"]
-    best_val_loss = check_point["best_val_loss"]
+    for path in ["RMSNorm", "LayerNorm"]:
+        print('*'*10+path+'*'*10)
+        train_data = torch.load("./train_tensor.pt", weights_only=True)
+        check_point = torch.load(f"./last_checkpoint_{path}.pt", device)
+        config = dict(check_point["model_config"])
+        config["norm_type"] = path
+        model = TinyLanguageModel(**config).to(device)
+        model.load_state_dict(check_point["model_state_dict"])
+        optimizer = torch.optim.AdamW(params=model.parameters())
+        optimizer.load_state_dict(check_point["optimizer_state_dict"])
+        start_step = check_point["step"]
+        non_improve = check_point["non_improve"]
+        best_val_loss = check_point["best_val_loss"]
+        benchmark_training(model, optimizer, train_data, batch_size, device)
 
     # for i in range(3):
     #     print("*" * 10, f"batch_size={32*2**i}", "*" * 10)
@@ -167,50 +171,50 @@ if __name__ == "__main__":
     # print(f"average grad norm:{torch.mean(grad_norm)}")
     # print(f"min grad norm:{torch.min(grad_norm)}")
 
-    print("*" * 10 + "use_cache=True" + "*" * 10)
-    benchmark_generate(
-        model,
-        train_data,
-        batch_size=16,
-        max_new_token=32,
-        use_cache=True,
-        device=device,
-    )
-    print("*" * 10 + "use_cache=False" + "*" * 10)
-    benchmark_generate(
-        model,
-        train_data,
-        batch_size=16,
-        max_new_token=32,
-        use_cache=False,
-        device=device,
-    )
-    # # 提前准备输入，两种模式使用同一份数据
-    # data, _ = get_batch(train_data, batch_size, 32, device)
-    # model.eval()
-    # for cache_enabled in (
-    #     False,
-    #     True,
-    #     False,
-    #     True,
-    # ):
-    #     torch.cuda.synchronize()
+    # print("*" * 10 + "use_cache=True" + "*" * 10)
+    # benchmark_generate(
+    #     model,
+    #     train_data,
+    #     batch_size=16,
+    #     max_new_token=32,
+    #     use_cache=True,
+    #     device=device,
+    # )
+    # print("*" * 10 + "use_cache=False" + "*" * 10)
+    # benchmark_generate(
+    #     model,
+    #     train_data,
+    #     batch_size=16,
+    #     max_new_token=32,
+    #     use_cache=False,
+    #     device=device,
+    # )
+    # # # 提前准备输入，两种模式使用同一份数据
+    # # data, _ = get_batch(train_data, batch_size, 32, device)
+    # # model.eval()
+    # # for cache_enabled in (
+    # #     False,
+    # #     True,
+    # #     False,
+    # #     True,
+    # # ):
+    # #     torch.cuda.synchronize()
 
-    #     with torch.profiler.profile(
-    #         activities=[
-    #             torch.profiler.ProfilerActivity.CPU,
-    #             torch.profiler.ProfilerActivity.CUDA,
-    #         ],
-    #     ) as prof:
-    #         model.generate(
-    #             data,
-    #             32,
-    #             eos_token=-1,
-    #             top_k=1,
-    #             use_cache=cache_enabled,
-    #         )
-    #         torch.cuda.synchronize()
+    # #     with torch.profiler.profile(
+    # #         activities=[
+    # #             torch.profiler.ProfilerActivity.CPU,
+    # #             torch.profiler.ProfilerActivity.CUDA,
+    # #         ],
+    # #     ) as prof:
+    # #         model.generate(
+    # #             data,
+    # #             32,
+    # #             eos_token=-1,
+    # #             top_k=1,
+    # #             use_cache=cache_enabled,
+    # #         )
+    # #         torch.cuda.synchronize()
 
-    #     print(f"use_cache={cache_enabled}")
-    #     print(prof.key_averages().table(sort_by="self_cpu_time_total", row_limit=10))
-    #     print(prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10))
+    # #     print(f"use_cache={cache_enabled}")
+    # #     print(prof.key_averages().table(sort_by="self_cpu_time_total", row_limit=10))
+    # #     print(prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10))

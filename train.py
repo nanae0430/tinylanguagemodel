@@ -10,12 +10,12 @@ torch.manual_seed(39)
 #     val_text = f.read()
 load_checkpoint = False
 
-batch_size = 32
+batch_size = 16
 block_size = 128
 n_embd = 128
 num_head = 8
 num_layer = 8
-steps = 20000
+steps = 200
 eval_iters = 100
 lr = 0.001
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -23,15 +23,15 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = RegexTokenizer()
 tokenizer.load("./tiny_story.model")
 vocab_size = len(tokenizer.vocab)
-
+path = "LayerNorm"
 # train_data = tokenizer.encode(train_text, {"<|endoftext|>"})
 # val_data = tokenizer.encode(val_text, {"<|endoftext|>"})
 # train_data = torch.tensor(train_data, dtype=torch.long)
 # val_data = torch.tensor(val_data, dtype=torch.long)
 # torch.save(train_data, "./train_tensor.pt")
 # torch.save(val_data, "./val_tensor.pt")
-train_data = torch.load("./train_tensor.pt")
-val_data = torch.load("./val_tensor.pt")
+train_data = torch.load("./train_tensor.pt", weights_only=True)
+val_data = torch.load("./val_tensor.pt", weights_only=True)
 if load_checkpoint:
     check_point = torch.load("./last_checkpoint.pt", device)
     print(check_point.keys())
@@ -55,10 +55,17 @@ if load_checkpoint:
         best_val_loss=best_val_loss,
         start_step=start_step,
         non_improve=non_improve,
+        path=path,
     )
 else:
     model = TinyLanguageModel(
-        vocab_size, n_embd, block_size, num_head, num_layer, dropout=0.1
+        vocab_size,
+        n_embd,
+        block_size,
+        num_head,
+        num_layer,
+        norm_type="RMSNorm",
+        dropout=0.1,
     )
     model = model.to(device)
     optimizer = torch.optim.AdamW(params=model.parameters(), lr=0.001)
@@ -73,4 +80,5 @@ else:
         eval_iters=eval_iters,
         device=device,
         max_lr=lr,
+        path=path,
     )
