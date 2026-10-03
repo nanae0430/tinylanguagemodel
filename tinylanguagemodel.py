@@ -628,9 +628,14 @@ if __name__ == "__main__":
     assert y.shape == x.shape
     norm = RMSNorm(dim=2)
 
-    x = torch.tensor([[[3.0, 4.0]]])  # [1, 1, 2]
+    x = torch.tensor(
+        [[[3.0, 4.0]]], dtype=torch.float32, requires_grad=True
+    )  # [1, 1, 2]
     y = norm(x)
+    loss = torch.sum(y, dim=-1)
+    loss.backward()
 
-    print(y)
+    print(loss)
+    print(f"x.grad:{x.grad} norm.gamma.grad:{norm.gamma.grad}")
     # gamma 初始为全 1 时，预期约为：
     # tensor([[[0.8485, 1.1314]]])
