@@ -623,7 +623,7 @@ if __name__ == "__main__":
         size=(2, 4, 8), dtype=torch.float32, requires_grad=True
     )  # [1, 1, 2]
     y = norm(x)
-
+    x2 = torch.tensor(data=x, dtype=torch.float32, requires_grad=True)
     print("输入形状：", x.shape)  # torch.Size([2, 4, 8])
     print("输出形状：", y.shape)  # torch.Size([2, 4, 8])
 
@@ -632,6 +632,14 @@ if __name__ == "__main__":
     loss.backward()
 
     print(loss)
-    print(f"x.grad:{x.grad} norm.gamma.grad:{norm.gamma.grad}")
+    print(f"handmadeRMSNorm\nx.grad:\t{x.grad}\nnorm.gamma.grad:\t{norm.gamma.grad}")
     # gamma 初始为全 1 时，预期约为：
     # tensor([[[0.8485, 1.1314]]])
+    norm2 = nn.RMSNorm(8, 1e-6)
+    y2 = norm2(x2)
+    loss = torch.sum(y2)
+    loss.backward()
+    print(f"nn.RMSNorm\nx.grad:\t{x2.grad}\nnorm.gamma.grad:\t{norm2.weight.grad}")
+    print((y2 - y).abs().max().item())
+    print((x2.grad - x.grad).abs().max().item())
+    print((norm2.weight.grad - norm.gamma.grad).abs().max().item())
