@@ -618,12 +618,18 @@ if __name__ == "__main__":
     # print("step:1100,lr:", get_lr(1100, 100, 1000, 1e-3, 1e-4))
 
     norm = RMSNorm(dim=8)
+    norm2 = nn.RMSNorm(8, 1e-6)
+    weights = torch.randn_like(norm.gamma)
+
+    with torch.no_grad():
+        norm.gamma.copy_(weights)
+        norm2.weight.copy_(weights)
 
     x = torch.randn(
         size=(2, 4, 8), dtype=torch.float32, requires_grad=True
     )  # [1, 1, 2]
     y = norm(x)
-    x2 = torch.tensor(data=x, dtype=torch.float32, requires_grad=True)
+    x2 = x.detach().clone().requires_grad_(True)
     print("输入形状：", x.shape)  # torch.Size([2, 4, 8])
     print("输出形状：", y.shape)  # torch.Size([2, 4, 8])
 
@@ -631,15 +637,14 @@ if __name__ == "__main__":
     loss = torch.sum(y)
     loss.backward()
 
-    print(loss)
-    print(f"handmadeRMSNorm\nx.grad:\t{x.grad}\nnorm.gamma.grad:\t{norm.gamma.grad}")
+    # print(loss)
+    # print(f"handmadeRMSNorm\nx.grad:\t{x.grad}\nnorm.gamma.grad:\t{norm.gamma.grad}")
     # gamma 初始为全 1 时，预期约为：
     # tensor([[[0.8485, 1.1314]]])
-    norm2 = nn.RMSNorm(8, 1e-6)
     y2 = norm2(x2)
     loss = torch.sum(y2)
     loss.backward()
-    print(f"nn.RMSNorm\nx.grad:\t{x2.grad}\nnorm.gamma.grad:\t{norm2.weight.grad}")
-    print((y2 - y).abs().max().item())
-    print((x2.grad - x.grad).abs().max().item())
-    print((norm2.weight.grad - norm.gamma.grad).abs().max().item())
+    # print(f"nn.RMSNorm\nx.grad:\t{x2.grad}\nnorm.gamma.grad:\t{norm2.weight.grad}")
+    print("y2-y:", (y2 - y).abs().max().item())
+    print("x2-x:", (x2.grad - x.grad).abs().max().item())
+    print("norm2-norm:", (norm2.weight.grad - norm.gamma.grad).abs().max().item())
