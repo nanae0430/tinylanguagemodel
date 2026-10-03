@@ -209,15 +209,16 @@ class FeedForward(nn.Module):
 
 class SwiGLU(nn.Module):
 
-    def __int__(self, n_embd):
+    def __init__(self, n_embd,dropout:float=0.0):
+        super().__init__()
         self.up = nn.Linear(n_embd, int(n_embd * 8 / 3))
         self.gate = nn.Linear(n_embd, int(n_embd * 8 / 3))
         self.down = nn.Linear(int(n_embd * 8 / 3), n_embd)
-
+        self.drouput=nn.Dropout(dropout)
     def forward(self, x):
         u = self.up(x)
-        g = nn.SiLU(self.gate(x))
-        return self.down(u * g)
+        g = F.silu(self.gate(x))
+        return self.drouput(self.down(u * g))
 
 
 class TransformerBlock(nn.Module):
