@@ -173,6 +173,26 @@ class MultiHeadAttentionSDPA(nn.Module):
         return self.residual_dropout(projection_output), k, v
 
 
+class RMSNorm(nn.Module):
+    def __init__(self, dim: int, eps: float = 1e-6):
+        super().__init__()
+        self.dim = dim
+        self.eps = eps
+        self.gamma = torch.ones(size=(dim,), requires_grad=True)
+        # TODO：创建形状为 [dim]、初始值全为 1 的可学习参数 gamma
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        输入：x，形状 [B, T, dim]
+        输出：y，形状 [B, T, dim]
+        """
+        # TODO：完成 RMSNorm 计算
+        B, T, C = x.shape
+        r = torch.sqrt(torch.sum(x * x, dim=-1) / C + self.eps)
+        y = self.gamma * x / r
+        return y
+
+
 class FeedForward(nn.Module):
     def __init__(self, n_embd, dropout=0):
         super().__init__()
