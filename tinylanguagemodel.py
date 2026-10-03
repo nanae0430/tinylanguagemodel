@@ -209,16 +209,17 @@ class FeedForward(nn.Module):
 
 class SwiGLU(nn.Module):
 
-    def __init__(self, n_embd,dropout:float=0.0):
+    def __init__(self, n_embd, dropout: float = 0.0):
         super().__init__()
         self.up = nn.Linear(n_embd, int(n_embd * 8 / 3))
         self.gate = nn.Linear(n_embd, int(n_embd * 8 / 3))
         self.down = nn.Linear(int(n_embd * 8 / 3), n_embd)
-        self.drouput=nn.Dropout(dropout)
+        self.dropout = nn.Dropout(dropout)
+
     def forward(self, x):
         u = self.up(x)
         g = F.silu(self.gate(x))
-        return self.drouput(self.down(u * g))
+        return self.dropout(self.down(u * g))
 
 
 class TransformerBlock(nn.Module):
@@ -593,8 +594,6 @@ def get_lr(step, warmup_step, total_step, max_lr, min_lr):
 
 
 if __name__ == "__main__":
-    path = "miku"
-    print(f"aaa{path}")
     #     device = "cuda" if torch.cuda.is_available() else "cpu"
     #     batch_size = 4
     # #     vocab_size = 100
@@ -682,3 +681,19 @@ if __name__ == "__main__":
     # print("y2-y:", (y2 - y).abs().max().item())
     # print("x2-x:", (x2.grad - x.grad).abs().max().item())
     # print("norm2-norm:", (norm2.weight.grad - norm.gamma.grad).abs().max().item())
+    x = torch.randn(2, 4, 128, requires_grad=True)
+    swiglu = SwiGLU(x.shape[-1])
+    y = swiglu(x)
+    assert x.shape == y.shape
+    loss = torch.sum(y)
+    loss.backward()
+    # 检查输入梯度
+    assert x.grad is not None, "输入梯度为 None"
+    assert torch.isfinite(x.grad).all().item(), "输入梯度含 NaN 或 Inf"
+
+    # 检查所有参数的梯度，包括 weight 和 bias
+    for name, param in swiglu.named_parameters():
+        assert param.grad is not None, f"{name} 的梯度为 None"
+        assert torch.isfinite(param.grad).all().item(), f"{name} 的梯度含 NaN 或 Inf"
+
+    print("梯度检查通过")
