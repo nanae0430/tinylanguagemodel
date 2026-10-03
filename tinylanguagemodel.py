@@ -619,20 +619,16 @@ if __name__ == "__main__":
 
     norm = RMSNorm(dim=8)
 
-    x = torch.randn(2, 4, 8)
+    x = torch.randn(
+        size=(2, 4, 8), dtype=torch.float32, requires_grad=True
+    )  # [1, 1, 2]
     y = norm(x)
 
     print("输入形状：", x.shape)  # torch.Size([2, 4, 8])
     print("输出形状：", y.shape)  # torch.Size([2, 4, 8])
 
     assert y.shape == x.shape
-    norm = RMSNorm(dim=2)
-
-    x = torch.tensor(
-        [[[3.0, 4.0]]], dtype=torch.float32, requires_grad=True
-    )  # [1, 1, 2]
-    y = norm(x)
-    loss = torch.sum(y, dim=-1)
+    loss = torch.sum(y)
     loss.backward()
 
     print(loss)
