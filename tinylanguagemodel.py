@@ -251,6 +251,7 @@ class TinyLanguageModel(nn.Module):
         dropout: float = 0,
     ):
         super().__init__()
+
         if norm_type == "LayerNorm":
             norm_cls = nn.LayerNorm
         elif norm_type == "RMSNorm":
@@ -263,6 +264,7 @@ class TinyLanguageModel(nn.Module):
             ffn_cls = SwiGLU
         else:
             raise ValueError(f"未知前馈网络层类型：{ffn_type}")
+
         self.vocab_size = vocab_size
         self.n_embd = n_embd
         self.block_size = block_size
