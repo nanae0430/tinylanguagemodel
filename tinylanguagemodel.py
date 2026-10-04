@@ -260,7 +260,7 @@ class TinyLanguageModel(nn.Module):
             raise ValueError(f"未知归一化类型：{norm_type}")
         if ffn_type == "GELU":
             ffn_cls = FeedForward
-        elif ffn_type == "SWiGLU":
+        elif ffn_type == "SwiGLU":
             ffn_cls = SwiGLU
         else:
             raise ValueError(f"未知前馈网络层类型：{ffn_type}")

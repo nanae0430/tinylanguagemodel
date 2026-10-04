@@ -1,6 +1,8 @@
 import torch, time
 from tinylanguagemodel import TinyLanguageModel, train, get_batch
 
+torch.manual_seed(39)
+
 
 def benchmark_training(
     model,
@@ -117,20 +119,25 @@ if __name__ == "__main__":
     # train_data = tokenizer.encode(train_text, {"<|endoftext|>"})
     # train_data = torch.tensor(train_data, dtype=torch.long)
     # torch.save(train_data, "./train_tensor.pt")
-    for path in ["RMSNorm", "LayerNorm"]:
-        print('*'*10+path+'*'*10)
-        train_data = torch.load("./train_tensor.pt", weights_only=True)
-        check_point = torch.load(f"./last_checkpoint_{path}.pt", device)
-        config = dict(check_point["model_config"])
-        config["norm_type"] = path
-        model = TinyLanguageModel(**config).to(device)
-        model.load_state_dict(check_point["model_state_dict"])
-        optimizer = torch.optim.AdamW(params=model.parameters())
-        optimizer.load_state_dict(check_point["optimizer_state_dict"])
-        start_step = check_point["step"]
-        non_improve = check_point["non_improve"]
-        best_val_loss = check_point["best_val_loss"]
-        benchmark_training(model, optimizer, train_data, batch_size, device)
+    for norm_type in ["RMSNorm", "LayerNorm"]:
+        for ffn_type in ["GELU", "SwiGLU"]:
+            path = norm_type + "_" + ffn_type
+            print("*" * 10 + path + "*" * 10)
+            train_data = torch.load("./train_tensor.pt", weights_only=True)
+            check_point = torch.load(
+                f"./last_checkpoint_{path}.pt", device, weights_only=True
+            )
+            config = dict(check_point["model_config"])
+            config["norm_type"] = norm_type
+            config["ffn_type"] = ffn_type
+            model = TinyLanguageModel(**config).to(device)
+            model.load_state_dict(check_point["model_state_dict"])
+            optimizer = torch.optim.AdamW(params=model.parameters())
+            optimizer.load_state_dict(check_point["optimizer_state_dict"])
+            start_step = check_point["step"]
+            non_improve = check_point["non_improve"]
+            best_val_loss = check_point["best_val_loss"]
+            benchmark_training(model, optimizer, train_data, batch_size, device)
 
     # for i in range(3):
     #     print("*" * 10, f"batch_size={32*2**i}", "*" * 10)
