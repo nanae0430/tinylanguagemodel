@@ -35,6 +35,7 @@ ffn_types = ["GELU", "SwiGLU"]
 train_data = torch.load("./train_tensor.pt", weights_only=True)
 val_data = torch.load("./val_tensor.pt", weights_only=True)
 if load_checkpoint:
+    path = "RMSNorm_SwiGLU"
     check_point = torch.load(f"./last_checkpoint_{path}.pt", device)
     model = TinyLanguageModel(**check_point["model_config"]).to(device)
     model.load_state_dict(check_point["model_state_dict"])
