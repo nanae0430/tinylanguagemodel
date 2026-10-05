@@ -30,8 +30,15 @@ def prepare_sft_text_sample(texts: list[str], tokenizer, eos_id, pad_id):
 
     for text in texts:
         match = re.fullmatch(pattern, text, flags=re.DOTALL)
-        questions.append(match.group("question"))
-        answers.append(match.group("answer"))
+        if match is None:
+            raise ValueError(f"问答格式不正确：{text!r}")
+        prompt, response = re.split(
+            r"(?<=\nAssistant:)",
+            text,
+            maxsplit=1,
+        )
+        questions.append(prompt)
+        answers.append(response)
 
     questions = [tokenizer.encode(question) for question in questions]
     answers = [tokenizer.encode(answer) for answer in answers]
@@ -63,6 +70,7 @@ if __name__ == "__main__":
     model_state_dict = checkpoint["model_state_dict"]
     optimizer_state_dict = checkpoint["optimizer_state_dict"]
     model = TinyLanguageModel(**model_config).to(device)
+    model.load_state_dict(model_state_dict)
     optimizer = torch.optim.AdamW(model.parameters())
     optimizer.load_state_dict(optimizer_state_dict)
     batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
