@@ -11,7 +11,7 @@ train_text = text[0 : eos_index + len(eos_token)]
 val_text = text[eos_index + len(eos_token) :]
 
 start_time = time.time()
-special_tokens = {"<|endoftext|>": 2000}
+special_tokens = {"<|endoftext|>": 2000, "<|PADDING|>": 2001}
 tokenizer.register_special_tokens(special_tokens)
 tokenizer.train(corpus=train_text, vocab_size=2000)
 tokenizer.save("tiny_story")

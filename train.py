@@ -10,12 +10,12 @@ torch.manual_seed(39)
 #     val_text = f.read()
 load_checkpoint = False
 
-batch_size = 16
+batch_size = 32
 block_size = 128
 n_embd = 128
 num_head = 8
 num_layer = 8
-steps = 200
+steps = 20000
 eval_iters = 100
 lr = 0.001
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -32,6 +32,7 @@ ffn_types = ["GELU", "SwiGLU"]
 # val_data = torch.tensor(val_data, dtype=torch.long)
 # torch.save(train_data, "./train_tensor.pt")
 # torch.save(val_data, "./val_tensor.pt")
+
 train_data = torch.load("./train_tensor.pt", weights_only=True)
 val_data = torch.load("./val_tensor.pt", weights_only=True)
 if load_checkpoint:
@@ -60,32 +61,61 @@ if load_checkpoint:
         path=path,
     )
 else:
-    for norm_type in norm_types:
-        for ffn_type in ffn_types:
-            path = norm_type + "_" + ffn_type
-            model = TinyLanguageModel(
-                vocab_size,
-                n_embd,
-                block_size,
-                num_head,
-                num_layer,
-                norm_type=norm_type,
-                ffn_type=ffn_type,
-                dropout=0.1,
-            )
-            model = model.to(device)
-            optimizer = torch.optim.AdamW(params=model.parameters(), lr=0.001)
-            print("-" * 5 + path + "-" * 5)
-            train(
-                model=model,
-                optimizer=optimizer,
-                train_data=train_data,
-                val_data=val_data,
-                batch_size=batch_size,
-                block_size=block_size,
-                steps=steps,
-                eval_iters=eval_iters,
-                device=device,
-                max_lr=lr,
-                path=path,
-            )
+    # for norm_type in norm_types:
+    #     for ffn_type in ffn_types:
+    #         path = norm_type + "_" + ffn_type
+    #         model = TinyLanguageModel(
+    #             vocab_size,
+    #             n_embd,
+    #             block_size,
+    #             num_head,
+    #             num_layer,
+    #             norm_type=norm_type,
+    #             ffn_type=ffn_type,
+    #             dropout=0.1,
+    #         )
+    #         model = model.to(device)
+    #         optimizer = torch.optim.AdamW(params=model.parameters(), lr=0.001)
+    #         print("-" * 5 + path + "-" * 5)
+    #         train(
+    #             model=model,
+    #             optimizer=optimizer,
+    #             train_data=train_data,
+    #             val_data=val_data,
+    #             batch_size=batch_size,
+    #             block_size=block_size,
+    #             steps=steps,
+    #             eval_iters=eval_iters,
+    #             device=device,
+    #             max_lr=lr,
+    #             path=path,
+    #         )
+    ffn_type = "SwiGLU"
+    norm_type = "RMSNorm"
+    path = norm_type + "_" + ffn_type
+    model = TinyLanguageModel(
+        vocab_size,
+        n_embd,
+        block_size,
+        num_head,
+        num_layer,
+        norm_type=norm_type,
+        ffn_type=ffn_type,
+        dropout=0.1,
+    )
+    model = model.to(device)
+    optimizer = torch.optim.AdamW(params=model.parameters(), lr=0.001)
+    print("-" * 5 + path + "-" * 5)
+    train(
+        model=model,
+        optimizer=optimizer,
+        train_data=train_data,
+        val_data=val_data,
+        batch_size=batch_size,
+        block_size=block_size,
+        steps=steps,
+        eval_iters=eval_iters,
+        device=device,
+        max_lr=lr,
+        path=path,
+    )
