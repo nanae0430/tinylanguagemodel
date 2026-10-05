@@ -1,4 +1,5 @@
 import torch
+from tinylanguagemodel import TinyLanguageModel
 
 torch.manual_seed(42)
 
@@ -26,7 +27,7 @@ if __name__ == "__main__":
     eos_id = 2000
     pad_id = 2001
     samples = []
-
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     for prompt_len, response_len in [(3, 2), (2, 1), (5, 4)]:
         prompt_ids = torch.randint(10, 100, (prompt_len,)).tolist()
         response_ids = torch.randint(10, 100, (response_len,)).tolist()
@@ -37,6 +38,18 @@ if __name__ == "__main__":
 
     batch_x, batch_labels = collate_sft_batch(samples, pad_id)
 
-    print("batch_x：\n", batch_x)
-    print("batch_labels：\n", batch_labels)
-    print("形状：", batch_x.shape, batch_labels.shape)
+    checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
+    model_config = checkpoint["model_config"]
+    model_state_dict = checkpoint["model_state_dict"]
+    optimizer_state_dict = checkpoint["optimizer_state_dict"]
+    model = TinyLanguageModel(**model_config).to(device)
+    optimizer = torch.optim.AdamW(model.parameters())
+    optimizer.load_state_dict(optimizer_state_dict)
+    batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
+    logits, loss = model(batch_x, batch_labels)
+    optimizer.zero_grad()
+    loss.backward()
+    for name, parameter in model.named_parameters():
+        assert parameter.grad is not None, f"{name}梯度为 None"
+        assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
+    print("梯度检查通过")
