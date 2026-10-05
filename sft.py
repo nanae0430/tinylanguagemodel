@@ -1,5 +1,6 @@
 import torch, re
 from tinylanguagemodel import TinyLanguageModel
+from MinBPE import RegexTokenizer
 
 torch.manual_seed(42)
 
@@ -29,6 +30,7 @@ def prepare_sft_text_sample(texts: list[str], tokenizer, eos_id, pad_id):
     pattern = r"User:[ \t]*(?P<question>.*?)\r?\nAssistant:[ \t]*(?P<answer>.*)"
 
     for text in texts:
+        text = re.sub(r"\r?\n[ \t]*Assistant:", "\nAssistant:", text.strip(), count=1)
         match = re.fullmatch(pattern, text, flags=re.DOTALL)
         if match is None:
             raise ValueError(f"问答格式不正确：{text!r}")
@@ -55,16 +57,28 @@ if __name__ == "__main__":
     pad_id = 2001
     samples = []
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    for prompt_len, response_len in [(3, 2), (2, 1), (5, 4)]:
-        prompt_ids = torch.randint(10, 100, (prompt_len,)).tolist()
-        response_ids = torch.randint(10, 100, (response_len,)).tolist()
+    texts = """User: What color is the sky on a sunny day?
+            Assistant: The sky is blue.
+            <|endoftext|>
+            User: What sound does a cat make?
+            Assistant: A cat says meow.
+            <|endoftext|>
+            User: What is one plus two?
+            Assistant: One plus two is three.
+            <|endoftext|>
+            User: Lily feels cold. What can she wear?
+            Assistant: Lily can wear a warm coat.
+            <|endoftext|>
+            User: Tom sees his friend fall down. What should he do?
+            Assistant: Tom should help his friend get up and ask if they are hurt.
+            <|endoftext|>
+            User: Tell me a short story about a dog.
+            Assistant: A little dog found a red ball in the park. He brought it to his owner, and they played together.
+            <|endoftext|>"""
+    texts = [part.strip() for part in texts.split("<|endoftext|>") if part.strip()]
 
-        sample = prepare_sft_sample(prompt_ids, response_ids, eos_id)
-        samples.append(sample)
-        print("单条样本：", sample)
-
-    batch_x, batch_labels = collate_sft_batch(samples, pad_id)
-
+    tokenizer = RegexTokenizer().load("tiny_story.model")
+    batch_x, batch_labels = prepare_sft_text_sample(texts, tokenizer, eos_id, pad_id)
     checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
     model_config = checkpoint["model_config"]
     model_state_dict = checkpoint["model_state_dict"]
@@ -72,7 +86,6 @@ if __name__ == "__main__":
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
     optimizer = torch.optim.AdamW(model.parameters())
-    optimizer.load_state_dict(optimizer_state_dict)
     batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
     logits, loss = model(batch_x, batch_labels)
     optimizer.zero_grad()

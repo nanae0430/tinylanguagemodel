@@ -137,6 +137,7 @@ class Tokenizer:
                 v: k for k, v in self.special_tokens.items()
             }
             self.vocab = self._build_vocab()
+            return self
 
 
 class BasicTokenizer(Tokenizer):
