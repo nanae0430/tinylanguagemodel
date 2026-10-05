@@ -93,15 +93,23 @@ if __name__ == "__main__":
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), float("inf"))
         optimizer.step()
-        if i % 10 == 0:
-            print(f"{loss.item():.4e}")
+        # if i % 10 == 0:
+        # print(f"{loss.item():.4e}")
         # for name, parameter in model.named_parameters():
         #     assert parameter.grad is not None, f"{name}梯度为 None"
         #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
         # print("梯度检查通过")
-    test = "User: What color is the sky on a sunny day?\nAssistant:"
+    test = "User: What color is the sky when the weather is sunny?\nAssistant:"
     model.eval()
     test_idx = tokenizer.encode(test, {"<|endoftext|>"})
     test_tensor = torch.tensor(test_idx, dtype=torch.long, device=device).unsqueeze(0)
     result, logits, _, _ = model.generate(test_tensor, 1000, 2000)
     print(tokenizer.decode(result[0].tolist()))
+    torch.save(
+        {
+            "model_config": model.model_config,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+        },
+        "last_checkpoint_RMSNorm_SwiGLU_sft.pt",
+    )
