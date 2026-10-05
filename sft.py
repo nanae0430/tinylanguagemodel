@@ -1,4 +1,4 @@
-import torch
+import torch, re
 from tinylanguagemodel import TinyLanguageModel
 
 torch.manual_seed(42)
@@ -21,6 +21,26 @@ def collate_sft_batch(samples: list[tuple[torch.Tensor, torch.Tensor]], pad_id: 
         x[i, : len(samples[i][0])] = samples[i][0]
         label[i, : len(samples[i][0])] = samples[i][1]
     return x, label
+
+
+def prepare_sft_text_sample(texts: list[str], tokenizer, eos_id, pad_id):
+    questions, answers = [], []
+
+    pattern = r"User:[ \t]*(?P<question>.*?)\r?\nAssistant:[ \t]*(?P<answer>.*)"
+
+    for text in texts:
+        match = re.fullmatch(pattern, text, flags=re.DOTALL)
+        questions.append(match.group("question"))
+        answers.append(match.group("answer"))
+
+    questions = [tokenizer.encode(question) for question in questions]
+    answers = [tokenizer.encode(answer) for answer in answers]
+
+    samples = [
+        prepare_sft_sample(question, answer, eos_id)
+        for question, answer in zip(questions, answers)
+    ]
+    return collate_sft_batch(samples, pad_id)
 
 
 if __name__ == "__main__":
