@@ -82,15 +82,20 @@ if __name__ == "__main__":
     checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
     model_config = checkpoint["model_config"]
     model_state_dict = checkpoint["model_state_dict"]
-    optimizer_state_dict = checkpoint["optimizer_state_dict"]
+
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
-    optimizer = torch.optim.AdamW(model.parameters())
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
     batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
-    logits, loss = model(batch_x, batch_labels)
-    optimizer.zero_grad()
-    loss.backward()
-    for name, parameter in model.named_parameters():
-        assert parameter.grad is not None, f"{name}梯度为 None"
-        assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
-    print("梯度检查通过")
+    for i in range(1, 51):
+        logits, loss = model(batch_x, batch_labels)
+        optimizer.zero_grad()
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), float("inf"))
+        optimizer.step()
+        if i % 10 == 0:
+            print(f"{loss.item():.4e}")
+        # for name, parameter in model.named_parameters():
+        #     assert parameter.grad is not None, f"{name}梯度为 None"
+        #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
+        # print("梯度检查通过")
