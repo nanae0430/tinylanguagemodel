@@ -189,6 +189,8 @@ if __name__ == "__main__":
     random.shuffle(texts)
     batch_size = 2
     steps = 500
+    print_interval = 10
+    save_interval = 50
     split = 4
     train_texts, test_texts = texts[:split], texts[split:]
     tokenizer = RegexTokenizer().load("tiny_story.model")
@@ -205,12 +207,14 @@ if __name__ == "__main__":
         model,
         optimizer,
         tokenizer,
-        test_texts,
+        train_texts,
         test_texts,
         steps,
         batch_size,
         eos_id,
         pad_id,
+        print_interval=print_interval,
+        save_interval=save_interval,
     )
     # torch.save(
     #     {
