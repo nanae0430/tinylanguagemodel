@@ -102,7 +102,7 @@ class MultiHeadAttention_v2(nn.Module):
             persistent=False,
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         B, T, C = x.shape
         if T > self.tril.shape[-1]:
             raise ValueError(f"序列长度{T}超出上下文长度")
@@ -358,6 +358,19 @@ class TinyLanguageModel(nn.Module):
             if eos_token >= 0 and stop.all():
                 break
         return result, logits, K, V
+
+
+class LoRALinear(nn.Module):
+    def __init__(self, base_layer: nn.Linear, r: int, alpha: float):
+        super().__init__()
+        self.base_layer = base_layer.requires_grad_(False)
+        self.scaling = alpha / r
+        self.A = nn.Linear(base_layer.in_features, r, bias=False)
+        self.B = nn.Linear(r, base_layer.out_features, bias=False)
+        nn.init.zeros_(self.B.weight)
+
+    def forward(self, x):
+        return self.base_layer(x) + self.scaling * self.B(self.A(x))
 
 
 def rope(q, k, sin_vector, cos_vector):
