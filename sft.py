@@ -61,7 +61,15 @@ def get_sft_batch(texts, tokenizer, batch_size, eos_id, pad_id):
 
 
 def eval_for_sft(
-    model, train_texts, test_texts, tokenizer, batch_size, eos_id, pad_id, eval_iters=1
+    model,
+    train_texts,
+    test_texts,
+    tokenizer,
+    batch_size,
+    device,
+    eos_id,
+    pad_id,
+    eval_iters=1,
 ):
     model.eval()
     train_losses, eval_losses = [], []
@@ -73,6 +81,12 @@ def eval_for_sft(
             )
             train_question, train_answer = get_sft_batch(
                 train_texts, tokenizer, batch_size, eos_id, pad_id
+            )
+            test_question, test_answer = test_question.to(device), test_answer.to(
+                device
+            )
+            train_question, train_answer = train_question.to(device), train_answer.to(
+                device
             )
             _, eval_loss = model(test_question, test_answer)
             _, train_loss = model(train_question, train_answer)
@@ -95,6 +109,8 @@ def train_sft(
     eval_iters=10,
     best_val_loss=float("inf"),
     start_step=0,
+    print_interval=50,
+    save_interval=100,
     non_improve=0,
     is_eval=True,
     patience=3,
@@ -112,23 +128,25 @@ def train_sft(
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
         optimizer.step()
-        if (step % 100 == 0 or step == steps) and is_eval:
-            print(f"train loss:{loss.item():.4e}")
+        if step % print_interval == 0:
+            print(f"{step}\ttrain loss:{loss.item():.4e}")
             # for name, parameter in model.named_parameters():
             #     assert parameter.grad is not None, f"{name}梯度为 None"
             #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
             # print("梯度检查通过")
+        if (step % save_interval == 0 or step == steps) and is_eval:
             train_loss, eval_loss = eval_for_sft(
                 model,
                 train_texts,
                 test_texts,
                 tokenizer,
                 batch_size,
+                device,
                 eos_id,
                 pad_id,
                 eval_iters,
             )
-            print(f"{step}\ttrain loss:{train_loss:.4f}\teval loss:{eval_loss:.4f}")
+            print(f"{step}\ttrain loss:{train_loss:.4e}\teval loss:{eval_loss:.4e}")
             best_val_loss, non_improve = save_model(
                 best_val_loss=best_val_loss,
                 current_train_loss=train_loss,
@@ -170,7 +188,7 @@ if __name__ == "__main__":
     texts = [part.strip() for part in texts.split("<|endoftext|>") if part.strip()]
     random.shuffle(texts)
     batch_size = 2
-    steps = 50
+    steps = 500
     split = 4
     train_texts, test_texts = texts[:split], texts[split:]
     tokenizer = RegexTokenizer().load("tiny_story.model")
