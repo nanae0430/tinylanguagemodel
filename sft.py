@@ -1,4 +1,4 @@
-import torch, re
+import torch, re, random
 from tinylanguagemodel import TinyLanguageModel
 from MinBPE import RegexTokenizer
 
@@ -50,6 +50,12 @@ def prepare_sft_text_sample(texts: list[str], tokenizer, eos_id, pad_id):
         for question, answer in zip(questions, answers)
     ]
     return collate_sft_batch(samples, pad_id)
+
+
+def get_sft_batch(texts, tokenizer, batch_size, eos_id, pad_id):
+
+    batch_texts = random.sample(texts, k=batch_size)
+    return prepare_sft_text_sample(batch_texts, tokenizer, eos_id, pad_id)
 
 
 if __name__ == "__main__":
