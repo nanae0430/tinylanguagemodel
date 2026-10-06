@@ -2,7 +2,9 @@ import torch, re, random
 from tinylanguagemodel import TinyLanguageModel
 from MinBPE import RegexTokenizer
 
-torch.manual_seed(42)
+torch.manual_seed(39)
+
+random.seed(39)
 
 
 def prepare_sft_sample(prompt_ids, response_ids, eos_id):
@@ -82,9 +84,9 @@ if __name__ == "__main__":
             Assistant: A little dog found a red ball in the park. He brought it to his owner, and they played together.
             <|endoftext|>"""
     texts = [part.strip() for part in texts.split("<|endoftext|>") if part.strip()]
-
+    batch_size = 3
     tokenizer = RegexTokenizer().load("tiny_story.model")
-    batch_x, batch_labels = prepare_sft_text_sample(texts, tokenizer, eos_id, pad_id)
+
     checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
     model_config = checkpoint["model_config"]
     model_state_dict = checkpoint["model_state_dict"]
@@ -92,12 +94,16 @@ if __name__ == "__main__":
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
-    batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
+
     for i in range(1, 51):
+        batch_x, batch_labels = get_sft_batch(
+            texts, tokenizer, batch_size, eos_id, pad_id
+        )
+        batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
         logits, loss = model(batch_x, batch_labels)
         optimizer.zero_grad()
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), float("inf"))
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
         optimizer.step()
         # if i % 10 == 0:
         # print(f"{loss.item():.4e}")
