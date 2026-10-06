@@ -363,10 +363,14 @@ class TinyLanguageModel(nn.Module):
 class LoRALinear(nn.Module):
     def __init__(self, base_layer: nn.Linear, r: int, alpha: float):
         super().__init__()
+        if r <= 0:
+            raise ValueError("r 必须为正整数")
+        device = next(base_layer.weight).device
+
         self.base_layer = base_layer.requires_grad_(False)
         self.scaling = alpha / r
-        self.A = nn.Linear(base_layer.in_features, r, bias=False)
-        self.B = nn.Linear(r, base_layer.out_features, bias=False)
+        self.A = nn.Linear(base_layer.in_features, r, bias=False).to(device)
+        self.B = nn.Linear(r, base_layer.out_features, bias=False).to(device)
         nn.init.zeros_(self.B.weight)
 
     def forward(self, x):
