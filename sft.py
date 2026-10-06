@@ -1,5 +1,5 @@
 import torch, re, random
-from tinylanguagemodel import TinyLanguageModel
+from tinylanguagemodel import TinyLanguageModel, save_model
 from MinBPE import RegexTokenizer
 
 torch.manual_seed(39)
@@ -60,6 +60,91 @@ def get_sft_batch(texts, tokenizer, batch_size, eos_id, pad_id):
     return prepare_sft_text_sample(batch_texts, tokenizer, eos_id, pad_id)
 
 
+def eval_for_sft(
+    model, train_texts, test_texts, tokenizer, batch_size, eos_id, pad_id, eval_iters=1
+):
+    model.eval()
+    train_losses, eval_losses = [], []
+
+    test_question, test_answer = test_question.to(device), test_answer.to(device)
+    with torch.no_grad():
+        for i in range(eval_iters):
+            test_question, test_answer = get_sft_batch(
+                test_texts, tokenizer, batch_size, eos_id, pad_id
+            )
+            train_question, train_answer = get_sft_batch(
+                train_texts, tokenizer, batch_size, eos_id, pad_id
+            )
+            _, eval_loss = model(test_question, test_answer)
+            _, train_loss = model(train_question, train_answer)
+            train_losses.append(train_loss.item())
+            eval_losses.append(eval_loss.item())
+    model.train()
+    return sum(train_losses) / len(train_losses), sum(eval_losses) / len(eval_losses)
+
+
+def train_sft(
+    model,
+    optimizer,
+    tokenizer,
+    train_texts,
+    test_texts,
+    steps,
+    batch_size,
+    eos_id,
+    pad_id,
+    eval_iters=10,
+    best_eval_loss=float("inf"),
+    start_step=0,
+    non_improve=0,
+    is_eval=True,
+    patience=3,
+    min_delta=0.01,
+    path="",
+):
+    device = next(model.parameters()).device
+    for step in range(start_step + 1, steps + 1):
+        batch_x, batch_labels = get_sft_batch(
+            train_texts, tokenizer, batch_size, eos_id, pad_id
+        )
+        batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
+        logits, loss = model(batch_x, batch_labels)
+        optimizer.zero_grad()
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
+        optimizer.step()
+        if (i % 100 == 0 or step == steps) and is_eval:
+            print(f"train loss:{loss.item():.4e}")
+            # for name, parameter in model.named_parameters():
+            #     assert parameter.grad is not None, f"{name}梯度为 None"
+            #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
+            # print("梯度检查通过")
+            train_loss, eval_loss = eval_for_sft(
+                model,
+                train_texts,
+                test_texts,
+                tokenizer,
+                batch_size,
+                eos_id,
+                pad_id,
+                eval_iters,
+            )
+            print(f"{step}\ttrain loss:{train_loss:.4f}\teval loss:{eval_loss:.4f}")
+            best_val_loss, non_improve = save_model(
+                best_val_loss=best_val_loss,
+                current_train_loss=train_loss,
+                current_eval_loss=eval_loss,
+                min_delta=min_delta,
+                model=model,
+                non_improve=non_improve,
+                optimizer=optimizer,
+                step=step,
+                path=path,
+            )
+            if non_improve >= patience:
+                return
+
+
 if __name__ == "__main__":
     eos_id = 2000
     pad_id = 2001
@@ -98,14 +183,7 @@ if __name__ == "__main__":
     model.load_state_dict(model_state_dict)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
-    model.eval()
-    test_question, test_answer = prepare_sft_text_sample(
-        test_texts, tokenizer, eos_id, pad_id
-    )
-    test_question, test_answer = test_question.to(device), test_answer.to(device)
-    with torch.no_grad():
-        logits, loss = model(test_question, test_answer)
-        print(f"eval loss:{loss.item():.4e}")
+    eval_for_sft(model, test_texts, tokenizer, eos_id, pad_id)
     model.train()
     for i in range(1, 51):
         batch_x, batch_labels = get_sft_batch(
@@ -119,19 +197,11 @@ if __name__ == "__main__":
         optimizer.step()
         if i % 10 == 0:
             print(f"train loss:{loss.item():.4e}")
-        # for name, parameter in model.named_parameters():
-        #     assert parameter.grad is not None, f"{name}梯度为 None"
-        #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
-        # print("梯度检查通过")
-
-    model.eval()
-    test_question, test_answer = prepare_sft_text_sample(
-        test_texts, tokenizer, eos_id, pad_id
-    )
-    test_question, test_answer = test_question.to(device), test_answer.to(device)
-    with torch.no_grad():
-        logits, loss = model(test_question, test_answer)
-        print(f"eval loss:{loss.item():.4e}")
+            # for name, parameter in model.named_parameters():
+            #     assert parameter.grad is not None, f"{name}梯度为 None"
+            #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
+            # print("梯度检查通过")
+            eval_for_sft(model, test_texts, tokenizer, eos_id, pad_id)
 
     torch.save(
         {
