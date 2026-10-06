@@ -98,6 +98,15 @@ if __name__ == "__main__":
     model.load_state_dict(model_state_dict)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
+    model.eval()
+    test_question, test_answer = prepare_sft_text_sample(
+        test_texts, tokenizer, eos_id, pad_id
+    )
+    test_question, test_answer = test_question.to(device), test_answer.to(device)
+    with torch.no_grad():
+        logits, loss = model(test_question, test_answer)
+        print(f"eval loss:{loss.item():.4e}")
+    model.train()
     for i in range(1, 51):
         batch_x, batch_labels = get_sft_batch(
             train_texts, tokenizer, batch_size, eos_id, pad_id
