@@ -365,12 +365,13 @@ class LoRALinear(nn.Module):
         super().__init__()
         if r <= 0:
             raise ValueError("r 必须为正整数")
-        device = next(base_layer.weight).device
+        device = base_layer.weight.device
+        dtype = base_layer.weight.dtype
 
         self.base_layer = base_layer.requires_grad_(False)
         self.scaling = alpha / r
-        self.A = nn.Linear(base_layer.in_features, r, bias=False).to(device)
-        self.B = nn.Linear(r, base_layer.out_features, bias=False).to(device)
+        self.A = nn.Linear(base_layer.in_features, r, bias=False).to(device, dtype)
+        self.B = nn.Linear(r, base_layer.out_features, bias=False).to(device, dtype)
         nn.init.zeros_(self.B.weight)
 
     def forward(self, x):
@@ -618,7 +619,7 @@ def get_lr(step, warmup_step, total_step, max_lr, min_lr):
 
 
 if __name__ == "__main__":
-    #     device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     #     batch_size = 4
     # #     vocab_size = 100
     # #     block_size = 16
@@ -705,19 +706,28 @@ if __name__ == "__main__":
     # print("y2-y:", (y2 - y).abs().max().item())
     # print("x2-x:", (x2.grad - x.grad).abs().max().item())
     # print("norm2-norm:", (norm2.weight.grad - norm.gamma.grad).abs().max().item())
-    x = torch.randn(2, 4, 128, requires_grad=True)
-    swiglu = SwiGLU(x.shape[-1])
-    y = swiglu(x)
-    assert x.shape == y.shape
-    loss = torch.sum(y)
+    # x = torch.randn(2, 4, 128, requires_grad=True)
+    # swiglu = SwiGLU(x.shape[-1])
+    # y = swiglu(x)
+    # assert x.shape == y.shape
+    # loss = torch.sum(y)
+    # loss.backward()
+    # # 检查输入梯度
+    # assert x.grad is not None, "输入梯度为 None"
+    # assert torch.isfinite(x.grad).all().item(), "输入梯度含 NaN 或 Inf"
+
+    # # 检查所有参数的梯度，包括 weight 和 bias
+    # for name, param in swiglu.named_parameters():
+    #     assert param.grad is not None, f"{name} 的梯度为 None"
+    #     assert torch.isfinite(param.grad).all().item(), f"{name} 的梯度含 NaN 或 Inf"
+
+    # print("梯度检查通过")
+    base_layer = nn.Linear(128, 256, device=device, dtype=torch.float32)
+    lora = LoRALinear(base_layer, 4, 8)
+    x = torch.randn((2, 4, 128), device=device, dtype=torch.float32)
+    output = lora(x)
+    loss = torch.sum(output)
     loss.backward()
-    # 检查输入梯度
-    assert x.grad is not None, "输入梯度为 None"
-    assert torch.isfinite(x.grad).all().item(), "输入梯度含 NaN 或 Inf"
-
-    # 检查所有参数的梯度，包括 weight 和 bias
-    for name, param in swiglu.named_parameters():
-        assert param.grad is not None, f"{name} 的梯度为 None"
-        assert torch.isfinite(param.grad).all().item(), f"{name} 的梯度含 NaN 或 Inf"
-
-    print("梯度检查通过")
+    print(f"base_layer.grad:{base_layer.weight.grad}")
+    print(f"A.grad:\n{lora.A.weight.grad}")
+    print(f"B.grad:\n{lora.B.weight.grad}")
