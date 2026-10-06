@@ -732,7 +732,10 @@ if __name__ == "__main__":
     loss.backward()
     optimizer.step()
     base_output = base_layer(x)
-    assert (base_output - output).max().item() == 0
+    optimizer.zero_grad()
+    output2 = lora(x)
+    output2.sum().backward()
+    assert (base_output - output).abs().max().item() == 0
     assert output.shape == (2, 4, 256)
     print(f"base_layer.grad:{base_layer.weight.grad}")
     print(f"A.grad:\n{lora.A.weight.grad}")
