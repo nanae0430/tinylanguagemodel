@@ -85,6 +85,9 @@ if __name__ == "__main__":
             <|endoftext|>"""
     texts = [part.strip() for part in texts.split("<|endoftext|>") if part.strip()]
     batch_size = 3
+    random.shuffle(texts)
+    split = 4
+    train_texts, test_texts = texts[:split], texts[split:]
     tokenizer = RegexTokenizer().load("tiny_story.model")
 
     checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
@@ -97,7 +100,7 @@ if __name__ == "__main__":
 
     for i in range(1, 51):
         batch_x, batch_labels = get_sft_batch(
-            texts, tokenizer, batch_size, eos_id, pad_id
+            train_texts, tokenizer, batch_size, eos_id, pad_id
         )
         batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
         logits, loss = model(batch_x, batch_labels)
@@ -105,18 +108,22 @@ if __name__ == "__main__":
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
         optimizer.step()
-        # if i % 10 == 0:
-        # print(f"{loss.item():.4e}")
+        if i % 10 == 0:
+            print(f"train loss:{loss.item():.4e}")
         # for name, parameter in model.named_parameters():
         #     assert parameter.grad is not None, f"{name}梯度为 None"
         #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
         # print("梯度检查通过")
-    test = "User: What color is the sky when the weather is sunny?\nAssistant:"
+
     model.eval()
-    test_idx = tokenizer.encode(test, {"<|endoftext|>"})
-    test_tensor = torch.tensor(test_idx, dtype=torch.long, device=device).unsqueeze(0)
-    result, logits, _, _ = model.generate(test_tensor, 1000, 2000)
-    print(tokenizer.decode(result[0].tolist()))
+    test_question, test_answer = prepare_sft_text_sample(
+        test_texts, tokenizer, eos_id, pad_id
+    )
+    test_question, test_answer = test_question.to(device), test_answer.to(device)
+    with torch.no_grad():
+        logits, loss = model(test_question, test_answer)
+        print(f"eval loss:{loss.item():.4e}")
+
     torch.save(
         {
             "model_config": model.model_config,
