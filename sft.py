@@ -66,9 +66,8 @@ def eval_for_sft(
     model.eval()
     train_losses, eval_losses = [], []
 
-    test_question, test_answer = test_question.to(device), test_answer.to(device)
     with torch.no_grad():
-        for i in range(eval_iters):
+        for _ in range(eval_iters):
             test_question, test_answer = get_sft_batch(
                 test_texts, tokenizer, batch_size, eos_id, pad_id
             )
@@ -94,12 +93,12 @@ def train_sft(
     eos_id,
     pad_id,
     eval_iters=10,
-    best_eval_loss=float("inf"),
+    best_val_loss=float("inf"),
     start_step=0,
     non_improve=0,
     is_eval=True,
     patience=3,
-    min_delta=0.01,
+    min_delta=0.0,
     path="",
 ):
     device = next(model.parameters()).device
@@ -113,7 +112,7 @@ def train_sft(
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
         optimizer.step()
-        if (i % 100 == 0 or step == steps) and is_eval:
+        if (step % 100 == 0 or step == steps) and is_eval:
             print(f"train loss:{loss.item():.4e}")
             # for name, parameter in model.named_parameters():
             #     assert parameter.grad is not None, f"{name}梯度为 None"
@@ -169,8 +168,9 @@ if __name__ == "__main__":
             Assistant: A little dog found a red ball in the park. He brought it to his owner, and they played together.
             <|endoftext|>"""
     texts = [part.strip() for part in texts.split("<|endoftext|>") if part.strip()]
-    batch_size = 3
     random.shuffle(texts)
+    batch_size = 2
+    steps = 50
     split = 4
     train_texts, test_texts = texts[:split], texts[split:]
     tokenizer = RegexTokenizer().load("tiny_story.model")
@@ -183,31 +183,22 @@ if __name__ == "__main__":
     model.load_state_dict(model_state_dict)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
-    eval_for_sft(model, test_texts, tokenizer, eos_id, pad_id)
-    model.train()
-    for i in range(1, 51):
-        batch_x, batch_labels = get_sft_batch(
-            train_texts, tokenizer, batch_size, eos_id, pad_id
-        )
-        batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
-        logits, loss = model(batch_x, batch_labels)
-        optimizer.zero_grad()
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
-        optimizer.step()
-        if i % 10 == 0:
-            print(f"train loss:{loss.item():.4e}")
-            # for name, parameter in model.named_parameters():
-            #     assert parameter.grad is not None, f"{name}梯度为 None"
-            #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
-            # print("梯度检查通过")
-            eval_for_sft(model, test_texts, tokenizer, eos_id, pad_id)
-
-    torch.save(
-        {
-            "model_config": model.model_config,
-            "model_state_dict": model.state_dict(),
-            "optimizer_state_dict": optimizer.state_dict(),
-        },
-        "last_checkpoint_RMSNorm_SwiGLU_sft.pt",
+    train_sft(
+        model,
+        optimizer,
+        tokenizer,
+        test_texts,
+        test_texts,
+        steps,
+        batch_size,
+        eos_id,
+        pad_id,
     )
+    # torch.save(
+    #     {
+    #         "model_config": model.model_config,
+    #         "model_state_dict": model.state_dict(),
+    #         "optimizer_state_dict": optimizer.state_dict(),
+    #     },
+    #     "last_checkpoint_RMSNorm_SwiGLU_sft.pt",
+    # )
