@@ -1,5 +1,5 @@
 import torch, re, random
-from tinylanguagemodel import TinyLanguageModel, save_model
+from tinylanguagemodel import TinyLanguageModel, save_model, LoRALinear
 from MinBPE import RegexTokenizer
 
 torch.manual_seed(39)
@@ -102,12 +102,12 @@ def train_sft(
     tokenizer,
     train_texts,
     test_texts,
-    steps,
     batch_size,
     eos_id,
     pad_id,
     eval_iters=10,
     best_val_loss=float("inf"),
+    steps=200,
     start_step=0,
     print_interval=50,
     save_interval=100,
@@ -162,11 +162,69 @@ def train_sft(
                 return
 
 
+def test_lora_model(
+    model: TinyLanguageModel,
+    tokenizer,
+    train_texts,
+    test_texts,
+    r,
+    alpha,
+    eos_id,
+    pad_id,
+    batch_size=2,
+    eval_iters=10,
+    best_val_loss=float("inf"),
+    steps=200,
+    start_step=0,
+    print_interval=50,
+    save_interval=100,
+    non_improve=0,
+    is_eval=True,
+    patience=3,
+    min_delta=0.0,
+    path="",
+):
+    model.requires_grad_(False)
+
+    for i in range(len(model.model) - 1):
+        qkv = model.model[i].heads.qkv
+        model.model[i].heads.qkv = LoRALinear(qkv, r, alpha)
+
+    optimizer = torch.optim.AdamW(model.parameters())
+    train_sft(
+        model,
+        optimizer,
+        tokenizer,
+        train_texts,
+        test_texts,
+        batch_size,
+        eos_id,
+        pad_id,
+        eval_iters,
+        best_val_loss,
+        steps,
+        start_step,
+        print_interval,
+        save_interval,
+        non_improve,
+        is_eval,
+        patience,
+        min_delta,
+        path,
+    )
+
+
 if __name__ == "__main__":
     eos_id = 2000
     pad_id = 2001
     samples = []
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    batch_size = 2
+    steps = 500
+    print_interval = 10
+    save_interval = 50
+    r = 2
+    alpha = 8
     texts = """User: What color is the sky on a sunny day?
             Assistant: The sky is blue.
             <|endoftext|>
@@ -187,10 +245,6 @@ if __name__ == "__main__":
             <|endoftext|>"""
     texts = [part.strip() for part in texts.split("<|endoftext|>") if part.strip()]
     random.shuffle(texts)
-    batch_size = 2
-    steps = 500
-    print_interval = 10
-    save_interval = 50
     split = 4
     train_texts, test_texts = texts[:split], texts[split:]
     tokenizer = RegexTokenizer().load("tiny_story.model")
@@ -203,24 +257,16 @@ if __name__ == "__main__":
     model.load_state_dict(model_state_dict)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
-    train_sft(
+    test_lora_model(
         model,
-        optimizer,
         tokenizer,
         train_texts,
         test_texts,
-        steps,
-        batch_size,
+        r,
+        alpha,
         eos_id,
         pad_id,
-        print_interval=print_interval,
-        save_interval=save_interval,
+        print_interval=10,
+        save_interval=50,
+        path="RMSNorm_SwiGLU_lora_qkv",
     )
-    # torch.save(
-    #     {
-    #         "model_config": model.model_config,
-    #         "model_state_dict": model.state_dict(),
-    #         "optimizer_state_dict": optimizer.state_dict(),
-    #     },
-    #     "last_checkpoint_RMSNorm_SwiGLU_sft.pt",
-    # )
