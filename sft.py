@@ -171,6 +171,7 @@ def test_lora_model(
     alpha,
     eos_id,
     pad_id,
+    lr=1e-4,
     batch_size=2,
     eval_iters=10,
     best_val_loss=float("inf"),
@@ -189,8 +190,10 @@ def test_lora_model(
     for i in range(len(model.model) - 1):
         qkv = model.model[i].heads.qkv
         model.model[i].heads.qkv = LoRALinear(qkv, r, alpha)
-
-    optimizer = torch.optim.AdamW(model.parameters())
+    optim_param = [
+        parameter for parameter in model.parameters() if parameter.requires_grad is True
+    ]
+    optimizer = torch.optim.AdamW(optim_param, lr=lr)
     train_sft(
         model,
         optimizer,
@@ -255,7 +258,6 @@ if __name__ == "__main__":
 
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
     test_lora_model(
         model,
@@ -270,3 +272,6 @@ if __name__ == "__main__":
         save_interval=50,
         path="RMSNorm_SwiGLU_lora_qkv",
     )
+    for name, parameter in model.named_parameters():
+        if parameter.requires_grad_ is True:
+            print(name)
