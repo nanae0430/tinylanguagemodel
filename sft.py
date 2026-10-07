@@ -105,6 +105,7 @@ def train_sft(
     batch_size,
     eos_id,
     pad_id,
+    lora_config,
     eval_iters=10,
     best_val_loss=float("inf"),
     steps=200,
@@ -157,6 +158,7 @@ def train_sft(
                 optimizer=optimizer,
                 step=step,
                 path=path,
+                lora_config=lora_config,
             )
             if non_improve >= patience:
                 return
@@ -202,6 +204,7 @@ def test_lora_model(
     model.requires_grad_(False)
 
     apply_lora(model, target_modules, r, alpha)
+    lora_config = {"r": r, "alpha": alpha, "target_modules": target_modules}
     optim_param = [
         parameter for parameter in model.parameters() if parameter.requires_grad is True
     ]
@@ -215,6 +218,7 @@ def test_lora_model(
         batch_size,
         eos_id,
         pad_id,
+        lora_config,
         eval_iters,
         best_val_loss,
         steps,
@@ -227,6 +231,30 @@ def test_lora_model(
         min_delta,
         path,
     )
+
+
+def load_lora(checkpoint):
+    step = checkpoint["step"]
+    model_config = checkpoint["model_config"]
+    model_state_dict = checkpoint["model_state_dict"]
+    optimizer_state_dict = checkpoint["optimizer_state_dict"]
+    train_loss = checkpoint["train_loss"]
+    eval_loss = checkpoint["eval_loss"]
+    best_val_loss = checkpoint["best_val_loss"]
+    non_improve = checkpoint["non_improve"]
+
+    model = TinyLanguageModel(**model_config)
+    model.requires_grad_(False)
+    lora_config = checkpoint["lora_config"]
+    apply_lora(model=model, **lora_config)
+    model.load_state_dict(model_state_dict)
+    optim_param = [
+        parameter for parameter in model.parameters() if parameter.requires_grad is True
+    ]
+    optimizer = torch.optim.AdamW(optim_param)
+    optimizer.load_state_dict(optimizer_state_dict)
+
+    return model, optimizer, step, train_loss, eval_loss, best_val_loss, non_improve
 
 
 if __name__ == "__main__":
@@ -270,7 +298,7 @@ if __name__ == "__main__":
 
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
-    target_modules = ["heads.qkv"]
+    target_modules = ["heads.projection"]
     test_lora_model(
         model,
         target_modules,
