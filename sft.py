@@ -166,10 +166,13 @@ def apply_lora(model: TinyLanguageModel, target_modules: list[str], r, alpha):
     paths = [target_module.split(".") for target_module in target_modules]
     for block in model.model[:-1]:
         for path in paths:
-            layer = block
+            parent = block
             for p in path[:-1]:
-                layer = getattr(layer, p)
-            setattr(layer, path[-1])
+                parent = getattr(parent, p)
+            base_layer = getattr(parent, path[-1])
+            if not isinstance(base_layer, torch.nn.Linear):
+                raise TypeError(f"目标不是线性层：{'.'.join(path)}")
+            setattr(parent, path[-1], LoRALinear(base_layer, r, alpha))
     return paths
 
 
