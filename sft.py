@@ -173,11 +173,11 @@ def apply_lora(model: TinyLanguageModel, target_modules: list[str], r, alpha):
             if not isinstance(base_layer, torch.nn.Linear):
                 raise TypeError(f"目标不是线性层：{'.'.join(path)}")
             setattr(parent, path[-1], LoRALinear(base_layer, r, alpha))
-    return paths
 
 
 def test_lora_model(
     model: TinyLanguageModel,
+    target_modules,
     tokenizer,
     train_texts,
     test_texts,
@@ -201,9 +201,7 @@ def test_lora_model(
 ):
     model.requires_grad_(False)
 
-    for i in range(len(model.model) - 1):
-        qkv = model.model[i].heads.qkv
-        model.model[i].heads.qkv = LoRALinear(qkv, r, alpha)
+    apply_lora(model, target_modules, r, alpha)
     optim_param = [
         parameter for parameter in model.parameters() if parameter.requires_grad is True
     ]
@@ -272,9 +270,10 @@ if __name__ == "__main__":
 
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
-
+    target_modules = ["heads.qkv"]
     test_lora_model(
         model,
+        target_modules,
         tokenizer,
         train_texts,
         test_texts,
@@ -287,5 +286,5 @@ if __name__ == "__main__":
         path="RMSNorm_SwiGLU_lora_qkv",
     )
     for name, parameter in model.named_parameters():
-        if parameter.requires_grad_ is True:
+        if parameter.requires_grad is True:
             print(name)
