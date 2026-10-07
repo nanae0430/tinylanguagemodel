@@ -162,6 +162,20 @@ def train_sft(
                 return
 
 
+def apply_lora(model: TinyLanguageModel, target_modules: list[str], r, alpha):
+    paths = [target_module.split(".") for target_module in target_modules]
+    for block in model.model[:-1]:
+        for path in paths:
+            i = 0
+            layer = block
+            while i < len(path) and getattr(layer, path[i], None) is not None:
+                layer = getattr(layer, path[i], None)
+                i += 1
+            if layer is torch.nn.Linear:
+                layer = LoRALinear(LoRALinear, r, alpha)
+    return paths
+
+
 def test_lora_model(
     model: TinyLanguageModel,
     tokenizer,
