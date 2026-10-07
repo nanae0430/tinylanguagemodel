@@ -233,17 +233,18 @@ def test_lora_model(
     )
 
 
-def load_lora(checkpoint):
+def load_lora(checkpoint_path, device):
+    checkpoint = torch.load(checkpoint_path)
     step = checkpoint["step"]
     model_config = checkpoint["model_config"]
     model_state_dict = checkpoint["model_state_dict"]
     optimizer_state_dict = checkpoint["optimizer_state_dict"]
     train_loss = checkpoint["train_loss"]
-    eval_loss = checkpoint["eval_loss"]
+    val_loss = checkpoint["val_loss"]
     best_val_loss = checkpoint["best_val_loss"]
     non_improve = checkpoint["non_improve"]
 
-    model = TinyLanguageModel(**model_config)
+    model = TinyLanguageModel(**model_config).to(device)
     model.requires_grad_(False)
     lora_config = checkpoint["lora_config"]
     apply_lora(model=model, **lora_config)
@@ -254,7 +255,7 @@ def load_lora(checkpoint):
     optimizer = torch.optim.AdamW(optim_param)
     optimizer.load_state_dict(optimizer_state_dict)
 
-    return model, optimizer, step, train_loss, eval_loss, best_val_loss, non_improve
+    return model, optimizer, step, train_loss, val_loss, best_val_loss, non_improve
 
 
 if __name__ == "__main__":
@@ -298,7 +299,7 @@ if __name__ == "__main__":
 
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
-    target_modules = ["heads.projection"]
+    target_modules = ["heads.qkv"]
     test_lora_model(
         model,
         target_modules,
@@ -313,6 +314,14 @@ if __name__ == "__main__":
         save_interval=50,
         path="RMSNorm_SwiGLU_lora_qkv",
     )
-    for name, parameter in model.named_parameters():
-        if parameter.requires_grad is True:
-            print(name)
+    model.eval()
+    test_question, _ = get_sft_batch(test_texts, tokenizer, 1, eos_id, pad_id)
+    test_question = test_question.to(device)
+    logits1, _ = model(test_question)
+
+    model2, optimizer, step, train_loss, val_loss, best_val_loss, non_improve = (
+        load_lora("last_checkpoint_RMSNorm_SwiGLU_lora_qkv.pt", device)
+    )
+    model2.eval()
+    logits2, _ = model2(test_question)
+    assert (logits1 - logits2).abs().max().item() == 0

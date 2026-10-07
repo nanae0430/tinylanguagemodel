@@ -563,6 +563,7 @@ def save_model(
             "val_loss": current_eval_loss,
             "best_val_loss": best_val_loss,
             "non_improve": non_improve,
+            "lora_config": lora_config,
         },
         "last_checkpoint.pt" if path == "" else f"last_checkpoint_{path}.pt",
     )
