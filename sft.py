@@ -361,7 +361,7 @@ if __name__ == "__main__":
     with torch.no_grad():
         logits2, _ = model2(test_question)
 
-    merge_lora(model2, target_modules)
+    merge_lora(model2, target_modules, "merged_RMSNorm_SwiGLU_lora_qkv")
     model2.eval()
     with torch.no_grad():
         logits3, _ = model2(test_question)
