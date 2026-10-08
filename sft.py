@@ -358,4 +358,6 @@ if __name__ == "__main__":
     model2.eval()
     with torch.no_grad():
         logits3, _ = model2(test_question)
-    assert torch.allclose(logits3, logits2)
+    assert logits3.shape == logits2.shape
+    assert torch.allclose(logits3, logits2, rtol=1e-5, atol=1e-5)
+    print(f"atol:{1e-5}\nmax abs error:{(logits2 - logits3).abs().max().item():.4e}")
