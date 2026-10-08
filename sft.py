@@ -177,6 +177,31 @@ def apply_lora(model: TinyLanguageModel, target_modules: list[str], r, alpha):
             setattr(parent, path[-1], LoRALinear(base_layer, r, alpha))
 
 
+def merge_lora(model: TinyLanguageModel, target_modules):
+    paths = [target_module.split(".") for target_module in target_modules]
+    device = next(model.parameters()).device
+    dtype = next(model.parameters()).dtype
+    for block in model.model[:-1]:
+        for path in paths:
+            parent = block
+            for p in path[:-1]:
+                parent = getattr(parent, p)
+            lora_layer: LoRALinear = getattr(parent, path[-1])
+            w_merged = (
+                lora_layer.base_layer.weight
+                + lora_layer.scaling * lora_layer.B.weight @ lora_layer.A.weight
+            )
+            layer_merged = torch.nn.Linear(
+                lora_layer.base_layer.in_features,
+                lora_layer.base_layer.out_features,
+                device,
+                dtype,
+            )
+            layer_merged.weight = w_merged
+            layer_merged.bias = lora_layer.base_layer.bias
+            setattr(parent, path[-1], layer_merged)
+
+
 def test_lora_model(
     model: TinyLanguageModel,
     target_modules,
