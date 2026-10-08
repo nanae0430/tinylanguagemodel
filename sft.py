@@ -177,7 +177,7 @@ def apply_lora(model: TinyLanguageModel, target_modules: list[str], r, alpha):
             setattr(parent, path[-1], LoRALinear(base_layer, r, alpha))
 
 
-def merge_lora(model: TinyLanguageModel, target_modules):
+def merge_lora(model: TinyLanguageModel, target_modules, file_path):
     paths = [target_module.split(".") for target_module in target_modules]
     device = next(model.parameters()).device
     dtype = next(model.parameters()).dtype
@@ -203,6 +203,13 @@ def merge_lora(model: TinyLanguageModel, target_modules):
                 if lora_layer.base_layer.bias is not None:
                     layer_merged.bias.copy_(lora_layer.base_layer.bias)
             setattr(parent, path[-1], layer_merged)
+    torch.save(
+        {
+            "model_config": model.model_config,
+            "model_state_dict": model.state_dict(),
+        },
+        f"{file_path}.pt",
+    )
 
 
 def test_lora_model(
