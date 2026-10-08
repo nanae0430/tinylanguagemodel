@@ -194,11 +194,14 @@ def merge_lora(model: TinyLanguageModel, target_modules):
             layer_merged = torch.nn.Linear(
                 lora_layer.base_layer.in_features,
                 lora_layer.base_layer.out_features,
-                device,
-                dtype,
+                bias=lora_layer.base_layer.bias is not None,
+                device=device,
+                dtype=dtype,
             )
-            layer_merged.weight = w_merged
-            layer_merged.bias = lora_layer.base_layer.bias
+            with torch.no_grad():
+                layer_merged.weight.copy_(w_merged)
+                if lora_layer.base_layer.bias is not None:
+                    layer_merged.bias.copy_(lora_layer.base_layer.bias)
             setattr(parent, path[-1], layer_merged)
 
 
@@ -318,35 +321,41 @@ if __name__ == "__main__":
     train_texts, test_texts = texts[:split], texts[split:]
     tokenizer = RegexTokenizer().load("tiny_story.model")
 
-    checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
-    model_config = checkpoint["model_config"]
-    model_state_dict = checkpoint["model_state_dict"]
+    # checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
+    # model_config = checkpoint["model_config"]
+    # model_state_dict = checkpoint["model_state_dict"]
 
-    model = TinyLanguageModel(**model_config).to(device)
-    model.load_state_dict(model_state_dict)
+    # model = TinyLanguageModel(**model_config).to(device)
+    # model.load_state_dict(model_state_dict)
     target_modules = ["heads.qkv"]
-    test_lora_model(
-        model,
-        target_modules,
-        tokenizer,
-        train_texts,
-        test_texts,
-        r,
-        alpha,
-        eos_id,
-        pad_id,
-        print_interval=10,
-        save_interval=50,
-        path="RMSNorm_SwiGLU_lora_qkv",
-    )
-    model.eval()
+    # test_lora_model(
+    #     model,
+    #     target_modules,
+    #     tokenizer,
+    #     train_texts,
+    #     test_texts,
+    #     r,
+    #     alpha,
+    #     eos_id,
+    #     pad_id,
+    #     print_interval=10,
+    #     save_interval=50,
+    #     path="RMSNorm_SwiGLU_lora_qkv",
+    # )
+    # model.eval()
     test_question, _ = get_sft_batch(test_texts, tokenizer, 1, eos_id, pad_id)
     test_question = test_question.to(device)
-    logits1, _ = model(test_question)
+    # logits1, _ = model(test_question)
 
     model2, optimizer, step, train_loss, val_loss, best_val_loss, non_improve = (
         load_lora("last_checkpoint_RMSNorm_SwiGLU_lora_qkv.pt", device)
     )
     model2.eval()
-    logits2, _ = model2(test_question)
-    assert (logits1 - logits2).abs().max().item() == 0
+    with torch.no_grad():
+        logits2, _ = model2(test_question)
+
+    merge_lora(model2, target_modules)
+    model2.eval()
+    with torch.no_grad():
+        logits3, _ = model2(test_question)
+    assert torch.allclose(logits3, logits2)
