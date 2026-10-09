@@ -86,9 +86,9 @@ def eval_for_sft(
     device,
     eos_id,
     pad_id,
+    eval_iters=1,
     use_samples_train=None,
     use_samples_val=None,
-    eval_iters=1,
 ):
     model.eval()
     train_losses, eval_losses = [], []
@@ -404,7 +404,7 @@ if __name__ == "__main__":
     model_state_dict = checkpoint["model_state_dict"]
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
-    optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-4)
+    optimizer = torch.optim.AdamW(params=model.parameters(), lr=5e-4)
     block_size = model.block_size
     eos_id = 2000
     pad_id = 2001
@@ -471,7 +471,7 @@ if __name__ == "__main__":
         lora_config,
         use_samples_train=train_data,
         use_samples_val=val_data,
-        steps=1000,
+        steps=3000,
         eval_iters=50,
         print_interval=50,
         save_interval=100,
