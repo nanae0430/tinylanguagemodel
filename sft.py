@@ -453,3 +453,27 @@ if __name__ == "__main__":
         samples[: int(0.9 * len(samples))],
         samples[int(0.9 * len(samples)) :],
     )
+
+    target_modules = ["heads.qkv"]
+    r = 2
+    alpha = 8
+    apply_lora(model, target_modules, r, alpha)
+    lora_config = {"target_modules": target_modules, "r": r, "alpha": alpha}
+    train_sft(
+        model,
+        optimizer,
+        tokenizer,
+        None,
+        None,
+        32,
+        eos_id,
+        pad_id,
+        lora_config,
+        use_samples_train=train_data,
+        use_samples_val=val_data,
+        steps=1000,
+        eval_iters=50,
+        print_interval=50,
+        save_interval=100,
+        path="RMSNorm_SwiGLU_lora_qkv",
+    )
