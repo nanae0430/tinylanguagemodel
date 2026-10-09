@@ -63,7 +63,7 @@ def get_sft_batch(
     use_samples=None,
 ):
     if use_samples is not None:
-        batch_sample = random.sample(samples, k=batch_size)
+        batch_sample = random.sample(use_samples, k=batch_size)
         return collate_sft_batch(batch_sample, pad_id)
 
     batch_texts = random.sample(texts, k=batch_size)
@@ -404,7 +404,7 @@ if __name__ == "__main__":
     model_state_dict = checkpoint["model_state_dict"]
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
-    optimizer = torch.optim.AdamW(params=model.parameters(), lr=5e-4)
+
     block_size = model.block_size
     eos_id = 2000
     pad_id = 2001
@@ -459,6 +459,11 @@ if __name__ == "__main__":
     alpha = 8
     apply_lora(model, target_modules, r, alpha)
     lora_config = {"target_modules": target_modules, "r": r, "alpha": alpha}
+    optim_param = [
+        parameter for parameter in model.parameters() if parameter.requires_grad is True
+    ]
+    optimizer = torch.optim.AdamW(params=optim_param, lr=5e-4)
+
     train_sft(
         model,
         optimizer,
