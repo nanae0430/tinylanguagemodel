@@ -404,7 +404,7 @@ if __name__ == "__main__":
     model_state_dict = checkpoint["model_state_dict"]
     model = TinyLanguageModel(**model_config).to(device)
     model.load_state_dict(model_state_dict)
-
+    model.requires_grad_(False)
     block_size = model.block_size
     eos_id = 2000
     pad_id = 2001
