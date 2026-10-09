@@ -1,4 +1,4 @@
-import torch, re, random
+import torch, re, random, json
 from tinylanguagemodel import TinyLanguageModel, save_model, LoRALinear
 from MinBPE import RegexTokenizer
 
@@ -294,77 +294,109 @@ def load_lora(checkpoint_path, device):
 
 
 if __name__ == "__main__":
+    # eos_id = 2000
+    # pad_id = 2001
+    # samples = []
+    # device = "cuda" if torch.cuda.is_available() else "cpu"
+    # batch_size = 2
+    # steps = 500
+    # print_interval = 10
+    # save_interval = 50
+    # r = 2
+    # alpha = 8
+    # texts = """User: What color is the sky on a sunny day?
+    #         Assistant: The sky is blue.
+    #         <|endoftext|>
+    #         User: What sound does a cat make?
+    #         Assistant: A cat says meow.
+    #         <|endoftext|>
+    #         User: What is one plus two?
+    #         Assistant: One plus two is three.
+    #         <|endoftext|>
+    #         User: Lily feels cold. What can she wear?
+    #         Assistant: Lily can wear a warm coat.
+    #         <|endoftext|>
+    #         User: Tom sees his friend fall down. What should he do?
+    #         Assistant: Tom should help his friend get up and ask if they are hurt.
+    #         <|endoftext|>
+    #         User: Tell me a short story about a dog.
+    #         Assistant: A little dog found a red ball in the park. He brought it to his owner, and they played together.
+    #         <|endoftext|>"""
+    # texts = [part.strip() for part in texts.split("<|endoftext|>") if part.strip()]
+    # random.shuffle(texts)
+    # split = 4
+    # train_texts, test_texts = texts[:split], texts[split:]
+    # tokenizer = RegexTokenizer().load("tiny_story.model")
+
+    # # checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
+    # # model_config = checkpoint["model_config"]
+    # # model_state_dict = checkpoint["model_state_dict"]
+
+    # # model = TinyLanguageModel(**model_config).to(device)
+    # # model.load_state_dict(model_state_dict)
+    # target_modules = ["heads.qkv"]
+    # # test_lora_model(
+    # #     model,
+    # #     target_modules,
+    # #     tokenizer,
+    # #     train_texts,
+    # #     test_texts,
+    # #     r,
+    # #     alpha,
+    # #     eos_id,
+    # #     pad_id,
+    # #     print_interval=10,
+    # #     save_interval=50,
+    # #     path="RMSNorm_SwiGLU_lora_qkv",
+    # # )
+    # # model.eval()
+    # test_question, _ = get_sft_batch(test_texts, tokenizer, 1, eos_id, pad_id)
+    # test_question = test_question.to(device)
+    # # logits1, _ = model(test_question)
+
+    # model2, optimizer, step, train_loss, val_loss, best_val_loss, non_improve = (
+    #     load_lora("last_checkpoint_RMSNorm_SwiGLU_lora_qkv.pt", device)
+    # )
+    # model2.eval()
+    # with torch.no_grad():
+    #     logits2, _ = model2(test_question)
+
+    # merge_lora(model2, target_modules, "merged_RMSNorm_SwiGLU_lora_qkv")
+    # model2.eval()
+    # with torch.no_grad():
+    #     logits3, _ = model2(test_question)
+    # assert logits3.shape == logits2.shape
+    # assert torch.allclose(logits3, logits2, rtol=1e-5, atol=1e-5)
+    # print(f"atol:{1e-5}\nmax abs error:{(logits2 - logits3).abs().max().item():.4e}")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    tokenizer = RegexTokenizer().load("tiny_story.model")
+    vocab_size = len(tokenizer.vocab)
+    checkpoint = torch.load("best_checkpoint_RMSNorm_SwiGLU.pt")
+    model_config = checkpoint["model_config"]
+    model_state_dict = checkpoint["model_state_dict"]
+    model = TinyLanguageModel(**model_config).to(device)
+    model.load_state_dict(model_state_dict)
+    optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-4)
+    block_size = model.block_size
     eos_id = 2000
     pad_id = 2001
+
+    with open("databricks-dolly-15k.jsonl", "r", encoding="utf-8") as f:
+        datas = [json.loads(line) for line in f if line.strip()]
+
+    data_filtered = []
     samples = []
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    batch_size = 2
-    steps = 500
-    print_interval = 10
-    save_interval = 50
-    r = 2
-    alpha = 8
-    texts = """User: What color is the sky on a sunny day?
-            Assistant: The sky is blue.
-            <|endoftext|>
-            User: What sound does a cat make?
-            Assistant: A cat says meow.
-            <|endoftext|>
-            User: What is one plus two?
-            Assistant: One plus two is three.
-            <|endoftext|>
-            User: Lily feels cold. What can she wear?
-            Assistant: Lily can wear a warm coat.
-            <|endoftext|>
-            User: Tom sees his friend fall down. What should he do?
-            Assistant: Tom should help his friend get up and ask if they are hurt.
-            <|endoftext|>
-            User: Tell me a short story about a dog.
-            Assistant: A little dog found a red ball in the park. He brought it to his owner, and they played together.
-            <|endoftext|>"""
-    texts = [part.strip() for part in texts.split("<|endoftext|>") if part.strip()]
-    random.shuffle(texts)
-    split = 4
-    train_texts, test_texts = texts[:split], texts[split:]
-    tokenizer = RegexTokenizer().load("tiny_story.model")
 
-    # checkpoint = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
-    # model_config = checkpoint["model_config"]
-    # model_state_dict = checkpoint["model_state_dict"]
-
-    # model = TinyLanguageModel(**model_config).to(device)
-    # model.load_state_dict(model_state_dict)
-    target_modules = ["heads.qkv"]
-    # test_lora_model(
-    #     model,
-    #     target_modules,
-    #     tokenizer,
-    #     train_texts,
-    #     test_texts,
-    #     r,
-    #     alpha,
-    #     eos_id,
-    #     pad_id,
-    #     print_interval=10,
-    #     save_interval=50,
-    #     path="RMSNorm_SwiGLU_lora_qkv",
-    # )
-    # model.eval()
-    test_question, _ = get_sft_batch(test_texts, tokenizer, 1, eos_id, pad_id)
-    test_question = test_question.to(device)
-    # logits1, _ = model(test_question)
-
-    model2, optimizer, step, train_loss, val_loss, best_val_loss, non_improve = (
-        load_lora("last_checkpoint_RMSNorm_SwiGLU_lora_qkv.pt", device)
-    )
-    model2.eval()
-    with torch.no_grad():
-        logits2, _ = model2(test_question)
-
-    merge_lora(model2, target_modules, "merged_RMSNorm_SwiGLU_lora_qkv")
-    model2.eval()
-    with torch.no_grad():
-        logits3, _ = model2(test_question)
-    assert logits3.shape == logits2.shape
-    assert torch.allclose(logits3, logits2, rtol=1e-5, atol=1e-5)
-    print(f"atol:{1e-5}\nmax abs error:{(logits2 - logits3).abs().max().item():.4e}")
+    for data in datas:
+        data["instruction"] = data["instruction"] + "\n"
+        data["context"] = "User:" + data["context"] + "\n"
+        data["response"] = "Assistant:" + data["context"]
+        instruction = tokenizer.encode(data["instruction"])
+        context = tokenizer.encode(data["context"])
+        response = tokenizer.encode(data["response"])
+        if 0 < len(instruction + context + response) <= block_size:
+            data_filtered.append(data)
+            samples.append(prepare_sft_sample(context + instruction, response, eos_id))
+    with open("data_filtered.jsonl", "w", encoding="utf-8") as f:
+        for data in data_filtered:
+            f.write(json.dumps(data, ensure_ascii=False) + "\n")
