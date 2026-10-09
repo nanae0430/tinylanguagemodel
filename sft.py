@@ -54,10 +54,27 @@ def prepare_sft_text_sample(texts: list[str], tokenizer, eos_id, pad_id):
     return collate_sft_batch(samples, pad_id)
 
 
-def get_sft_batch(texts, tokenizer, batch_size, eos_id, pad_id):
+def get_sft_batch(
+    texts,
+    tokenizer,
+    batch_size,
+    eos_id,
+    pad_id,
+    use_samples=None,
+):
+    if use_samples is not None:
+        batch_sample = random.sample(samples, k=batch_size)
+        return collate_sft_batch(batch_sample, pad_id)
 
     batch_texts = random.sample(texts, k=batch_size)
     return prepare_sft_text_sample(batch_texts, tokenizer, eos_id, pad_id)
+
+
+def get_sft_batch_sample(
+    samples: list[tuple[torch.Tensor, torch.Tensor]], batch_size, pad_id: int
+):
+    batch_sample = random.sample(samples, k=batch_size)
+    return collate_sft_batch(batch_sample, pad_id)
 
 
 def eval_for_sft(
@@ -69,6 +86,8 @@ def eval_for_sft(
     device,
     eos_id,
     pad_id,
+    use_samples_train=None,
+    use_samples_val=None,
     eval_iters=1,
 ):
     model.eval()
@@ -77,10 +96,10 @@ def eval_for_sft(
     with torch.no_grad():
         for _ in range(eval_iters):
             test_question, test_answer = get_sft_batch(
-                test_texts, tokenizer, batch_size, eos_id, pad_id
+                test_texts, tokenizer, batch_size, eos_id, pad_id, use_samples_val
             )
             train_question, train_answer = get_sft_batch(
-                train_texts, tokenizer, batch_size, eos_id, pad_id
+                train_texts, tokenizer, batch_size, eos_id, pad_id, use_samples_train
             )
             test_question, test_answer = test_question.to(device), test_answer.to(
                 device
@@ -106,6 +125,8 @@ def train_sft(
     eos_id,
     pad_id,
     lora_config,
+    use_samples_train=None,
+    use_samples_val=None,
     eval_iters=10,
     best_val_loss=float("inf"),
     steps=200,
@@ -121,7 +142,12 @@ def train_sft(
     device = next(model.parameters()).device
     for step in range(start_step + 1, steps + 1):
         batch_x, batch_labels = get_sft_batch(
-            train_texts, tokenizer, batch_size, eos_id, pad_id
+            train_texts,
+            tokenizer,
+            batch_size,
+            eos_id,
+            pad_id,
+            use_samples=use_samples_train,
         )
         batch_x, batch_labels = batch_x.to(device), batch_labels.to(device)
         logits, loss = model(batch_x, batch_labels)
@@ -146,6 +172,8 @@ def train_sft(
                 eos_id,
                 pad_id,
                 eval_iters,
+                use_samples_train=use_samples_train,
+                use_samples_val=use_samples_val,
             )
             print(f"{step}\ttrain loss:{train_loss:.4e}\teval loss:{eval_loss:.4e}")
             best_val_loss, non_improve = save_model(
@@ -381,22 +409,47 @@ if __name__ == "__main__":
     eos_id = 2000
     pad_id = 2001
 
-    with open("databricks-dolly-15k.jsonl", "r", encoding="utf-8") as f:
-        datas = [json.loads(line) for line in f if line.strip()]
+    # with open("databricks-dolly-15k.jsonl", "r", encoding="utf-8") as f:
+    #     datas = [json.loads(line) for line in f if line.strip()]
 
-    data_filtered = []
+    # data_filtered = []
     samples = []
 
+    # for data in datas:
+    #     instruction = "User:" + data["instruction"] + "\n"
+    #     context = data["context"] + "\n"
+    #     response = "Assistant:" + data["response"]
+    #     instruction = tokenizer.encode(instruction)
+    #     context = tokenizer.encode(context)
+    #     response = tokenizer.encode(response)
+    #     if 0 < len(instruction + context + response) <= block_size:
+    #         data_filtered.append(data)
+    #         samples.append(prepare_sft_sample(context + instruction, response, eos_id))
+    # print(len(data_filtered))
+
+    # avg_total = sum(x.numel() for x, y in samples) / len(samples)
+    # avg_response = sum((y != -100).sum().item() - 1 for x, y in samples) / len(samples)
+    # avg_prompt = avg_total - avg_response
+
+    # print(f"平均 Prompt 长度：{avg_prompt:.2f}")
+    # print(f"平均 Response 长度：{avg_response:.2f}")
+    # print(f"平均总长度：{avg_total:.2f}")
+
+    # with open("data_filtered.jsonl", "w", encoding="utf-8") as f:
+    #     for data in data_filtered:
+    #         f.write(json.dumps(data, ensure_ascii=False) + "\n")
+    with open("data_filtered.jsonl", "r", encoding="utf-8") as f:
+        datas = [json.loads(line) for line in f if line.strip()]
     for data in datas:
-        data["instruction"] = data["instruction"] + "\n"
-        data["context"] = "User:" + data["context"] + "\n"
-        data["response"] = "Assistant:" + data["context"]
-        instruction = tokenizer.encode(data["instruction"])
-        context = tokenizer.encode(data["context"])
-        response = tokenizer.encode(data["response"])
-        if 0 < len(instruction + context + response) <= block_size:
-            data_filtered.append(data)
-            samples.append(prepare_sft_sample(context + instruction, response, eos_id))
-    with open("data_filtered.jsonl", "w", encoding="utf-8") as f:
-        for data in data_filtered:
-            f.write(json.dumps(data, ensure_ascii=False) + "\n")
+        instruction = "User:" + data["instruction"] + "\n"
+        context = data["context"] + "\n"
+        response = "Assistant:" + data["response"]
+        instruction = tokenizer.encode(instruction)
+        context = tokenizer.encode(context)
+        response = tokenizer.encode(response)
+        samples.append(prepare_sft_sample(context + instruction, response, eos_id))
+    random.shuffle(samples)
+    train_data, val_data = (
+        samples[: int(0.9 * len(samples))],
+        samples[int(0.9 * len(samples)) :],
+    )
