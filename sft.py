@@ -94,19 +94,30 @@ def eval_for_sft(
     train_losses, eval_losses = [], []
 
     with torch.no_grad():
-        for _ in range(eval_iters):
-            test_question, test_answer = get_sft_batch(
-                test_texts, tokenizer, batch_size, eos_id, pad_id, use_samples_val
-            )
+        for i in range(eval_iters):
             train_question, train_answer = get_sft_batch(
                 train_texts, tokenizer, batch_size, eos_id, pad_id, use_samples_train
-            )
-            test_question, test_answer = test_question.to(device), test_answer.to(
-                device
             )
             train_question, train_answer = train_question.to(device), train_answer.to(
                 device
             )
+            test_question, test_answer = get_sft_batch(
+                test_texts,
+                tokenizer,
+                batch_size,
+                eos_id,
+                pad_id,
+                use_samples_val[
+                    i
+                    * (len(use_samples_val) // eval_iters) : (i + 1)
+                    * (len(use_samples_val) // eval_iters)
+                ],
+            )
+            test_question, test_answer = test_question.to(device), test_answer.to(
+                device
+            )
+            # for sample in use_samples_val:
+
             _, eval_loss = model(test_question, test_answer)
             _, train_loss = model(train_question, train_answer)
             train_losses.append(train_loss.item())
@@ -477,7 +488,7 @@ if __name__ == "__main__":
         use_samples_train=train_data,
         use_samples_val=val_data,
         steps=3000,
-        eval_iters=50,
+        eval_iters=10,
         print_interval=50,
         save_interval=100,
         path="RMSNorm_SwiGLU_lora_qkv",
