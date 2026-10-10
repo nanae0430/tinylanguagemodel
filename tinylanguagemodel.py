@@ -332,6 +332,7 @@ class TinyLanguageModel(nn.Module):
         use_cache=True,
         K=None,
         V=None,
+        output_kv=False,
     ):
 
         result = idx
@@ -357,7 +358,7 @@ class TinyLanguageModel(nn.Module):
             stop |= new_token == eos_token
             if eos_token >= 0 and stop.all():
                 break
-        return result, logits, K, V
+        return (result, logits, K, V) if output_kv else (result, logits)
 
 
 class LoRALinear(nn.Module):

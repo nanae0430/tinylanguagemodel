@@ -340,7 +340,7 @@ def test_lora_model(
     )
 
 
-def load_lora(checkpoint_path, device):
+def load_lora(checkpoint_path, device, model_optimizer_only=True):
     checkpoint = torch.load(checkpoint_path)
     step = checkpoint["step"]
     model_config = checkpoint["model_config"]
@@ -362,7 +362,19 @@ def load_lora(checkpoint_path, device):
     optimizer = torch.optim.AdamW(optim_param)
     optimizer.load_state_dict(optimizer_state_dict)
 
-    return model, optimizer, step, train_loss, val_loss, best_val_loss, non_improve
+    return (
+        (model, optimizer)
+        if model_optimizer_only
+        else (
+            model,
+            optimizer,
+            step,
+            train_loss,
+            val_loss,
+            best_val_loss,
+            non_improve,
+        )
+    )
 
 
 if __name__ == "__main__":
@@ -498,31 +510,59 @@ if __name__ == "__main__":
         samples[int(0.9 * len(samples)) :],
     )
 
-    target_modules = ["heads.qkv"]
-    r = 2
-    alpha = 8
-    apply_lora(model, target_modules, r, alpha)
-    lora_config = {"target_modules": target_modules, "r": r, "alpha": alpha}
-    optim_param = [
-        parameter for parameter in model.parameters() if parameter.requires_grad is True
-    ]
-    optimizer = torch.optim.AdamW(params=optim_param, lr=5e-4)
+    # target_modules = ["heads.qkv"]
+    # r = 8
+    # alpha = 8
+    # apply_lora(model, target_modules, r, alpha)
+    # lora_config = {"target_modules": target_modules, "r": r, "alpha": alpha}
+    # optim_param = [
+    #     parameter for parameter in model.parameters() if parameter.requires_grad is True
+    # ]
+    # optimizer = torch.optim.AdamW(params=optim_param, lr=5e-4)
 
-    train_sft(
-        model,
-        optimizer,
-        tokenizer,
-        None,
-        None,
-        32,
-        eos_id,
-        pad_id,
-        lora_config,
-        use_samples_train=train_data,
-        use_samples_val=val_data,
-        steps=3000,
-        eval_iters=10,
-        print_interval=50,
-        save_interval=100,
-        path="RMSNorm_SwiGLU_lora_qkv",
-    )
+    # train_sft(
+    #     model,
+    #     optimizer,
+    #     tokenizer,
+    #     None,
+    #     None,
+    #     32,
+    #     eos_id,
+    #     pad_id,
+    #     lora_config,
+    #     use_samples_train=train_data,
+    #     use_samples_val=val_data,
+    #     steps=3000,
+    #     eval_iters=10,
+    #     print_interval=50,
+    #     save_interval=100,
+    #     path="RMSNorm_SwiGLU_lora_qkv_r8",
+    # )
+
+    prompts = val_data[:3]
+    checkpoint1 = torch.load("last_checkpoint_RMSNorm_SwiGLU.pt")
+    model_config1 = checkpoint1["model_config"]
+    model1 = TinyLanguageModel(**model_config1).to(device)
+    model_state_dict1 = checkpoint1["model_state_dict"]
+    model1.load_state_dict(model_state_dict1)
+    model1.requires_grad_(False)
+
+    model2, _ = load_lora("last_checkpoint_RMSNorm_SwiGLU_lora_qkv.pt", device)
+    model3, _ = load_lora("last_checkpoint_RMSNorm_SwiGLU_lora_qkv_r8.pt", device)
+
+    model1.eval()
+    model2.eval()
+    model3.eval()
+    for qa in prompts:
+        print("*" * 40)
+        print("true q&a:", tokenizer.decode(qa[0].tolist()), "\n")
+        prompt_len = (qa[1] == -100).sum().item() + 1
+        prompt = qa[0][:prompt_len].unsqueeze(0).to(device)
+
+        result1, _ = model1.generate(prompt, 100, eos_id, top_p=0.8)
+        result2, _ = model2.generate(prompt, 100, eos_id, top_p=0.8)
+        result3, _ = model3.generate(prompt, 100, eos_id, top_p=0.8)
+
+        print("non_lora q&a:", tokenizer.decode(result1[0].tolist()), "\n")
+        print("r2_lora q&a:", tokenizer.decode(result2[0].tolist()), "\n")
+        print("r8_lora q&a:", tokenizer.decode(result3[0].tolist()), "\n")
