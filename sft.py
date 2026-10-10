@@ -126,6 +126,33 @@ def eval_for_sft(
     return sum(train_losses) / len(train_losses), sum(eval_losses) / len(eval_losses)
 
 
+@torch.no_grad()
+def evaluate_all_samples(model, samples, batch_size, pad_id, device):
+    was_training = model.training
+    model.eval()
+
+    total_loss = 0.0
+    total_tokens = 0
+
+    for i in range(0, len(samples), batch_size):
+        batch = samples[i : i + batch_size]
+
+        x, labels = collate_sft_batch(batch, pad_id)
+        x = x.to(device)
+        labels = labels.to(device)
+
+        _, loss = model(x, labels)
+
+        valid_tokens = (labels != -100).sum().item()
+
+        total_loss += loss.item() * valid_tokens
+        total_tokens += valid_tokens
+
+    model.train(was_training)
+
+    return total_loss / total_tokens
+
+
 def train_sft(
     model,
     optimizer,
@@ -173,18 +200,24 @@ def train_sft(
             #     assert torch.isfinite(parameter.grad).all().item(), f"{name}梯度为NaN或inf"
             # print("梯度检查通过")
         if (step % save_interval == 0 or step == steps) and is_eval:
-            train_loss, eval_loss = eval_for_sft(
-                model,
-                train_texts,
-                test_texts,
-                tokenizer,
-                batch_size,
-                device,
-                eos_id,
-                pad_id,
-                eval_iters,
-                use_samples_train=use_samples_train,
-                use_samples_val=use_samples_val,
+            # train_loss, eval_loss = eval_for_sft(
+            #     model,
+            #     train_texts,
+            #     test_texts,
+            #     tokenizer,
+            #     batch_size,
+            #     device,
+            #     eos_id,
+            #     pad_id,
+            #     eval_iters,
+            #     use_samples_train=use_samples_train,
+            #     use_samples_val=use_samples_val,
+            # )
+            train_loss = evaluate_all_samples(
+                model, use_samples_train, batch_size, pad_id, device
+            )
+            eval_loss = evaluate_all_samples(
+                model, use_samples_val, batch_size, pad_id, device
             )
             print(f"{step}\ttrain loss:{train_loss:.4e}\teval loss:{eval_loss:.4e}")
             best_val_loss, non_improve = save_model(
