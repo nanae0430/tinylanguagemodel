@@ -1,6 +1,7 @@
-import torch
+import torch, math
 import torch.nn.functional as F
-from sentence_transformers import SentenceTransformer
+
+# from sentence_transformers import SentenceTransformer
 
 torch.manual_seed(39)
 
@@ -12,12 +13,7 @@ def cos_similarity(query, docs, top_k):
     return torch.topk(score, top_k, -1)
 
 
-if __name__ == "__main__":
-    # query = torch.randn(4, 768)
-    # docs = torch.randn(1000, 768)
-    # top_k = 3
-    # print(cos_similarity(query, docs, top_k=top_k))
-
+def test_rag():
     model = SentenceTransformer(
         "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     )
@@ -36,9 +32,11 @@ if __name__ == "__main__":
         "自回归生成时，如何避免重复计算历史 Key 和 Value？",
         "How can we reuse previously computed attention states during decoding?",
     ]
-    answer = torch.tensor([0, 0, 0, 1, 2, 2], dtype=torch.long, device="cuda")
     doc_embeddings = model.encode(docs, convert_to_tensor=True)
     query_embeddings = model.encode(query, convert_to_tensor=True)
+    answer = torch.tensor(
+        [0, 0, 0, 1, 2, 2], dtype=torch.long, device=query_embeddings.device
+    )
 
     print(doc_embeddings.shape)
     print(query_embeddings.shape)
@@ -48,3 +46,33 @@ if __name__ == "__main__":
     print(f"cos_similarity:{values}")
     print(f"index:{indices}")
     print(f"Recall@1:{correct.sum()/len(answer)}")
+
+
+def idf(term, docs: list[str]):
+    dft = 0
+    for doc in docs:
+        df = 0
+        tokens = doc.split()
+        if term in tokens:
+            dft += 1
+    return math.log((1 + (len(docs) - dft + 0.5) / (dft + 0.5)))
+
+
+def test_idf():
+    docs = [
+        "lora uses low rank matrices",
+        "rope uses rotary embeddings",
+        "kv cache stores key and value",
+        "lora reduces trainable parameters",
+    ]
+    terms = ["lora", "uses"]
+    for term in terms:
+        print(f"{idf(term, docs):.4f}")
+
+
+if __name__ == "__main__":
+    # query = torch.randn(4, 768)
+    # docs = torch.randn(1000, 768)
+    # top_k = 3
+    # print(cos_similarity(query, docs, top_k=top_k))
+    test_idf()
