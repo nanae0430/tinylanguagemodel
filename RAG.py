@@ -64,6 +64,7 @@ def test_idf():
         "lora reduces trainable parameters",
     ]
     terms = ["lora", "uses"]
+    docs = [doc.split() for doc in docs]
     for term in terms:
         print(f"{idf(term, docs):.4f}")
 
@@ -119,4 +120,4 @@ if __name__ == "__main__":
     # print(cos_similarity(query, docs, top_k=top_k))
     # test_idf()
     # test_tf()
-    test_bm25()
+    # test_bm25()
