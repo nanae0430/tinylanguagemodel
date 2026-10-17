@@ -48,11 +48,9 @@ def test_rag():
     print(f"Recall@1:{correct.sum()/len(answer)}")
 
 
-def idf(term, docs: list[str]):
+def idf(term, docs: list[list[str]]):
     dft = 0
-    for doc in docs:
-        df = 0
-        tokens = doc.split()
+    for tokens in docs:
         if term in tokens:
             dft += 1
     return math.log((1 + (len(docs) - dft + 0.5) / (dft + 0.5)))
@@ -70,8 +68,7 @@ def test_idf():
         print(f"{idf(term, docs):.4f}")
 
 
-def tf(term, doc: str, avgdl, k1=1.5, b=0.75):
-    tokens = doc.split()
+def tf(term, tokens: list[str], avgdl, k1=1.5, b=0.75):
     tf_ = tokens.count(term)
     doc_len = len(tokens)
     return tf_ * (k1 + 1) / (tf_ + k1 * (1 - b + b * doc_len / avgdl))
@@ -90,14 +87,14 @@ def test_tf():
 def bm25(query: str, docs: list[str], k1=1.5, b=0.75):
     terms = query.split()
     bm25_scores = []
-    tokens = [doc.split() for doc in docs]
-    avgdl = sum([len(token) for token in tokens]) / len(tokens)
-    for doc in docs:
+    docs_ = [doc.split() for doc in docs]
+    idf_score = {term: idf(term, docs_) for term in terms}
+    avgdl = sum([len(token) for token in docs_]) / len(docs_)
+    for tokens in docs_:
         bm25_score = 0
         for term in terms:
-            idf_score = idf(term, docs)
-            tf_score = tf(term, doc, avgdl, k1, b)
-            bm25_score += idf_score * tf_score
+            tf_score = tf(term, tokens, avgdl, k1, b)
+            bm25_score += idf_score[term] * tf_score
         bm25_scores.append(bm25_score)
     return bm25_scores
 
