@@ -1,8 +1,6 @@
 import torch, math
 import torch.nn.functional as F
 
-# from sentence_transformers import SentenceTransformer
-
 torch.manual_seed(39)
 
 
@@ -14,6 +12,8 @@ def cos_similarity(query, docs, top_k):
 
 
 def test_rag():
+    from sentence_transformers import SentenceTransformer
+
     model = SentenceTransformer(
         "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     )
@@ -70,9 +70,56 @@ def test_idf():
         print(f"{idf(term, docs):.4f}")
 
 
+def tf(term, doc: str, avgdl, k1=1.5, b=0.75):
+    tokens = doc.split()
+    tf_ = tokens.count(term)
+    doc_len = len(tokens)
+    return tf_ * (k1 + 1) / (tf_ + k1 * (1 - b + b * doc_len / avgdl))
+
+
+def test_tf():
+    k1 = 1.5
+    b = 0.75
+    test = [[3, 100, 100], [0, 100, 100], [3, 200, 100]]
+    for tf, doc_len, avgdl in test:
+        tfscore = tf * (k1 + 1) / (tf + k1 * (1 - b + b * doc_len / avgdl))
+
+        print(tfscore)
+
+
+def bm25(query: str, docs: list[str], k1=1.5, b=0.75):
+    terms = query.split()
+    bm25_scores = []
+    tokens = [doc.split() for doc in docs]
+    avgdl = sum([len(token) for token in tokens]) / len(tokens)
+    for doc in docs:
+        bm25_score = 0
+        for term in terms:
+            idf_score = idf(term, docs)
+            tf_score = tf(term, doc, avgdl, k1, b)
+            bm25_score += idf_score * tf_score
+        bm25_scores.append(bm25_score)
+    return bm25_scores
+
+
+def test_bm25():
+    docs = [
+        "lora uses low rank matrices",
+        "rope uses rotary embeddings",
+        "kv cache stores key and value",
+        "lora reduces trainable parameters",
+    ]
+
+    query = "lora parameters"
+    bm25_scores = bm25(query, docs)
+    print(bm25_scores)
+
+
 if __name__ == "__main__":
     # query = torch.randn(4, 768)
     # docs = torch.randn(1000, 768)
     # top_k = 3
     # print(cos_similarity(query, docs, top_k=top_k))
-    test_idf()
+    # test_idf()
+    # test_tf()
+    test_bm25()
