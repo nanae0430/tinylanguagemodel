@@ -113,6 +113,27 @@ def test_bm25():
     print(bm25_scores)
 
 
+def eval_rag(k=3):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    from retrieval_eval import docs, queries, labels
+    from sentence_transformers import SentenceTransformer
+
+    bm25_scores = torch.tensor([bm25(query, docs) for query in queries])
+    bm25_indices = torch.argsort(bm25_scores, dim=-1, descending=True)[:, :k].to(device)
+
+    model = SentenceTransformer(
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    ).to(device)
+    queries_tensor = model.encode(queries, convert_to_tensor=True)
+    docs_tensor = model.encode(docs, convert_to_tensor=True)
+    dr_values, dr_indices = cos_similarity(queries_tensor, docs_tensor, top_k=k)
+    labels = torch.tensor(labels, device=device)
+    bm25_correct = (bm25_indices == labels[:, None]).any(dim=-1).to(device)
+    dr_correct = (dr_indices == labels[:, None]).any(dim=-1).to(device)
+    print(f"bm25 recall@{k}:\t{bm25_correct.float().mean().item()}")
+    print(f"dr recall@{k}:\t{dr_correct.float().mean().item()}")
+
+
 if __name__ == "__main__":
     # query = torch.randn(4, 768)
     # docs = torch.randn(1000, 768)
@@ -121,3 +142,4 @@ if __name__ == "__main__":
     # test_idf()
     # test_tf()
     # test_bm25()
+    eval_rag()
