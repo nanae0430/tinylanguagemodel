@@ -132,6 +132,19 @@ def eval_rag(k=3):
     dr_correct = (dr_indices == labels[:, None]).any(dim=-1).to(device)
     print(f"bm25 recall@{k}:\t{bm25_correct.float().mean().item()}")
     print(f"dr recall@{k}:\t{dr_correct.float().mean().item()}")
+    for i in range(len(labels)):
+        if not bm25_correct[i]:
+            print(
+                f"Query {i}: {queries[i]}\n"
+                f"Expected: {labels[i].item()}\n"
+                f"Retrieved: {bm25_indices[i].tolist()}"
+            )
+        if not dr_correct[i]:
+            print(
+                f"Query {i}: {queries[i]}\n"
+                f"Expected: {labels[i].item()}\n"
+                f"Retrieved: {dr_indices[i].tolist()}"
+            )
 
 
 if __name__ == "__main__":
@@ -142,4 +155,5 @@ if __name__ == "__main__":
     # test_idf()
     # test_tf()
     # test_bm25()
-    eval_rag()
+    for i in range(3):
+        eval_rag(i)
