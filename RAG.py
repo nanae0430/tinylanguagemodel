@@ -126,11 +126,15 @@ def eval_rag(k=3):
     queries_tensor = model.encode(queries, convert_to_tensor=True)
     docs_tensor = model.encode(docs, convert_to_tensor=True)
     dr_values, dr_indices = cos_similarity(queries_tensor, docs_tensor, top_k=k)
+    rrf_score = rrf(bm25_indices, dr_indices, bm25_scores, len(docs))
+    rrf_values, rrf_indices = torch.topk(rrf_score, k)
     labels = torch.tensor(labels, device=device)
     bm25_correct = (bm25_indices == labels[:, None]).any(dim=-1).to(device)
     dr_correct = (dr_indices == labels[:, None]).any(dim=-1).to(device)
+    rrf_correct = (rrf_indices == labels[:None]).any(dim=-1).to(device)
     print(f"bm25 recall@{k}:\t{bm25_correct.float().mean().item()}")
     print(f"dr recall@{k}:\t{dr_correct.float().mean().item()}")
+    print(f"rrf recall@{k}:\t{rrf_correct.float().mean().item()}")
     for i in range(len(labels)):
         if not bm25_correct[i]:
             print(
@@ -141,6 +145,12 @@ def eval_rag(k=3):
         if not dr_correct[i]:
             print(
                 f"Query {i}: {queries[i]}\n"
+                f"Expected: {labels[i].item()}\n"
+                f"Retrieved: {dr_indices[i].tolist()}"
+            )
+        if not rrf_correct[i]:
+            print(
+                f"rrf {i}: {queries[i]}\n"
                 f"Expected: {labels[i].item()}\n"
                 f"Retrieved: {dr_indices[i].tolist()}"
             )
@@ -158,7 +168,9 @@ def rrf(
     rank = torch.arange(1, 1 + T, device=bm25_indices.device)
     weight = 1 / (c + rank)
     valid_bm25 = bm25_values > 0
-    rrf_score.scatter_add_(-1, bm25_indices, valid_bm25.float() * weight[None, :])
+    rrf_score.scatter_add_(
+        -1, bm25_indices, valid_bm25.float()[:None] * weight[None, :]
+    )
     rrf_score.scatter_add_(
         -1,
         dense_indices,
@@ -177,5 +189,4 @@ if __name__ == "__main__":
     # test_bm25()
     from sentence_transformers import SentenceTransformer
 
-    for i in range(1, 4):
-        eval_rag(i)
+    eval_rag()
