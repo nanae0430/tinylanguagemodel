@@ -146,15 +146,22 @@ def eval_rag(k=3):
             )
 
 
-def rrf(bm25_indices: torch.Tensor, dense_indices: torch.Tensor, num_docs, c=60):
+def rrf(
+    bm25_indices: torch.Tensor,
+    dense_indices: torch.Tensor,
+    bm25_values,
+    dense_values,
+    num_docs,
+    c=60,
+):
     B, T = bm25_indices.shape
     rrf_score = torch.zeros(size=(B, num_docs), device=bm25_indices.device)
     rank = torch.arange(1, 1 + T, device=bm25_indices.device)
     weight = 1 / (c + rank)
-    valid_bm25 = bm25_indices.max(dim=-1).values > 0
-    rrf_score.scatter_(0, bm25_indices, valid_bm25 * weight)
-    valid_dense = dense_indices.max(dim=-1).values > 0
-    rrf_score.scatter_(0, dense_indices, valid_dense * weight)
+    valid_bm25 = bm25_values.max(dim=-1).values > 0
+    rrf_score.scatter_add_(-1, bm25_indices, valid_bm25[:, None] * weight[None, :])
+    valid_dense = dense_values.max(dim=-1).values > 0
+    rrf_score.scatter_add_(-1, dense_indices, valid_dense[:, None] * weight[None, :])
     return rrf_score
 
 
