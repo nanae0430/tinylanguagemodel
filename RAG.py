@@ -116,7 +116,6 @@ def test_bm25():
 def eval_rag(k=3):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     from retrieval_eval import docs, queries, labels
-    from sentence_transformers import SentenceTransformer
 
     bm25_scores = torch.tensor([bm25(query, docs) for query in queries])
     bm25_indices = torch.argsort(bm25_scores, dim=-1, descending=True)[:, :k].to(device)
@@ -147,6 +146,18 @@ def eval_rag(k=3):
             )
 
 
+def rrf(bm25_indices: torch.Tensor, dense_indices: torch.Tensor, num_docs, c=60):
+    B, T = bm25_indices.shape
+    rrf_score = torch.zeros(size=(B, num_docs), device=bm25_indices.device)
+    rank = torch.arange(1, 1 + T, device=bm25_indices.device)
+    weight = 1 / (c + rank)
+    valid_bm25 = bm25_indices.max(dim=-1).values > 0
+    rrf_score.scatter_(0, bm25_indices, valid_bm25 * weight)
+    valid_dense = dense_indices.max(dim=-1).values > 0
+    rrf_score.scatter_(0, dense_indices, valid_dense * weight)
+    return rrf_score
+
+
 if __name__ == "__main__":
     # query = torch.randn(4, 768)
     # docs = torch.randn(1000, 768)
@@ -155,5 +166,7 @@ if __name__ == "__main__":
     # test_idf()
     # test_tf()
     # test_bm25()
-    for i in range(3):
+    from sentence_transformers import SentenceTransformer
+
+    for i in range(1, 4):
         eval_rag(i)
