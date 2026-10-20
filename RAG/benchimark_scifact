@@ -18,4 +18,12 @@ print((bm25_values == 0).any(-1).sum().item())
 print((bm25_values == 0).all(-1).sum().item())
 bm25_ids = data.index_rankings_to_ids(bm25_indices)
 result = metrics(bm25_ids, data.gold_sets)
-pprint.pprint(result)
+print(result)
+print(type(bm25_ids[0][0]))
+is_hit = []
+for retrieved, gold in zip(bm25_ids, data.gold_sets):
+    if any(idx in gold for idx in retrieved):
+        is_hit.append(True)
+    else:
+        is_hit.append(False)
+print(is_hit)
