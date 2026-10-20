@@ -1,6 +1,6 @@
 import torch, re, random, json
-from tinylanguagemodel import TinyLanguageModel, save_model, LoRALinear
-from MinBPE import RegexTokenizer
+from MODEL.tinylanguagemodel import TinyLanguageModel, save_model, LoRALinear
+from BPE.MinBPE import RegexTokenizer
 
 torch.manual_seed(39)
 

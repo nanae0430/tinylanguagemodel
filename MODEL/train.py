@@ -1,5 +1,5 @@
-from MinBPE import RegexTokenizer
-from tinylanguagemodel import TinyLanguageModel, train
+from BPE.MinBPE import RegexTokenizer
+from MODEL.tinylanguagemodel import TinyLanguageModel, train
 import torch
 
 torch.manual_seed(39)

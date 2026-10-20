@@ -1,4 +1,4 @@
-from MinBPE import RegexTokenizer
+from BPE.MinBPE import RegexTokenizer
 import time
 
 tokenizer = RegexTokenizer()

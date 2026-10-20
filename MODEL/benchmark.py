@@ -1,5 +1,5 @@
 import torch, time
-from tinylanguagemodel import TinyLanguageModel, train, get_batch
+from MODEL.tinylanguagemodel import TinyLanguageModel, train, get_batch
 
 torch.manual_seed(39)
 

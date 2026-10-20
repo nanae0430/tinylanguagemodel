@@ -7,3 +7,4 @@ venv/
 .idea/
 *.log
 *.jsonl
+scifact_benchmark

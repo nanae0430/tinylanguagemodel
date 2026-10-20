@@ -115,7 +115,7 @@ def test_bm25():
 
 def eval_rag(model, retrieval_k, final_k=3):
     device = next(model.parameters()).device
-    from retrieval_eval import docs, queries, labels
+    from RAG.retrieval_eval import docs, queries, labels
 
     bm25_scores = torch.tensor([bm25(query, docs) for query in queries], device=device)
     bm25_values, bm25_indices = torch.topk(bm25_scores, k=retrieval_k, dim=-1)

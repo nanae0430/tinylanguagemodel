@@ -1,6 +1,6 @@
-from tinylanguagemodel import TinyLanguageModel, get_batch
+from MODEL.tinylanguagemodel import TinyLanguageModel, get_batch
 import torch
-from MinBPE import RegexTokenizer
+from BPE.MinBPE import RegexTokenizer
 
 torch.manual_seed(39)
 device = "cuda" if torch.cuda.is_available() else "cpu"
