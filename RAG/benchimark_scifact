@@ -1,11 +1,19 @@
 from evaluation import RetrievalDataset, metrics
 from rag import bm25
+import torch, pprint
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 data = RetrievalDataset("scifact_benchmark/mini", split="dev")
-
+k = 10
 docs = data.doc_texts
 queries = data.query_texts
 
-print(len(docs))  # 1000
-print(len(queries))  # 40
-print(data.gold_sets[0])  # 第一条 Query 的相关文档 ID 集合
+# print(type(docs))  # 1000
+# print(type(queries))  # 40
+# print(data.gold_sets[0])  # 第一条 Query 的相关文档 ID 集合
+
+bm25_scores = torch.tensor([bm25(query, docs) for query in queries], device=device)
+bm25_values, bm25_indices = torch.topk(bm25_scores, k)
+bm25_ids = data.index_rankings_to_ids(bm25_indices)
+result = metrics(bm25_ids, data.gold_sets)
+pprint.pprint(result)
