@@ -4,8 +4,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 import json
-import scifact_benchmark.build_dataset as build_dataset
-from scifact_benchmark.evaluation import RetrievalDataset, metrics
+import RAG.build_dataset as build_dataset
+from RAG.evaluation import RetrievalDataset, metrics
 
 
 def check():

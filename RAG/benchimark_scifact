@@ -25,8 +25,12 @@ for retrieved, gold in zip(bm25_ids, data.gold_sets):
         is_hit.append(True)
     else:
         is_hit.append(False)
-non_hit_index = []
+missed_index = []
 for index, value in enumerate(is_hit):
     if not value:
-        non_hit_index.append(index)
-print(non_hit_index)
+        missed_index.append(index)
+print(missed_index)
+for index in missed_index:
+    print(data.docs[bm25_indices[index, 0].item()])
+    print(data.query_texts[index])
+    print(data.gold_sets[index])
