@@ -14,6 +14,8 @@ queries = data.query_texts
 
 bm25_scores = torch.tensor([bm25(query, docs) for query in queries], device=device)
 bm25_values, bm25_indices = torch.topk(bm25_scores, k)
+print((bm25_values == 0).any(-1).sum().item())
+print((bm25_values == 0).all(-1).sum().item())
 bm25_ids = data.index_rankings_to_ids(bm25_indices)
 result = metrics(bm25_ids, data.gold_sets)
 pprint.pprint(result)
