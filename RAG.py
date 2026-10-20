@@ -129,7 +129,7 @@ def eval_rag(model, retrieval_k, final_k=3):
     rrf_values, rrf_indices = torch.topk(rrf_score, final_k)
     labels = torch.tensor(labels, device=device)
     bm25_correct = (
-        (bm25_indices == labels[:, None] & bm25_values > 0).any(dim=-1).to(device)
+        ((bm25_indices == labels[:, None]) & (bm25_values > 0)).any(dim=-1).to(device)
     )
     dr_correct = (dr_indices == labels[:, None]).any(dim=-1).to(device)
     rrf_correct = (rrf_indices == labels[:, None]).any(dim=-1).to(device)
