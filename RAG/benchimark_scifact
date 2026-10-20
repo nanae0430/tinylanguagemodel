@@ -1,0 +1,11 @@
+from evaluation import RetrievalDataset, metrics
+from rag import bm25
+
+data = RetrievalDataset("scifact_benchmark/mini", split="dev")
+
+docs = data.doc_texts
+queries = data.query_texts
+
+print(len(docs))  # 1000
+print(len(queries))  # 40
+print(data.gold_sets[0])  # 第一条 Query 的相关文档 ID 集合
