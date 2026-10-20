@@ -113,46 +113,50 @@ def test_bm25():
     print(bm25_scores)
 
 
-def eval_rag(model, k=3):
+def eval_rag(model, retrieval_k, final_k=3):
     device = next(model.parameters()).device
     from retrieval_eval import docs, queries, labels
 
     bm25_scores = torch.tensor([bm25(query, docs) for query in queries], device=device)
-    bm25_values, bm25_indices = torch.topk(bm25_scores, k=k, dim=-1)
+    bm25_values, bm25_indices = torch.topk(bm25_scores, k=retrieval_k, dim=-1)
 
     queries_tensor = model.encode(queries, convert_to_tensor=True)
     docs_tensor = model.encode(docs, convert_to_tensor=True)
-    dr_values, dr_indices = cos_similarity(queries_tensor, docs_tensor, top_k=k)
+    dr_values, dr_indices = cos_similarity(
+        queries_tensor, docs_tensor, top_k=retrieval_k
+    )
     rrf_score = rrf(bm25_indices, dr_indices, bm25_values, len(docs))
-    rrf_values, rrf_indices = torch.topk(rrf_score, k)
+    rrf_values, rrf_indices = torch.topk(rrf_score, final_k)
     labels = torch.tensor(labels, device=device)
-    bm25_correct = (bm25_indices == labels[:, None]).any(dim=-1).to(device)
+    bm25_correct = (
+        (bm25_indices == labels[:, None] & bm25_values > 0).any(dim=-1).to(device)
+    )
     dr_correct = (dr_indices == labels[:, None]).any(dim=-1).to(device)
     rrf_correct = (rrf_indices == labels[:, None]).any(dim=-1).to(device)
-    print(f"bm25 recall@{k}:\t{bm25_correct.float().mean().item()}")
-    print(f"dr recall@{k}:\t{dr_correct.float().mean().item()}")
-    print(f"rrf recall@{k}:\t{rrf_correct.float().mean().item()}")
+    print(f"bm25 recall@{final_k}:\t{bm25_correct.float().mean().item()}")
+    print(f"dr recall@{final_k}:\t{dr_correct.float().mean().item()}")
+    print(f"rrf recall@{final_k}:\t{rrf_correct.float().mean().item()}")
     for i in range(len(labels)):
         if not bm25_correct[i]:
             print(
-                f"bm25"
+                f"bm25\n"
                 f"Query {i}: {queries[i]}\n"
                 f"Expected: {labels[i].item()}\n"
                 f"Retrieved: {bm25_indices[i].tolist()}"
             )
         if not dr_correct[i]:
             print(
-                f"dense"
+                f"dense\n"
                 f"Query {i}: {queries[i]}\n"
                 f"Expected: {labels[i].item()}\n"
                 f"Retrieved: {dr_indices[i].tolist()}"
             )
         if not rrf_correct[i]:
             print(
-                "rrf"
+                "rrf\n"
                 f"query {i}: {queries[i]}\n"
                 f"Expected: {labels[i].item()}\n"
-                f"Retrieved: {dr_indices[i].tolist()}"
+                f"Retrieved: {rrf_indices[i].tolist()}"
             )
 
 
@@ -186,6 +190,6 @@ if __name__ == "__main__":
     model = SentenceTransformer(
         "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     ).to("cuda" if torch.cuda.is_available() else "cpu")
-    for i in range(1, 4):
-        print("*" * 10, i, "*" * 10)
-        eval_rag(model, i)
+    for retrieval_k in [1, 3, 5, 8]:
+        print("*" * 10, f"retrieval_k:{retrieval_k}", "*" * 10)
+        eval_rag(model, retrieval_k=retrieval_k, final_k=1)
