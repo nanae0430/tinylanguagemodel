@@ -8,6 +8,7 @@ k = 10
 docs = data.doc_texts
 queries = data.query_texts
 docs = [doc.lower() for doc in docs]
+queries = [query.lower() for query in queries]
 # print(type(docs))  # 1000
 # print(type(queries))  # 40
 # print(data.gold_sets[0])  # 第一条 Query 的相关文档 ID 集合
