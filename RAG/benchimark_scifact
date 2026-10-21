@@ -33,10 +33,10 @@ print(missed_index)
 for index in missed_index:
     # print(data.docs[bm25_indices[index, 0].item()])
     print("*" * 10, index, "*" * 10)
-    print(data.query_texts[index])
-    print(bm25_values[index, 0].item())
+    print("query:", data.query_texts[index])
+    print(f"bm25 top1:\t{bm25_values[index, 0].item()}")
     gold_id = next(iter(data.gold_sets[index]))
     gold_index = data.doc_id_to_index[gold_id]
-    print(bm25_values[index, gold_index].item())
+    print(f"gold index:\t{bm25_scores[index, gold_index].item()}")
 
     # print(data.docs[gold_index])
