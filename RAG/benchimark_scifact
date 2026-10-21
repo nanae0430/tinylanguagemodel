@@ -31,9 +31,11 @@ for index, value in enumerate(is_hit):
         missed_index.append(index)
 print(missed_index)
 for index in missed_index:
-    print(data.docs[bm25_indices[index, 0].item()])
+    # print(data.docs[bm25_indices[index, 0].item()])
+    print("*" * 10, index, "*" * 10)
     print(data.query_texts[index])
+    print(bm25_values[index, 0].item())
     gold_id = next(iter(data.gold_sets[index]))
     gold_index = data.doc_id_to_index[gold_id]
 
-    print(data.docs[gold_index])
+    # print(data.docs[gold_index])
