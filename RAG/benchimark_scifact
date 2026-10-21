@@ -37,5 +37,6 @@ for index in missed_index:
     print(bm25_values[index, 0].item())
     gold_id = next(iter(data.gold_sets[index]))
     gold_index = data.doc_id_to_index[gold_id]
+    print(bm25_values[index, gold_index].item())
 
     # print(data.docs[gold_index])
