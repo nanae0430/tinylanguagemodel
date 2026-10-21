@@ -36,6 +36,16 @@ for index in missed_index:
     print("*" * 10, index, "*" * 10)
     print("query:", data.query_texts[index])
     print(f"bm25 top1:\t{bm25_values[index, 0].item()}")
+    query_terms = set(queries[index].split())
+
+    for gold_id in sorted(data.gold_sets[index]):
+        j = data.doc_id_to_index[gold_id]
+        doc_terms = set(docs[j].split())
+
+        print("Gold ID:", gold_id)
+        print("Gold Score:", bm25_scores[index, j].item())
+        print("Matched Terms:", query_terms & doc_terms)
+        print("Gold Document:", data.doc_texts[j][:600])
     gold_id = next(iter(data.gold_sets[index]))
     gold_index = data.doc_id_to_index[gold_id]
     print(f"gold index:\t{bm25_scores[index, gold_index].item()}")
