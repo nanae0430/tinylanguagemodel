@@ -1,14 +1,14 @@
 from evaluation import RetrievalDataset, metrics
-from rag import bm25
+from rag import bm25, tokenize
 import torch, pprint
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 data = RetrievalDataset("scifact_benchmark/mini", split="dev")
 k = 10
-docs = data.doc_texts
-queries = data.query_texts
-docs = [doc.lower() for doc in docs]
-queries = [query.lower() for query in queries]
+docs_origin = data.doc_texts
+queries_origin = data.query_texts
+docs = [tokenize(doc) for doc in docs_origin]
+queries = [tokenize(query) for query in queries_origin]
 # print(type(docs))  # 1000
 # print(type(queries))  # 40
 # print(data.gold_sets[0])  # 第一条 Query 的相关文档 ID 集合
@@ -36,11 +36,11 @@ for index in missed_index:
     print("*" * 10, index, "*" * 10)
     print("query:", data.query_texts[index])
     print(f"bm25 top1:\t{bm25_values[index, 0].item()}")
-    query_terms = set(queries[index].split())
+    query_terms = set(queries[index])
 
     for gold_id in sorted(data.gold_sets[index]):
         j = data.doc_id_to_index[gold_id]
-        doc_terms = set(docs[j].split())
+        doc_terms = set(docs[j])
 
         print("Gold ID:", gold_id)
         print("Gold Score:", bm25_scores[index, j].item())
