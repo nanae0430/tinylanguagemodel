@@ -1,12 +1,21 @@
 import torch, math
 import torch.nn.functional as F
 import re
+from collections import Counter, defaultdict
 
 torch.manual_seed(39)
 
 
 def tokenize(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", text.lower())
+
+
+def build_inverted_index(docs: list[list[str]]) -> dict[str, dict[int, int]]:
+    index = defaultdict(dict)
+    for i in range(len(docs)):
+        for term, frequency in Counter(docs):
+            index[term][i] = frequency
+    return index
 
 
 def cos_similarity(query: torch.Tensor, docs: torch.Tensor, top_k):
