@@ -1,10 +1,15 @@
 import torch, math
 import torch.nn.functional as F
+import re
 
 torch.manual_seed(39)
 
 
-def cos_similarity(query, docs, top_k):
+def tokenize(text: str) -> list[str]:
+    return re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", text.lower())
+
+
+def cos_similarity(query: torch.Tensor, docs: torch.Tensor, top_k):
     cos_query = F.normalize(query, p=2, dim=-1)
     cos_docs = F.normalize(docs, p=2, dim=-1)
     score = cos_query @ cos_docs.T
@@ -85,15 +90,15 @@ def test_tf():
         print(tfscore)
 
 
-def bm25(query: str, docs: list[str], k1=1.5, b=0.75):
-    terms = query.split()
+def bm25(query: list[str], docs: list[list[str]], k1=1.5, b=0.75):
+
     bm25_scores = []
-    docs_ = [doc.split() for doc in docs]
-    idf_score = {term: idf(term, docs_) for term in terms}
-    avgdl = sum([len(token) for token in docs_]) / len(docs_)
-    for tokens in docs_:
+
+    idf_score = {term: idf(term, docs) for term in query}
+    avgdl = sum([len(token) for token in docs]) / len(docs)
+    for tokens in docs:
         bm25_score = 0
-        for term in terms:
+        for term in query:
             tf_score = tf(term, tokens, avgdl, k1, b)
             bm25_score += idf_score[term] * tf_score
         bm25_scores.append(bm25_score)
