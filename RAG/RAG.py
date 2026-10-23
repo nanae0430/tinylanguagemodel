@@ -23,18 +23,16 @@ def build_bm25_index(docs: list[list[str]]) -> dict:
 
     # TODO: 由你计算以下信息
     num_docs = len(docs)
-    doc_lengths = [0] * num_docs
-    for term, frequency in inverted_index.items():
-        for index, freq in frequency:
-            doc_lengths[index] += freq
+    doc_lengths = [len(doc) for doc in docs]
 
     avgdl = sum(doc_lengths) / num_docs
     idf_scores = {
         term: math.log(
-            (1 + num_docs - len(inverted_index.get(term, {})) + 0.5)
+            1
+            + (num_docs - len(inverted_index.get(term, {})) + 0.5)
             / (len(inverted_index.get(term, {})) + 0.5)
         )
-        for term, frequency in inverted_index.items()
+        for term, _ in inverted_index.items()
     }
 
     return {
