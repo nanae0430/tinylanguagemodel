@@ -13,9 +13,37 @@ def tokenize(text: str) -> list[str]:
 def build_inverted_index(docs: list[list[str]]) -> dict[str, dict[int, int]]:
     index = defaultdict(dict)
     for i in range(len(docs)):
-        for term, frequency in Counter(docs):
+        for term, frequency in Counter(docs[i]).items():
             index[term][i] = frequency
     return index
+
+
+def build_bm25_index(docs: list[list[str]]) -> dict:
+    inverted_index = build_inverted_index(docs)
+
+    # TODO: 由你计算以下信息
+    num_docs = len(docs)
+    doc_lengths = [0] * num_docs
+    for term, frequency in inverted_index.items():
+        for index, freq in frequency:
+            doc_lengths[index] += freq
+
+    avgdl = sum(doc_lengths) / num_docs
+    idf_scores = {
+        term: math.log(
+            (1 + num_docs - len(inverted_index.get(term, {})) + 0.5)
+            / (len(inverted_index.get(term, {})) + 0.5)
+        )
+        for term, frequency in inverted_index.items()
+    }
+
+    return {
+        "inverted_index": inverted_index,
+        "num_docs": num_docs,
+        "doc_lengths": doc_lengths,
+        "avgdl": avgdl,
+        "idf_scores": idf_scores,
+    }
 
 
 def cos_similarity(query: torch.Tensor, docs: torch.Tensor, top_k):
@@ -204,11 +232,14 @@ if __name__ == "__main__":
     # test_idf()
     # test_tf()
     # test_bm25()
-    from sentence_transformers import SentenceTransformer
+    # from sentence_transformers import SentenceTransformer
 
-    model = SentenceTransformer(
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-    ).to("cuda" if torch.cuda.is_available() else "cpu")
-    for retrieval_k in [1, 3, 5, 8]:
-        print("*" * 10, f"retrieval_k:{retrieval_k}", "*" * 10)
-        eval_rag(model, retrieval_k=retrieval_k, final_k=1)
+    # model = SentenceTransformer(
+    #     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    # ).to("cuda" if torch.cuda.is_available() else "cpu")
+    # for retrieval_k in [1, 3, 5, 8]:
+    #     print("*" * 10, f"retrieval_k:{retrieval_k}", "*" * 10)
+    #     eval_rag(model, retrieval_k=retrieval_k, final_k=1)
+    docs = [["lora", "lora", "training"], ["lora", "model"], ["rope", "model"]]
+
+    print(dict(build_inverted_index(docs)))
