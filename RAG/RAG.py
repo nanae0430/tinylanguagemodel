@@ -53,6 +53,7 @@ def bm25_search(query: list[str], index: dict, k1=1.5, b=0.75) -> list[float]:
                 frequency, index["doc_lengths"][doc_index], index["avgdl"], k1, b
             )
             bm25_scores[doc_index] += tf_score * index["idf_scores"][term]
+    return bm25_scores
 
 
 def cos_similarity(query: torch.Tensor, docs: torch.Tensor, top_k):

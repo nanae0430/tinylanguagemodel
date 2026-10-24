@@ -1,6 +1,6 @@
 from evaluation import RetrievalDataset, metrics
-from rag import bm25, tokenize
-import torch, pprint
+from rag import bm25, tokenize, build_bm25_index, bm25_search
+import torch, pprint, time
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 data = RetrievalDataset("scifact_benchmark/mini", split="dev")
@@ -12,8 +12,22 @@ queries = [tokenize(query) for query in queries_origin]
 # print(type(docs))  # 1000
 # print(type(queries))  # 40
 # print(data.gold_sets[0])  # 第一条 Query 的相关文档 ID 集合
+# index=build_bm25_index(docs)
+# bm25_scores = torch.tensor([bm25_search(query, index) for query in queries], device=device)
 
-bm25_scores = torch.tensor([bm25(query, docs) for query in queries], device=device)
+start = time.perf_counter()
+bm25_index = build_bm25_index(docs)
+build_time = time.perf_counter() - start
+
+start = time.perf_counter()
+bm25_scores = torch.tensor(
+    [bm25_search(query, bm25_index) for query in queries], device=device
+)
+search_time = time.perf_counter() - start
+
+print(f"Build index: {build_time:.4f}s")
+print(f"Search total: {search_time:.4f}s")
+print(f"Search per query: {search_time / len(queries) * 1000:.4f}ms")
 bm25_values, bm25_indices = torch.topk(bm25_scores, k)
 print((bm25_values == 0).any(-1).sum().item())
 print((bm25_values == 0).all(-1).sum().item())
