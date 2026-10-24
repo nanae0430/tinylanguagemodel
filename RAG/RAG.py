@@ -32,7 +32,7 @@ def build_bm25_index(docs: list[list[str]]) -> dict:
             + (num_docs - len(inverted_index.get(term, {})) + 0.5)
             / (len(inverted_index.get(term, {})) + 0.5)
         )
-        for term, _ in inverted_index.items()
+        for term in inverted_index
     }
 
     return {
@@ -42,6 +42,17 @@ def build_bm25_index(docs: list[list[str]]) -> dict:
         "avgdl": avgdl,
         "idf_scores": idf_scores,
     }
+
+
+def bm25_search(query: list[str], index: dict, k1=1.5, b=0.75) -> list[float]:
+    bm25_scores = [0] * index["num_docs"]
+    for term in query:
+        posting = index["inverted_index"].get(term, {})
+        for doc_index, frequency in posting.items():
+            tf_score = tf(
+                frequency, index["doc_lengths"][doc_index], index["avgdl"], k1, b
+            )
+            bm25_scores[doc_index] += tf_score * index["idf_scores"][term]
 
 
 def cos_similarity(query: torch.Tensor, docs: torch.Tensor, top_k):
@@ -109,10 +120,9 @@ def test_idf():
         print(f"{idf(term, docs):.4f}")
 
 
-def tf(term, tokens: list[str], avgdl, k1=1.5, b=0.75):
-    tf_ = tokens.count(term)
-    doc_len = len(tokens)
-    return tf_ * (k1 + 1) / (tf_ + k1 * (1 - b + b * doc_len / avgdl))
+def tf(term_tf, doc_len, avgdl, k1=1.5, b=0.75):
+
+    return term_tf * (k1 + 1) / (term_tf + k1 * (1 - b + b * doc_len / avgdl))
 
 
 def test_tf():
