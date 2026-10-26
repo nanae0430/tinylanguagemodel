@@ -1,6 +1,6 @@
 from evaluation import RetrievalDataset, metrics
-from rag import bm25, tokenize, build_bm25_index, bm25_search, cos_similarity
-import torch, pprint, time
+from rag import bm25, tokenize, build_bm25_index, bm25_search, cos_similarity, rrf
+import torch, time
 from sentence_transformers import SentenceTransformer
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -103,3 +103,11 @@ print("Both miss:", both_miss)
 
 union_hit = len(bm25_only) + len(dense_only) + len(both_hit)
 print(f"Union Hit@10: {union_hit / len(data.gold_sets):.4f}")
+
+rrf_scores = rrf(
+    bm25_indices, dr_indices, bm25_values, num_docs=len(data.doc_ids), c=60
+)
+rrf_top10_values, rrf_top10_indices = torch.topk(rrf_scores, 10, -1)
+rrf_ids = data.index_rankings_to_ids(rrf_top10_indices)
+result = metrics(rrf_ids, data.gold_sets)
+print(result)
