@@ -75,3 +75,31 @@ dr_values, dr_indices = cos_similarity(queries_tensor, docs_tensor, top_k=k)
 dr_ids = data.index_rankings_to_ids(dr_indices)
 result = metrics(dr_ids, data.gold_sets)
 print(result)
+
+bm25_only = []
+dense_only = []
+both_hit = []
+both_miss = []
+
+for i, (bm25_docs, dense_docs, gold) in enumerate(
+    zip(bm25_ids, dr_ids, data.gold_sets)
+):
+    bm25_hit = bool(set(bm25_docs) & gold)
+    dense_hit = bool(set(dense_docs) & gold)
+
+    if bm25_hit and dense_hit:
+        both_hit.append(i)
+    elif bm25_hit and not dense_hit:
+        bm25_only.append(i)
+    elif not bm25_hit and dense_hit:
+        dense_only.append(i)
+    else:
+        both_miss.append(i)
+
+print("BM25 only:", bm25_only)
+print("Dense only:", dense_only)
+print("Both hit:", both_hit)
+print("Both miss:", both_miss)
+
+union_hit = len(bm25_only) + len(dense_only) + len(both_hit)
+print(f"Union Hit@10: {union_hit / len(data.gold_sets):.4f}")
