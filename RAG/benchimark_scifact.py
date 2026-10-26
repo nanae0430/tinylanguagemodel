@@ -104,6 +104,7 @@ print("Both miss:", both_miss)
 union_hit = len(bm25_only) + len(dense_only) + len(both_hit)
 print(f"Union Hit@10: {union_hit / len(data.gold_sets):.4f}")
 
+print("*" * 10, "rrf", "*" * 10)
 rrf_scores = rrf(
     bm25_indices, dr_indices, bm25_values, num_docs=len(data.doc_ids), c=60
 )
@@ -111,3 +112,29 @@ rrf_top10_values, rrf_top10_indices = torch.topk(rrf_scores, 10, -1)
 rrf_ids = data.index_rankings_to_ids(rrf_top10_indices)
 result = metrics(rrf_ids, data.gold_sets)
 print(result)
+
+rrf_miss = [
+    i
+    for i, (retrieved, gold) in enumerate(zip(rrf_ids, data.gold_sets))
+    if not (set(retrieved) & gold)
+]
+
+print("RRF missed:", rrf_miss)
+
+for i in [1, 2, 5, 9]:
+    gold = data.gold_sets[i]
+
+    def first_rank(ranking):
+        return next(
+            (rank for rank, doc_id in enumerate(ranking, 1) if doc_id in gold), None
+        )
+
+    print(
+        f"Query {i}:",
+        "BM25 =",
+        first_rank(bm25_ids[i]),
+        "Dense =",
+        first_rank(dr_ids[i]),
+        "RRF =",
+        first_rank(rrf_ids[i]),
+    )
