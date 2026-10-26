@@ -1,6 +1,7 @@
 from evaluation import RetrievalDataset, metrics
-from rag import bm25, tokenize, build_bm25_index, bm25_search
+from rag import bm25, tokenize, build_bm25_index, bm25_search, cos_similarity
 import torch, pprint, time
+from sentence_transformers import SentenceTransformer
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 data = RetrievalDataset("scifact_benchmark/mini", split="dev")
@@ -14,7 +15,6 @@ queries = [tokenize(query) for query in queries_origin]
 # print(data.gold_sets[0])  # 第一条 Query 的相关文档 ID 集合
 # index=build_bm25_index(docs)
 # bm25_scores = torch.tensor([bm25_search(query, index) for query in queries], device=device)
-
 start = time.perf_counter()
 bm25_index = build_bm25_index(docs)
 build_time = time.perf_counter() - start
@@ -65,3 +65,13 @@ for index in missed_index:
     print(f"gold index:\t{bm25_scores[index, gold_index].item()}")
 
     # print(data.docs[gold_index])
+print("*" * 10 + "dense retrieval model" + "*" * 10)
+model = SentenceTransformer(
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+).to(device)
+queries_tensor = model.encode(queries_origin, convert_to_tensor=True)
+docs_tensor = model.encode(docs_origin, convert_to_tensor=True)
+dr_values, dr_indices = cos_similarity(queries_tensor, docs_tensor, top_k=k)
+dr_ids = data.index_rankings_to_ids(dr_indices)
+result = metrics(dr_ids, data.gold_sets)
+print(result)
