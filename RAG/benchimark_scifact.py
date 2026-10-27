@@ -2,6 +2,7 @@ from evaluation import RetrievalDataset, metrics
 from rag import bm25, tokenize, build_bm25_index, bm25_search, cos_similarity, rrf
 import torch, time
 from sentence_transformers import SentenceTransformer
+from sentence_transformers import CrossEncoder
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 data = RetrievalDataset("scifact_benchmark/mini", split="dev")
@@ -138,3 +139,33 @@ for i in [1, 2, 5, 9]:
         "RRF =",
         first_rank(rrf_ids[i]),
     )
+
+
+reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L6-v2", device=device)
+all_pairs = []
+candidates_per_query = []
+
+for i, query in enumerate(queries_origin):
+    candidates = list(dict.fromkeys(bm25_indices[i].tolist() + dr_indices[i].tolist()))
+
+    candidates_per_query.append(candidates)
+
+    all_pairs.extend((query, docs_origin[j]) for j in candidates)
+
+scores = reranker.predict(all_pairs, batch_size=32)
+
+offset = 0
+print("*" * 5 + "cross-encoder reranker" + "*" * 5)
+for candidates in candidates_per_query:
+    n = len(candidates)
+    query_scores = scores[offset : offset + n]
+
+    # TODO: 根据 query_scores 对 candidates 降序排序
+
+    offset += n
+    order = sorted(range(len(candidates)), key=lambda i: query_scores[i], reverse=True)
+    ranked_indices = [candidates[i] for i in order]
+    ranked_ids = data.index_rankings_to_ids(ranked_indices)
+    result = metrics(ranked_ids, data.gold_sets)
+    print("*" * 5, f"{candidates}", "*" * 5)
+    print(result)
