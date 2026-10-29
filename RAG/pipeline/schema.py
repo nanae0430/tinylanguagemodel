@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+import hashlib
 
 
 @dataclass
@@ -18,7 +19,6 @@ class Chunk:
 
 def load_documents(directory: str) -> list[Document]:
 
-    doc_id = 0
     documents = []
     root = Path(directory)
     assert root.exists()
@@ -28,8 +28,9 @@ def load_documents(directory: str) -> list[Document]:
         if path.suffix.lower() not in [".txt", ".md"]:
             continue
         text = path.read_text("utf-8")
-        documents.append(Document(str(doc_id), path, text))
-        doc_id += 1
+        relative_path = path.relative_to(root).as_posix()
+        doc_id = hashlib.sha256(relative_path.encode("utf-8")).hexdigest()
+        documents.append(Document(doc_id, relative_path, text))
     return documents
 
 
