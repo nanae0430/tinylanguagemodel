@@ -6,11 +6,12 @@ def chunk_document(
 ) -> list[Chunk]:
     step = chunk_size - overlap
     chunked_document = []
-    for start_char in range(0, len(doc.text), step):
-        end_char = start_char + chunk_size
+    doc_len = len(doc.text)
+    for start_char in range(0, doc_len, step):
+        end_char = min(start_char + chunk_size, doc_len)
         text = doc.text[start_char:end_char]
         doc_id = doc.doc_id
-        chunk_id = doc_id + str(start_char) + str(end_char)
+        chunk_id = doc_id + ":" + str(start_char) + ":" + str(end_char)
         chunked_document.append(Chunk(chunk_id, doc_id, start_char, end_char, text))
     return chunked_document
 
