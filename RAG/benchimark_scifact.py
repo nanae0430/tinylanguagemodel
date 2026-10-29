@@ -144,7 +144,7 @@ for i in [1, 2, 5, 9]:
 reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L6-v2", device=device)
 all_pairs = []
 candidates_per_query = []
-
+reranked_indices = []
 for i, query in enumerate(queries_origin):
     candidates = list(dict.fromkeys(bm25_indices[i].tolist() + dr_indices[i].tolist()))
 
@@ -153,19 +153,35 @@ for i, query in enumerate(queries_origin):
     all_pairs.extend((query, docs_origin[j]) for j in candidates)
 
 scores = reranker.predict(all_pairs, batch_size=32)
-
 offset = 0
-print("*" * 5 + "cross-encoder reranker" + "*" * 5)
+reranked_indices = []
+
 for candidates in candidates_per_query:
     n = len(candidates)
     query_scores = scores[offset : offset + n]
 
-    # TODO: 根据 query_scores 对 candidates 降序排序
+    order = sorted(range(n), key=lambda i: query_scores[i], reverse=True)
+
+    ranked_indices = [candidates[i] for i in order[:10]]
+    reranked_indices.append(ranked_indices)
 
     offset += n
-    order = sorted(range(len(candidates)), key=lambda i: query_scores[i], reverse=True)
-    ranked_indices = [candidates[i] for i in order]
-    ranked_ids = data.index_rankings_to_ids(ranked_indices)
-    result = metrics(ranked_ids, data.gold_sets)
-    print("*" * 5, f"{candidates}", "*" * 5)
-    print(result)
+
+assert offset == len(scores)
+assert len(reranked_indices) == len(queries_origin)
+
+# 转换为 doc_id
+reranked_ids = data.index_rankings_to_ids(reranked_indices)
+
+# 评测
+result = metrics(reranked_ids, data.gold_sets)
+print("Cross-Encoder:", result)
+
+# 查询失败案例
+missed = [
+    i
+    for i, (retrieved, gold) in enumerate(zip(reranked_ids, data.gold_sets))
+    if not (set(retrieved) & gold)
+]
+
+print("Cross-Encoder missed:", missed)
