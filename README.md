@@ -1,4 +1,23 @@
-# Tiny Language Model
+# Tiny Language Model & LLM Engineering
+
+基于 PyTorch 的 LLM 学习与工程实践仓库，涵盖 **BPE 分词器、Transformer 预训练、SFT / LoRA 相关实验，以及 RAG 检索与重排序评测**。项目以可理解的底层实现为起点，逐步推进到可评测、可部署的 LLM 应用工程。
+
+## 项目导航
+
+| 目录 | 内容 | 状态 |
+| --- | --- | --- |
+| [BPE/](BPE/) | 字节级 BPE、正则预分词、特殊 token、词表保存/加载 | 已实现 |
+| [MODEL/](MODEL/) | Transformer、RoPE、RMSNorm、SwiGLU、训练与采样、KV cache | 已实现实验 |
+| [SFT/](SFT/) | 监督微调数据处理及 LoRA 相关代码与实验 | 持续迭代 |
+| [RAG/](RAG/README.md) | BM25、Dense、RRF、Cross-Encoder、SciFact 对照评测 | **检索实验已完成** |
+
+### RAG 实验亮点
+
+在自建的 **SciFact Mini Dev（1,000 篇文档、40 条 Query）** 上，对 BM25、Dense、RRF 和 Cross-Encoder 重排序进行对照。BM25 + Dense 候选并集经 Cross-Encoder 重排序后，达到 **Recall@10 = 0.9750、Hit@10 = 0.9750、MRR@10 = 0.8037**。数据是缩小语料后的自定义划分，不与官方 BEIR 全量测试成绩直接比较。
+
+完整设计、各模型对照指标、错误案例和复现说明请见 **[RAG/README.md](RAG/README.md)**。
+
+## 模型与分词器实验记录
 
 基于 PyTorch 的小型自回归语言模型学习项目。从字节级 BPE 分词开始，逐步实现 Transformer、训练、文本采样和性能测量，并通过对照实验理解模型结构与计算开销之间的关系。
 
@@ -13,20 +32,20 @@
 - **生成**：temperature、top-k、top-p、批量 EOS 停止和动态 KV cache。
 - **性能测量**：warmup、CUDA 同步计时、ms/step、tokens/s、峰值显存，以及可选的 BF16 autocast。
 
-## 文件说明
+## 模型与分词器文件说明
 
 | 文件 | 用途 |
 |---|---|
-| `MinBPE.py` | 分词器实现：`BasicTokenizer`、`RegexTokenizer` 及保存、加载、编码、解码 |
-| `BasicBPE.py` | 早期 BPE 学习实现 |
-| `tiny_story_bpe.py` | 按故事边界划分语料，并在训练部分训练 tokenizer |
-| `tinylanguagemodel.py` | 模型、归一化、前馈网络、采样、训练、评估和 checkpoint 保存 |
-| `train.py` | 数据加载、模型配置、四组对照训练和断点续训入口 |
-| `benchmark.py` | 训练和生成的性能测量；当前主入口测量四组模型的训练性能 |
-| `generate.py` | 使用 checkpoint 进行生成和 KV cache 调用的实验脚本 |
-| `TinyStories-valid.txt` | 本项目使用的原始 TinyStories 文本 |
-| `train_text.txt` / `val_text.txt` | 本项目划分得到的训练和验证文本 |
-| `tiny_story.model` / `tiny_story.vocab` | 保存的 tokenizer 规则和可读词表 |
+| `BPE/MinBPE.py` | 分词器实现：`BasicTokenizer`、`RegexTokenizer` 及保存、加载、编码、解码 |
+| `BPE/BasicBPE.py` | 早期 BPE 学习实现 |
+| `BPE/tiny_story_bpe.py` | 按故事边界划分语料，并在训练部分训练 tokenizer |
+| `MODEL/tinylanguagemodel.py` | 模型、归一化、前馈网络、采样、训练、评估和 checkpoint 保存 |
+| `MODEL/train.py` | 数据加载、模型配置、四组对照训练和断点续训入口 |
+| `MODEL/benchmark.py` | 训练和生成的性能测量；当前主入口测量四组模型的训练性能 |
+| `MODEL/generate.py` | 使用 checkpoint 进行生成和 KV cache 调用的实验脚本 |
+| `MODEL/TinyStories-valid.txt` | 本项目使用的原始 TinyStories 文本 |
+| `MODEL/train_text.txt` / `MODEL/val_text.txt` | 本项目划分得到的训练和验证文本 |
+| `BPE/tiny_story.model` / `BPE/tiny_story.vocab` | 保存的 tokenizer 规则和可读词表 |
 
 运行时还需要本地生成的 `train_tensor.pt`、`val_tensor.pt`，以及训练产生的 checkpoint。仓库的 `.gitignore` 忽略了 `*.pt`，这些文件不会随 `git clone` 下载。
 
@@ -39,7 +58,7 @@ git clone https://github.com/nanae0430/tinylanguagemodel.git
 cd tinylanguagemodel
 ```
 
-以下命令都在仓库根目录执行。脚本使用相对路径读取数据和 checkpoint。
+以下 MODEL/BPE 命令涉及脚本的相对路径：源码保存在子目录，训练缓存、模型文件与 checkpoint 的实际工作目录需按脚本中的相对路径准备；运行时建议从仓库根目录执行模块式导入。RAG 的独立运行流程请查看 [RAG/README.md](RAG/README.md)。
 
 使用 Python 3.10 或以上版本，并安装 `torch` 和 `regex`。PyTorch 的安装命令按操作系统和计算平台从 [官方安装页](https://pytorch.org/get-started/locally/) 选择。
 
@@ -61,10 +80,10 @@ Tokenizer 仅使用前面的训练文本训练。这里的验证集是本项目�
 仓库已经包含 `train_text.txt`、`val_text.txt` 和 `tiny_story.model`，换电脑后可以直接使用。如果需要重新划分数据并训练 tokenizer，运行：
 
 ```bash
-python tiny_story_bpe.py
+python BPE/tiny_story_bpe.py
 ```
 
-当前普通词表大小为 2000，另外注册 `<|endoftext|>`，ID 为 2000；包含该特殊 token 的总词表大小为 2001。模型从 `len(tokenizer.vocab)` 获取实际词表大小。
+当前普通词表大小为 2000，另外注册 `<|endoftext|>`（ID 为 2000）和 `<|PADDING|>`（ID 为 2001）；注册后词表总大小为 2002。模型从 `len(tokenizer.vocab)` 获取实际词表大小。
 
 ### 3. 生成 token 缓存
 
@@ -74,7 +93,7 @@ python tiny_story_bpe.py
 
 ```python
 import torch
-from MinBPE import RegexTokenizer
+from BPE.MinBPE import RegexTokenizer
 
 tokenizer = RegexTokenizer()
 tokenizer.load("./tiny_story.model")
@@ -90,10 +109,10 @@ for split in ("train", "val"):
 ### 4. 训练
 
 ```bash
-python train.py
+python MODEL/train.py
 ```
 
-当前入口在 `load_checkpoint=False` 时，按下面的配置列表依次从头训练四组模型：
+代码中保留了四组结构组合的对照配置（见下方列表），但**当前 MODEL/train.py 的可执行入口**在 `load_checkpoint=False` 时只训练 `RMSNorm + SwiGLU`；四组循环目前被注释：
 
 ```python
 norm_types = ["LayerNorm", "RMSNorm"]
@@ -116,17 +135,17 @@ Checkpoint 保存 `model_config`、模型权重、优化器状态、步数、los
 ### 5. 性能测量与生成
 
 ```bash
-python benchmark.py
+python MODEL/benchmark.py
 ```
 
-当前 benchmark 从四组 `last_checkpoint_<组合名>.pt` 加载模型，因此需要先完成四组训练。计时覆盖数据取样与传输、前向、反向和优化器更新，是训练步骤的整体耗时。
+MODEL/benchmark.py 中保留了四组 checkpoint 的对照测量流程；具体运行前请检查当前主入口启用的实验和 checkpoint 文件是否存在。计时覆盖数据取样与传输、前向、反向和优化器更新，是训练步骤的整体耗时。
 
 Benchmark 会在内存中继续更新模型参数，但当前脚本不会把这些更新写回 checkpoint。
 
 `generate.py` 保留了早期 RoPE checkpoint 的实验路径。使用前需要调整 checkpoint 文件名，并确保 `model_config` 包含正确的 `norm_type` 和 `ffn_type`，再运行：
 
 ```bash
-python generate.py
+python MODEL/generate.py
 ```
 
 生成时，`top_k=1` 使用贪心选择；`top_p` 不为 `None` 时采用 top-p 分支。动态 KV cache 将历史 K/V 与新 token 的 K/V 拼接；启用 cache 后，达到 `block_size` 上限会停止继续生成。
