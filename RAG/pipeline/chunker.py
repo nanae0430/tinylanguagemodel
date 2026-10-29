@@ -13,3 +13,12 @@ def chunk_document(
         chunk_id = doc_id + str(start_char) + str(end_char)
         chunked_document.append(Chunk(chunk_id, doc_id, start_char, end_char, text))
     return chunked_document
+
+
+if __name__ == "main":
+    doc = Document(
+        doc_id="001",
+        source="test.txt",
+        text="ABCDEFGHIJK",
+    )
+    print(chunk_document(doc, 5, 2))
