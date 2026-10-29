@@ -1,6 +1,6 @@
 from pathlib import Path
 import hashlib
-from schema import Document
+from .schema import Document
 
 
 def load_documents(directory: str) -> list[Document]:

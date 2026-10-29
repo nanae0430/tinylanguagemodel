@@ -13,6 +13,7 @@ class Document:
 @dataclass
 class Chunk:
     chunk_id: str
+    doc_id: str
     start_char: int
     end_char: int
     text: str
