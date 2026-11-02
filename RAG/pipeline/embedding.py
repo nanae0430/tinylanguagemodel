@@ -8,7 +8,7 @@ def encode_chunks(
     model: SentenceTransformer,
     batch_size=32,
     device="cuda" if torch.cuda.is_available() else "cpu",
-):
+) -> torch.Tensor:
     if len(chunks) == 0:
         return torch.zeros(
             size=(0, model.get_embedding_dimension()),
