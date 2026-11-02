@@ -2,10 +2,13 @@ from RAG.pipeline.schema import Document
 from RAG.pipeline.chunker import chunk_document
 from RAG.pipeline.embedding import encode_chunks
 from sentence_transformers import SentenceTransformer
+from RAG.pipeline.storage import save_index, load_index
+import torch
 
 doc = Document("001", "test.txt", "ABCDEFGHIJK")
 
 chunks = chunk_document(doc, chunk_size=5, overlap=2)
+
 
 for chunk in chunks:
     print(chunk)
@@ -24,3 +27,13 @@ print(empty.shape)
 
 assert embeddings.shape == (len(chunks), 384)
 assert empty.shape == (0, 384)
+
+
+save_index(embeddings, chunks, "RAG/index")
+
+loaded_embeddings, loaded_chunks = load_index("RAG/index")
+
+assert torch.equal(embeddings.cpu(), loaded_embeddings)
+assert chunks == loaded_chunks
+
+print("Storage test passed!")
