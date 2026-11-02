@@ -14,8 +14,8 @@ def build_index(
     overlap: int = 100,
 ) -> None:
     documents = load_documents(source_dir)
-    chunks = [].extend(
-        chunk_document(document, chunk_size, overlap) for document in documents
-    )
+    chunks = []
+    for document in documents:
+        chunks.extend(chunk_document(document, chunk_size, overlap))
     embeddings = encode_chunks(chunks, model)
     save_index(embeddings, chunks, index_dir)
