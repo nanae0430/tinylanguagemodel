@@ -8,3 +8,5 @@ venv/
 *.log
 *.jsonl
 scifact_benchmark
+RAG/index/
+RAG/index_smoke/
