@@ -34,7 +34,9 @@ def sparse_search(
     bm25_index: dict,
     top_k: int = 5,
 ) -> list[tuple[Chunk, float]]:
-
+    if top_k <= 0:
+        raise ValueError("invalid top_k")
+    top_k = min(top_k, len(chunks))
     bm25_values = bm25_search(tokenize(query), bm25_index)
     return [
         (chunks[i], bm25_values[i])
