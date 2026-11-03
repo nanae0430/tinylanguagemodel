@@ -72,3 +72,23 @@ assert len(results) == 3
 assert all(isinstance(score, float) for _, score in results)
 
 print("Dense Retriever test passed!")
+
+from RAG.rag import tokenize, build_bm25_index
+from RAG.pipeline.retriever import sparse_search
+
+bm25_index = build_bm25_index([tokenize(chunk.text) for chunk in chunks])
+
+results = sparse_search(
+    query="miku",
+    chunks=chunks,
+    bm25_index=bm25_index,
+    top_k=5,
+)
+
+for chunk, score in results:
+    print(chunk.text, score)
+
+assert len(results) == 3
+assert results[0][0].text == "i'm miku!!!"
+
+print("Sparse Retriever test passed!")

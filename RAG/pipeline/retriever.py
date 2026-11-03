@@ -36,6 +36,8 @@ def sparse_search(
 ) -> list[tuple[Chunk, float]]:
     if top_k <= 0:
         raise ValueError("invalid top_k")
+    if bm25_index["num_docs"] != len(chunks):
+        raise ValueError("BM25 index and chunks mismatch")
     top_k = min(top_k, len(chunks))
     bm25_values = bm25_search(tokenize(query), bm25_index)
     return [
