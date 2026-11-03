@@ -40,9 +40,10 @@ def sparse_search(
         raise ValueError("BM25 index and chunks mismatch")
     top_k = min(top_k, len(chunks))
     bm25_values = bm25_search(tokenize(query), bm25_index)
+    valid_indices = [i for i in range(len(bm25_values)) if bm25_values[i] > 0]
     return [
         (chunks[i], bm25_values[i])
-        for i in sorted(
-            range(len(bm25_values)), key=lambda i: bm25_values[i], reverse=True
-        )[:top_k]
+        for i in sorted(valid_indices, key=lambda i: bm25_values[i], reverse=True)[
+            :top_k
+        ]
     ]
