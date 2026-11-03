@@ -44,11 +44,9 @@ def load_bm25_index(directory: str) -> dict:
 
     with open(index_dir / "bm25.json", "r", encoding="utf-8") as f:
         bm25_index = json.load(f)
-        for term in bm25_index["inverted_index"]:
-            for i in bm25_index["inverted_index"][term]:
-                i = int(i)
-
-    # TODO: 恢复 inverted_index 中的整数文档索引
-    # 例如 {"miku": {"0": 1}} -> {"miku": {0: 1}}
+        for term, posting in bm25_index["inverted_index"].items():
+            bm25_index["inverted_index"][term] = {
+                int(doc_id): freq for doc_id, freq in posting.items()
+            }
 
     return bm25_index

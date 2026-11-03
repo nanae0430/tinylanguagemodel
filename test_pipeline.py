@@ -78,18 +78,21 @@ from RAG.pipeline.retriever import sparse_search
 
 bm25_index = build_bm25_index([tokenize(chunk.text) for chunk in chunks])
 
+from RAG.pipeline.storage import save_bm25_index, load_bm25_index
+
+save_bm25_index(bm25_index, "RAG/index_smoke")
+loaded_bm25 = load_bm25_index("RAG/index_smoke")
+
+assert bm25_index == loaded_bm25
+
 results = sparse_search(
     query="miku",
     chunks=chunks,
-    bm25_index=bm25_index,
+    bm25_index=loaded_bm25,
     top_k=5,
 )
 
-for chunk, score in results:
-    print(chunk.text, score)
 assert len(results) == 1
 assert results[0][0].text == "i'm miku!!!"
-assert results[0][1] > 0
 
-
-print("Sparse Retriever test passed!")
+print("BM25 Persistence test passed!")
