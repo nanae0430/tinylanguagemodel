@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
 from .schema import Chunk
+from RAG.rag import tokenize, build_bm25_index, bm25_search
 import torch
 
 
@@ -24,4 +25,20 @@ def dense_search(
     topk_logits, topk_indices = torch.topk(query_embedding @ embeddings.T, k=top_k)
     return [
         (chunks[i.item()], logit.item()) for logit, i in zip(topk_logits, topk_indices)
+    ]
+
+
+def sparse_search(
+    query: str,
+    chunks: list[Chunk],
+    bm25_index: dict,
+    top_k: int = 5,
+) -> list[tuple[Chunk, float]]:
+
+    bm25_values = bm25_search(tokenize(query), bm25_index)
+    return [
+        (chunks[i], bm25_values[i])
+        for i in sorted(
+            range(len(bm25_values)), key=lambda i: bm25_values[i], reverse=True
+        )[:top_k]
     ]
