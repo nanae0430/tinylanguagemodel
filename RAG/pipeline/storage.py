@@ -18,6 +18,14 @@ def save_index(embeddings: torch.Tensor, chunks: list[Chunk], directory: str):
     torch.save(embeddings.cpu(), index_dir / "embeddings.pt")
 
 
+def save_bm25_index(bm25_index: dict, directory: str) -> None:
+    index_dir = Path(directory)
+    index_dir.mkdir(parents=True, exist_ok=True)
+
+    with open(index_dir / "bm25.json", "w", encoding="utf-8") as f:
+        json.dump(bm25_index, f, ensure_ascii=False, indent=2)
+
+
 def load_index(directory: str) -> tuple[torch.Tensor, list[Chunk]]:
     index_dir = Path(directory)
     with open(index_dir / "chunks.json", "r", encoding="utf-8") as f:
@@ -29,3 +37,18 @@ def load_index(directory: str) -> tuple[torch.Tensor, list[Chunk]]:
     if embeddings.ndim != 2 or embeddings.shape[0] != len(chunks):
         raise ValueError("Embeddings and chunks shape mismatch")
     return (embeddings, chunks)
+
+
+def load_bm25_index(directory: str) -> dict:
+    index_dir = Path(directory)
+
+    with open(index_dir / "bm25.json", "r", encoding="utf-8") as f:
+        bm25_index = json.load(f)
+        for term in bm25_index["inverted_index"]:
+            for i in bm25_index["inverted_index"][term]:
+                i = int(i)
+
+    # TODO: 恢复 inverted_index 中的整数文档索引
+    # 例如 {"miku": {"0": 1}} -> {"miku": {0: 1}}
+
+    return bm25_index

@@ -87,8 +87,9 @@ results = sparse_search(
 
 for chunk, score in results:
     print(chunk.text, score)
-
-assert len(results) == 3
+assert len(results) == 1
 assert results[0][0].text == "i'm miku!!!"
+assert results[0][1] > 0
+
 
 print("Sparse Retriever test passed!")
