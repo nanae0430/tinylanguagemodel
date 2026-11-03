@@ -54,3 +54,21 @@ assert embeddings.shape[0] == len(chunks)
 assert len(chunks) == 3
 
 print("Index Builder test passed!")
+
+from RAG.pipeline.retriever import dense_search
+
+results = dense_search(
+    query="Who is Miku?",
+    embeddings=embeddings,
+    chunks=chunks,
+    model=model,
+    top_k=5,
+)
+
+for chunk, score in results:
+    print(chunk.text, score)
+
+assert len(results) == 3
+assert all(isinstance(score, float) for _, score in results)
+
+print("Dense Retriever test passed!")
