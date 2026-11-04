@@ -9,6 +9,8 @@ def rerank(
     model: CrossEncoder,
     top_k: int = 3,
 ) -> list[tuple[Chunk, float]]:
+    if not candidates:
+        return []
     if top_k <= 0:
         raise ValueError("invalid top_k")
 
