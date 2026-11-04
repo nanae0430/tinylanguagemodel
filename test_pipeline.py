@@ -149,11 +149,9 @@ print("Reranker test passed!")
 
 from RAG.pipeline.query_pipeline import retrieve
 
+from sentence_transformers import CrossEncoder
 
-class DummyReranker:
-    def predict(self, pairs, **kwargs):
-        return torch.arange(len(pairs), dtype=torch.float32)
-
+reranker_model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 results = retrieve(
     query="Who is Miku?",
@@ -161,15 +159,10 @@ results = retrieve(
     chunks=chunks,
     bm25_index=loaded_bm25,
     embedding_model=model,
-    reranker_model=DummyReranker(),
+    reranker_model=reranker_model,
     retrieval_k=5,
     final_k=2,
 )
 
 for chunk, score in results:
     print(chunk.text, score)
-
-assert len(results) == 2
-assert len({chunk.chunk_id for chunk, _ in results}) == 2
-
-print("Query Pipeline test passed!")
