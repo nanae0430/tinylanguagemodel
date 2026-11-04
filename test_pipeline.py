@@ -1,4 +1,4 @@
-from RAG.pipeline.schema import Document
+from RAG.pipeline.schema import Document, Chunk
 from RAG.pipeline.chunker import chunk_document
 from RAG.pipeline.embedding import encode_chunks
 from sentence_transformers import SentenceTransformer
@@ -95,3 +95,26 @@ assert len(results) == 1
 assert results[0][0].text == "i'm miku!!!"
 
 print("BM25 Persistence test passed!")
+from RAG.pipeline.hybrid import hybrid_search
+
+a = Chunk("a", "doc1", 0, 1, "A")
+b = Chunk("b", "doc2", 0, 1, "B")
+
+dense_results = [(a, 0.95), (b, 0.85)]
+sparse_results = [(b, 2.5)]
+
+results = hybrid_search(
+    dense_results,
+    sparse_results,
+    top_k=2,
+    c=60,
+)
+
+for chunk, score in results:
+    print(chunk.chunk_id, score)
+
+assert len(results) == 2
+assert results[0][0].chunk_id == "b"
+assert abs(results[0][1] - (1 / 61 + 1 / 62)) < 1e-10
+
+print("Hybrid Retriever test passed!")

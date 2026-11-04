@@ -8,6 +8,10 @@ def hybrid_search(
     top_k: int = 5,
     c: int = 60,
 ) -> list[tuple[Chunk, float]]:
+    if top_k <= 0:
+        raise ValueError("invalid top_k")
+    if c <= 0:
+        raise ValueError("invalid c")
     chunk_map = {}
     rrf_score = defaultdict(float)
     for i in range(len(dense_results)):
