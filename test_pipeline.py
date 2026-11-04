@@ -80,7 +80,6 @@ bm25_index = build_bm25_index([tokenize(chunk.text) for chunk in chunks])
 
 from RAG.pipeline.storage import save_bm25_index, load_bm25_index
 
-save_bm25_index(bm25_index, "RAG/index_smoke")
 loaded_bm25 = load_bm25_index("RAG/index_smoke")
 
 assert bm25_index == loaded_bm25
