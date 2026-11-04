@@ -146,3 +146,30 @@ assert abs(results[0][1] - 0.9) < 1e-6
 assert rerank("test", [], DummyCrossEncoder()) == []
 
 print("Reranker test passed!")
+
+from RAG.pipeline.query_pipeline import retrieve
+
+
+class DummyReranker:
+    def predict(self, pairs, **kwargs):
+        return torch.arange(len(pairs), dtype=torch.float32)
+
+
+results = retrieve(
+    query="Who is Miku?",
+    embeddings=embeddings,
+    chunks=chunks,
+    bm25_index=loaded_bm25,
+    embedding_model=model,
+    reranker_model=DummyReranker(),
+    retrieval_k=5,
+    final_k=2,
+)
+
+for chunk, score in results:
+    print(chunk.text, score)
+
+assert len(results) == 2
+assert len({chunk.chunk_id for chunk, _ in results}) == 2
+
+print("Query Pipeline test passed!")
