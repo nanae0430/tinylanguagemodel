@@ -118,3 +118,31 @@ assert results[0][0].chunk_id == "b"
 assert abs(results[0][1] - (1 / 61 + 1 / 62)) < 1e-10
 
 print("Hybrid Retriever test passed!")
+
+from RAG.pipeline.reranker import rerank
+
+
+class DummyCrossEncoder:
+    def predict(self, pairs, **kwargs):
+        return torch.tensor([0.2, 0.9][: len(pairs)])
+
+
+candidates = [
+    (a, 0.95),
+    (b, 0.85),
+]
+
+results = rerank(
+    query="test",
+    candidates=candidates,
+    model=DummyCrossEncoder(),
+    top_k=3,
+)
+
+assert len(results) == 2
+assert results[0][0].chunk_id == "b"
+assert abs(results[0][1] - 0.9) < 1e-6
+
+assert rerank("test", [], DummyCrossEncoder()) == []
+
+print("Reranker test passed!")

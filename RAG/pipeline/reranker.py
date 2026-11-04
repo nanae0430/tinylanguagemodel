@@ -16,7 +16,8 @@ def rerank(
 
     pairs = [(query, chunk.text) for chunk, _ in candidates]
     scores = model.predict(pairs, convert_to_tensor=True)
+    topk_scores, topk_indices = torch.topk(scores, k=top_k)
     return [
         (candidates[index.item()][0], score.item())
-        for score, index in torch.topk(scores, k=top_k)
+        for score, index in zip(topk_scores, topk_indices)
     ]
