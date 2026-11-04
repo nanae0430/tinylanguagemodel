@@ -9,13 +9,14 @@ def rerank(
     model: CrossEncoder,
     top_k: int = 3,
 ) -> list[tuple[Chunk, float]]:
+    if top_k <= 0:
+        raise ValueError("invalid top_k")
+
+    top_k = min(top_k, len(candidates))
+
     pairs = [(query, chunk.text) for chunk, _ in candidates]
-    scores = model.predict(
-        pairs,
-        convert_to_tensor=True,
-        device="cuda" if torch.cuda.is_available() else "cpu",
-    )
-    topk_scores, topk_indices = torch.topk(scores, k=top_k)
+    scores = model.predict(pairs, convert_to_tensor=True)
     return [
-        (candidates[index.item()][0], scores[index].item()) for index in topk_indices
+        (candidates[index.item()][0], score.item())
+        for score, index in torch.topk(scores, k=top_k)
     ]
