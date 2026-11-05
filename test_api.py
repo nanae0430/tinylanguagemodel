@@ -38,3 +38,28 @@ print("回答：", response.choices[0].message.content)
 
 print("Input tokens:", response.usage.prompt_tokens)
 print("Output tokens:", response.usage.completion_tokens)
+
+from RAG.pipeline.generator import generate_answer
+
+prompt = """
+Context:
+[1] RAG combines retrieval with language model generation.
+
+Question:
+What is RAG?
+
+Answer using the context and cite your source.
+"""
+
+answer = generate_answer(
+    prompt=prompt,
+    client=client,
+    model=model,
+)
+
+print("Generated answer:", answer)
+
+assert isinstance(answer, str)
+assert len(answer.strip()) > 0
+
+print("Generator test passed!")

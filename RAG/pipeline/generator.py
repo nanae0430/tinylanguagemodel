@@ -12,7 +12,13 @@ def generate_answer(
 
     # TODO 1:
     response = client.chat.completions.create(
-        model=model or "deepseek-flash", messages=prompt
+        model=model or "deepseek-flash",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
     )
     # TODO 2:
     answer = response.choices[0].message.content
