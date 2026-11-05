@@ -166,3 +166,23 @@ results = retrieve(
 
 for chunk, score in results:
     print(chunk.text, score)
+
+from RAG.pipeline.prompt_builder import build_prompt
+
+prompt = build_prompt(
+    query="Who is Miku?",
+    results=[
+        (Chunk("c1", "doc1", 0, 14, "i'm miku!!!"), 3.51),
+        (Chunk("c2", "doc2", 0, 13, "i'm ena!!!"), -10.99),
+    ],
+)
+
+print(prompt)
+
+assert "Who is Miku?" in prompt
+assert "i'm miku!!!" in prompt
+assert "i'm ena!!!" in prompt
+assert "[1]" in prompt
+assert "[2]" in prompt
+
+print("Prompt Builder test passed!")
