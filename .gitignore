@@ -10,3 +10,6 @@ venv/
 scifact_benchmark
 RAG/index/
 RAG/index_smoke/
+.env
+.env.*
+!.env.example
