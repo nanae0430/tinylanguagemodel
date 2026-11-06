@@ -22,7 +22,7 @@ def load_documents(directory: str) -> list[Document]:
     return documents
 
 
-def load_scifact(path):
+def load_jsonl(path):
     with open(path, "w", encoding="utf-8") as f:
         datas = [json.loads(line) for line in f if line.strip()]
     return [
