@@ -196,3 +196,19 @@ assert "[1]" in prompt
 assert "[2]" in prompt
 
 print("Prompt Builder test passed!")
+
+from RAG.pipeline.citation import validate_citations
+
+candidates = [
+    (Chunk("c1", "doc1", 0, 10, "Miku"), 3.5),
+    (Chunk("c2", "doc2", 0, 10, "Ena"), -10.9),
+]
+
+assert validate_citations("Miku is mentioned [1].", candidates)
+assert validate_citations("Miku [1] and Ena [2].", candidates)
+
+assert not validate_citations("Miku is mentioned [3].", candidates)
+assert not validate_citations("Invalid reference [0].", candidates)
+assert not validate_citations("No citation here.", candidates)
+
+print("Citation Validation test passed!")
