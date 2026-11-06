@@ -5,6 +5,8 @@ from .storage import save_index, save_bm25_index, save_source_map
 from .loader import load_documents
 from sentence_transformers import SentenceTransformer
 from RAG.rag import build_bm25_index, tokenize
+from pathlib import Path
+from .loader import load_jsonl
 
 
 def build_index(
@@ -14,7 +16,12 @@ def build_index(
     chunk_size: int = 500,
     overlap: int = 100,
 ) -> None:
-    documents = load_documents(source_dir)
+    source = Path(source_dir)
+
+    if source.is_file() and source.suffix.lower() == ".jsonl":
+        documents = load_jsonl(source_dir)
+    else:
+        documents = load_documents(source_dir)
     source_map = {document.doc_id: document.source for document in documents}
     save_source_map(source_map, index_dir)
     chunks = []

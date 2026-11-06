@@ -23,13 +23,15 @@ def load_documents(directory: str) -> list[Document]:
 
 
 def load_jsonl(path):
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "r", encoding="utf-8") as f:
         datas = [json.loads(line) for line in f if line.strip()]
     return [
         Document(
             doc_id=data["_id"],
-            source=path + data["_id"],
-            text=data["title"] + data["text"],
+            source=f'{Path(path).name}#{data["_id"]}',
+            text="\n".join(
+                part for part in [data.get("title", ""), data.get("text", "")] if part
+            ),
         )
         for data in datas
     ]

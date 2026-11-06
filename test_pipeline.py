@@ -212,3 +212,15 @@ assert not validate_citations("Invalid reference [0].", candidates)
 assert not validate_citations("No citation here.", candidates)
 
 print("Citation Validation test passed!")
+from RAG.pipeline.loader import load_jsonl
+
+docs = load_jsonl("scifact_benchmark/mini/corpus.jsonl")
+
+print("Document count:", len(docs))
+print("First document:", docs[0])
+print("Unique IDs:", len(set(doc.doc_id for doc in docs)))
+
+assert len(docs) == 1000
+assert len(set(doc.doc_id for doc in docs)) == 1000
+
+print("JSONL Loader test passed!")
