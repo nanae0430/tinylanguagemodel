@@ -52,7 +52,17 @@ embeddings, chunks = load_index("RAG/index_smoke")
 
 assert embeddings.shape[0] == len(chunks)
 assert len(chunks) == 3
+from RAG.pipeline.storage import load_source_map
 
+source_map = load_source_map("RAG/index_smoke")
+
+assert len(source_map) == 3
+assert all(chunk.doc_id in source_map for chunk in chunks)
+
+for doc_id, source in source_map.items():
+    print(doc_id, "->", source)
+
+print("Source Tracking test passed!")
 print("Index Builder test passed!")
 
 from RAG.pipeline.retriever import dense_search
