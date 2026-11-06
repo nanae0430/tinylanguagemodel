@@ -11,12 +11,7 @@ def validate_citations(
 
     # TODO 1: 没有引用时如何处理？
     if not citations:
-        raise ValueError("invalid citation")
+        return False
     # TODO 2: 判断所有编号是否合法
     # 有效范围：1 ~ len(results)
-    if all([1 <= citation <= len(results) for citation in citations]):
-        return True
-    else:
-        return False
-
-    # TODO 3: 返回 bool
+    return all([1 <= citation <= len(results) for citation in citations])

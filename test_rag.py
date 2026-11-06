@@ -55,3 +55,9 @@ for i, (chunk, score) in enumerate(topk_chunks, start=1):
     print(f"[{i}] {source_map[chunk.doc_id]}")
     print(f"\tChunk ID: {chunk.chunk_id}")
     print(f"\tScore: {score:.4f}")
+
+from RAG.pipeline.citation import validate_citations
+
+is_valid = validate_citations(answer, topk_chunks)
+
+print("Citation valid:", is_valid)
