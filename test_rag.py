@@ -5,7 +5,7 @@ from dotenv import dotenv_values
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer, CrossEncoder
 
-from RAG.pipeline.storage import load_index, load_bm25_index
+from RAG.pipeline.storage import load_index, load_bm25_index, load_source_map
 from RAG.pipeline.query_pipeline import retrieve
 from RAG.pipeline.prompt_builder import build_prompt
 from RAG.pipeline.generator import generate_answer
@@ -17,6 +17,7 @@ api_key = config.get("DEEPSEEK_API_KEY")
 base_url = config.get("DEEPSEEK_BASE_URL")
 model = config.get("DEEPSEEK_MODEL")
 
+source_map = load_source_map("RAG/index_smoke")
 if not api_key:
     raise ValueError("Missing DEEPSEEK_API_KEY in .env")
 
@@ -40,6 +41,7 @@ query = "Who is Miku?"
 topk_chunks = retrieve(
     query, embeddings, chunks, bm25_index, embedding_model, reranker_model
 )
+
 # 6. 调用 build_prompt() 构造 Prompt
 # TODO
 prompt = build_prompt(query, topk_chunks)
@@ -48,4 +50,8 @@ prompt = build_prompt(query, topk_chunks)
 answer = generate_answer(prompt, client, model=model or "deepseek-flash")
 # 8. 打印答案和检索到的 Chunk
 # TODO
-print(f"answer:\n{answer}\n\nchunks:\n{topk_chunks}")
+print(f"answer:\n{answer}\n\n")
+for i, (chunk, score) in enumerate(topk_chunks, start=1):
+    print(f"[{i}] {source_map[chunk.doc_id]}")
+    print(f"\tChunk ID: {chunk.chunk_id}")
+    print(f"\tScore: {score:.4f}")
