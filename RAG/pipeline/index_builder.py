@@ -1,7 +1,7 @@
 from .embedding import encode_chunks
 from .schema import Chunk, Document
 from .chunker import chunk_document
-from .storage import save_index, save_bm25_index
+from .storage import save_index, save_bm25_index, save_source_map
 from .loader import load_documents
 from sentence_transformers import SentenceTransformer
 from RAG.rag import build_bm25_index, tokenize
@@ -16,6 +16,7 @@ def build_index(
 ) -> None:
     documents = load_documents(source_dir)
     source_map = {document.doc_id: document.source for document in documents}
+    save_source_map(source_map, index_dir)
     chunks = []
     for document in documents:
         chunks.extend(chunk_document(document, chunk_size, overlap))
