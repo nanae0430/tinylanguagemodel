@@ -15,6 +15,7 @@ def build_index(
     overlap: int = 100,
 ) -> None:
     documents = load_documents(source_dir)
+    source_map = {document.doc_id: document.source for document in documents}
     chunks = []
     for document in documents:
         chunks.extend(chunk_document(document, chunk_size, overlap))

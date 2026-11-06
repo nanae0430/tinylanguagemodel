@@ -50,3 +50,26 @@ def load_bm25_index(directory: str) -> dict:
             }
 
     return bm25_index
+
+
+def save_source_map(
+    source_map: dict[str, str],
+    directory: str,
+) -> None:
+    # TODO: 保存为 sources.json
+    map_dir = Path(directory)
+    map_dir.mkdir(parents=True, exist_ok=True)
+
+    with open(map_dir / "sources.json", "w", encoding="utf-8") as f:
+        json.dump(source_map, f, ensure_ascii=False, indent=2)
+
+
+def load_source_map(
+    directory: str,
+) -> dict[str, str]:
+    # TODO: 从 sources.json 加载
+    map_dir = Path(directory)
+
+    with open(map_dir / "sources.json", "r", encoding="utf-8") as f:
+        source_map = json.load(f)
+    return source_map
