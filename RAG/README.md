@@ -74,6 +74,7 @@
 | `RAG/evaluation.py` | SciFact Qrels 和 Recall/Hit/MRR 计算 |
 | `RAG/benchimark_scifact.py` | **历史版本**的整篇 Document 检索对照 |
 | `test_pipeline.py` | 各模块功能与 Smoke Test |
+| `test_bm25_multilingual.py` | 中文、英文与中英混合技术文本的 BM25 检索测试 |
 | `test_api.py` / `test_rag.py` | LLM API、三文档端到端生成测试 |
 | `test_scifact_index.py` | 1,000 文档的离线索引构建检查 |
 | `test_scifact_retrieval.py` | Dev 集消融、错误分析、K 对照、延迟 |
@@ -263,7 +264,7 @@ Cross-Encoder 约占平均检索耗时的 80%，是当前主要延迟来源，�
 - 现有 `evaluation.py` 使用文档 ID 与 Qrels 匹配；Chunk 检索结果先按 `doc_id` 首次出现去重，后计算 Document 级指标。
 - SciFact Mini 只含 1,000 篇采样后的标题与摘要，并确保评测查询的正例文档入选，因此**不等同于官方完整 SciFact 结果**。
 - Chunking 依据字符位置切分，可能截断单词/句子，且后续 Chunk 不保证含原标题；Embedding / Cross-Encoder 还有各自的 Token 长度限制。
-- 当前 BM25 使用英文正则 tokenizer，不适合直接评估中文专业技术语料；Cross-Encoder 也主要用于英文检索。
+- BM25 现已支持中英混合分词：英文保持原有正则规则，中文片段通过 `jieba` 分词；中文技术术语可能需要补充用户词典及停用词评估。当前 Cross-Encoder 仍主要用于英文检索，中文重排序效果尚未经系统评测。
 - Dense 检索对全部向量做矩阵乘法，尚未引入 FAISS / ANN / 向量数据库；扩大到百万级数据需重新评估内存和延迟。
 - Source Tracking 可找回原始文件/JSONL 记录；`validate_citations()` 只检查引用编号是否在有效范围内，**不验证引用语义真实性、事实支持性或拒答质量**。
 - API 调用需要网络及密钥；推理延迟统计没有包含 DeepSeek 请求耗时、服务部署和并发压力。
@@ -279,3 +280,30 @@ Cross-Encoder 约占平均检索耗时的 80%，是当前主要延迟来源，�
 - 之后再将稳定的 RAG Pipeline 封装为 FastAPI 服务、Docker 镜像，并延伸到 Agent Harness 的工具调用、状态管理和 Trace。
 
 **现阶段定位：已完成离线检索评测 + 小型端到端生成 Smoke Test 的 RAG 原型，不是可直接部署的生产系统。**
+
+## 8. 中文与英文混合 BM25（新增）
+
+`RAG/rag.py` 的 `tokenize()` 现在对英文仍使用原有正则，对连续中文字符使用 `jieba.lcut(..., HMM=False)`，保留 `LS-DYNA`、`ALE`、`BM25` 等 ASCII 技术关键词。BM25 的 IDF、TF、倒排索引和评分计算保持原样；`index_builder.py` 与 `retriever.py` 都复用同一个 `tokenize()`，避免训练/查询分词规则不一致。
+
+在仓库根目录安装：
+
+~~~bash
+python -m pip install jieba
+python test_bm25_multilingual.py
+~~~
+
+可以单独测试分词：
+
+~~~python
+from RAG.rag import tokenize
+
+print(tokenize("LS-DYNA 中的 ALE 方法如何处理网格变形？"))
+print(tokenize("The LS-DYNA model uses ALE."))
+~~~
+
+**注意事项：**
+
+- 中文文档必须**重新执行 `build_index()` 构建 BM25 索引**；不要仅更换查询分词器就复用旧索引。新的中文索引建议输出到独立目录，避免覆盖 SciFact 基线。
+- 纯英文的分词规则未改变，所以历史 SciFact 英文实验仍有可比性；新增 `jieba` 在检测到中文时才会导入。
+- `jieba` 是通用中文分词器；复杂的材料牌号、求解器关键字和工程术语可能还需 `jieba.add_word()` 或用户词典，但**词典必须在索引构建与查询时保持一致**。
+- 这次仅完成 BM25 的**中英混合分词支持与功能测试**，不意味着完整 RAG 的中文检索和回答质量已经完成验证。后续还需要多语言 Cross-Encoder 与领域数据评测。
