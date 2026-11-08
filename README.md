@@ -9,13 +9,19 @@
 | [BPE/](BPE/) | 字节级 BPE、正则预分词、特殊 token、词表保存/加载 | 已实现 |
 | [MODEL/](MODEL/) | Transformer、RoPE、RMSNorm、SwiGLU、训练与采样、KV cache | 已实现实验 |
 | [SFT/](SFT/) | 监督微调数据处理及 LoRA 相关代码与实验 | 持续迭代 |
-| [RAG/](RAG/README.md) | BM25、Dense、RRF、Cross-Encoder、SciFact 对照评测 | **检索实验已完成** |
+| [RAG/](RAG/README.md) | Chunk 级 Hybrid Retrieval、Cross-Encoder、DeepSeek 生成、引用追踪及 SciFact Dev/Test 评测 | **检索评测完成，端到端问答原型已跑通** |
 
 ### RAG 实验亮点
 
-在自建的 **SciFact Mini Dev（1,000 篇文档、40 条 Query）** 上，对 BM25、Dense、RRF 和 Cross-Encoder 重排序进行对照。BM25 + Dense 候选并集经 Cross-Encoder 重排序后，达到 **Recall@10 = 0.9750、Hit@10 = 0.9750、MRR@10 = 0.8037**。数据是缩小语料后的自定义划分，不与官方 BEIR 全量测试成绩直接比较。
+已实现 **TXT/MD/JSONL 加载 → Chunking → BM25 + Dense → RRF → Cross-Encoder → DeepSeek 生成 → 引用来源追踪** 的 RAG 原型，并完成可复现的 SciFact Mini 检索评测。
 
-完整设计、各模型对照指标、错误案例和复现说明请见 **[RAG/README.md](RAG/README.md)**。
+- **当前 Chunk 级 Pipeline**：1,000 篇文档、4,089 个 Chunk；Dev（40 Queries）Recall@10 = **0.9500**、MRR@10 = **0.8611**；独立 Test（160 Queries）Recall@10 = **0.8956**、MRR@10 = **0.7979**。
+- **延迟实验**：Dev 查询平均检索耗时 **42.54 ms**、P95 **52.07 ms**（K=50，排除 LLM API 延迟）。
+- **历史文档级实验**：候选并集 + Cross-Encoder 的 Dev Recall@10 = **0.9750**、MRR@10 = **0.8037**；与当前 Chunk 级流程的实验口径不同，不直接比较高低。
+
+Mini 使用自定义的 1,000 篇缩减语料与 Dev/Test 划分，**不代表官方完整 BEIR SciFact 排行榜成绩**。当前已跑通三文档问答及引用编号校验，真实技术文档的生成质量评测、API 服务和部署仍待完成。
+
+完整架构、代码入口、复现步骤、四阶段消融实验、误差分析及已知限制详见 **[RAG/README.md](RAG/README.md)**。
 
 ## 模型与分词器实验记录
 
