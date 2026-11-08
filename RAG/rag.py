@@ -7,7 +7,36 @@ torch.manual_seed(39)
 
 
 def tokenize(text: str) -> list[str]:
-    return re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", text.lower())
+    """Tokenize English and Chinese text for BM25.
+
+    Preserve the original English tokenizer's behavior; split Chinese spans
+    with jieba so both indexing and querying use the same word boundaries.
+    ASCII technical terms such as LS-DYNA, ALE, and BM25 remain searchable.
+    """
+    parts = re.findall(
+        r"[a-z0-9]+(?:-[a-z0-9]+)*|[\u3400-\u9fff]+",
+        text.lower(),
+    )
+
+    # English-only queries and SciFact documents need no extra dependency.
+    if not any("\u3400" <= part[0] <= "\u9fff" for part in parts):
+        return parts
+
+    try:
+        import jieba
+    except ImportError as exc:
+        raise ImportError(
+            "Chinese BM25 tokenization requires jieba. "
+            "Install it with: python -m pip install jieba"
+        ) from exc
+
+    tokens = []
+    for part in parts:
+        if "\u3400" <= part[0] <= "\u9fff":
+            tokens.extend(word for word in jieba.lcut(part, HMM=False) if word.strip())
+        else:
+            tokens.append(part)
+    return tokens
 
 
 def build_inverted_index(docs: list[list[str]]) -> dict[str, dict[int, int]]:
