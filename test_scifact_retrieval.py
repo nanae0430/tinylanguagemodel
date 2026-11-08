@@ -4,7 +4,8 @@ from RAG.evaluation import RetrievalDataset, metrics
 from RAG.pipeline.storage import load_index, load_bm25_index
 from RAG.pipeline.query_pipeline import retrieve
 
-import torch, numpy
+import torch
+import numpy as np
 import time
 
 
@@ -217,8 +218,26 @@ for query in data.query_texts:
     rerank_times.append(rerank_time)
 
 print(
-    f"dense_time:{sum(dense_times)/len(dense_times)}"
-    f"sparse_times:{sum(sparse_times)/len(sparse_times)}"
-    f"rrf_times:{sum(rrf_times)/len(rrf_times)}"
-    f"rerank_times:{sum(rerank_times)/len(rerank_times)}"
+    f"dense_time:{sum(dense_times)/len(dense_times)}\n"
+    f"sparse_times:{sum(sparse_times)/len(sparse_times)}\n"
+    f"rrf_times:{sum(rrf_times)/len(rrf_times)}\n"
+    f"rerank_times:{sum(rerank_times)/len(rerank_times)}\n"
 )
+
+
+total_times = [
+    sum(values) for values in zip(dense_times, sparse_times, rrf_times, rerank_times)
+]
+
+for name, times in {
+    "Dense": dense_times,
+    "BM25": sparse_times,
+    "RRF": rrf_times,
+    "Reranker": rerank_times,
+    "Total": total_times,
+}.items():
+    print(
+        f"{name:12s} "
+        f"Mean: {np.mean(times)*1000:.2f} ms  "
+        f"P95: {np.percentile(times, 95)*1000:.2f} ms"
+    )
