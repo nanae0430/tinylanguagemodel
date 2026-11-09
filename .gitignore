@@ -13,4 +13,3 @@ RAG/index_smoke/
 .env
 .env.*
 !.env.example
-RAG/index_qa45/
