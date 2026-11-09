@@ -13,6 +13,9 @@ RAG/index_smoke/
 .env
 .env.*
 !.env.example
+<<<<<<< HEAD
 LLM_RAG_QA_Eval_45/
 LOCAL_USAGE.md
 eval_45
+=======
+>>>>>>> 70b1f00ae3da3d0b8e1f64891955f45bad030d79
