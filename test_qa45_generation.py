@@ -143,5 +143,39 @@ def main():
             f.write(json.dumps(item, ensure_ascii=False) + "\n")
 
 
+def test_refusal():
+    answerable_ids = set()
+
+    with open("RAG/LLM_RAG_QA_Eval_45/qrels.tsv", "r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+
+        for row in reader:
+            if int(row["relevance"]) > 0:
+                answerable_ids.add(row["query_id"])
+    with open("RAG/eval_45/predictions.jsonl", "r", encoding="utf-8") as f:
+        qa = [json.loads(line) for line in f if line.strip()]
+    stats = {
+        "correct_refusal": 0,
+        "false_refusal": 0,
+        "missed_refusal": 0,
+        "answered": 0,
+    }
+
+    for item in qa:
+        gold_abstained = item["id"] not in answerable_ids
+        abstained = item["abstained"]
+
+        if abstained and gold_abstained:
+            stats["correct_refusal"] += 1
+        elif abstained and not gold_abstained:
+            stats["false_refusal"] += 1
+        elif not abstained and gold_abstained:
+            stats["missed_refusal"] += 1
+        else:
+            stats["answered"] += 1
+
+    print(stats)
+
+
 if __name__ == "__main__":
-    main()
+    test_refusal()
